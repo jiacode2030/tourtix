@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LegalPage } from "@/components/LegalPage";
 import { contactEmail } from "@/lib/site";
+import { activeSources } from "@/lib/sources";
 
 export const metadata: Metadata = { title: "Privacy Policy · TourTix" };
 
@@ -36,7 +37,7 @@ export default function PrivacyPage() {
       </ul>
       <p>
         When you search, your search term is sent to our ticket data providers (currently
-        Ticketmaster and SeatGeek) to look up artists and shows. Artist photos and seat maps load
+        {activeSources().join(" and ") || "Ticketmaster"}) to look up artists and shows. Artist photos and seat maps load
         directly from Ticketmaster&apos;s servers, which can see your IP address when they do. Our hosting provider, Vercel, keeps
         standard server logs such as IP address, browser type, and pages requested, for security and
         reliability.
