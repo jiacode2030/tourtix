@@ -25,6 +25,7 @@ export type Show = {
   name: string;
   date: string | null;
   time: string | null;
+  timezone: string | null;
   venue: string | null;
   city: string | null;
   region: string | null;

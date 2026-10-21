@@ -50,6 +50,7 @@ function toShow(e: any): Show {
     name: e.name,
     date: e.dates?.start?.localDate ?? null,
     time: e.dates?.start?.localTime ?? null,
+    timezone: e.dates?.timezone ?? venue?.timezone ?? null,
     venue: venue?.name ?? null,
     city: venue?.city?.name ?? null,
     region: venue?.state?.stateCode ?? null,

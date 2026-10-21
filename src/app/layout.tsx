@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 import Link from "next/link";
 import { SampleBanner } from "@/components/SampleBanner";
 import { SourcesBar } from "@/components/SourcesBar";
+import { Footer } from "@/components/Footer";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -33,6 +34,7 @@ export default function RootLayout({
           </nav>
         </header>
         <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
+        <Footer />
       </body>
     </html>
   );

@@ -11,12 +11,16 @@ function fmtDate(d: string | null) {
   });
 }
 
-function fmtDateTime(iso: string) {
+// Sale times are shown in the venue's time zone with its abbreviation,
+// since the server's own time zone means nothing to visitors.
+function fmtDateTime(iso: string, timeZone: string | null) {
   return new Date(iso).toLocaleString("en-US", {
     month: "short",
     day: "numeric",
     hour: "numeric",
     minute: "2-digit",
+    timeZone: timeZone ?? "UTC",
+    timeZoneName: "short",
   });
 }
 
@@ -26,12 +30,12 @@ function saleNote(show: Show): string | null {
     const next = show.presales
       .filter((p) => p.start && new Date(p.start) > now)
       .sort((a, b) => a.start!.localeCompare(b.start!))[0];
-    if (next?.start) return `${next.name} starts ${fmtDateTime(next.start)}`;
-    if (show.publicSaleStart) return `On sale ${fmtDateTime(show.publicSaleStart)}`;
+    if (next?.start) return `${next.name} starts ${fmtDateTime(next.start, show.timezone)}`;
+    if (show.publicSaleStart) return `On sale ${fmtDateTime(show.publicSaleStart, show.timezone)}`;
     return "On-sale date TBA";
   }
   if (show.status === "presale" && show.publicSaleStart) {
-    return `General sale ${fmtDateTime(show.publicSaleStart)}`;
+    return `General sale ${fmtDateTime(show.publicSaleStart, show.timezone)}`;
   }
   return null;
 }
@@ -39,10 +43,6 @@ function saleNote(show: Show): string | null {
 export function ShowRow({ show }: { show: Show }) {
   const place = [show.city, show.region ?? show.country].filter(Boolean).join(", ");
   const note = saleNote(show);
-  const price =
-    show.priceMin != null
-      ? `From $${Math.round(show.priceMin)}${show.currency && show.currency !== "USD" ? ` ${show.currency}` : ""}`
-      : null;
 
   return (
     <li className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-4 sm:flex-row sm:items-center dark:border-zinc-800 dark:bg-zinc-900">
@@ -52,10 +52,7 @@ export function ShowRow({ show }: { show: Show }) {
         <div className="truncate text-sm text-zinc-500">{show.venue}</div>
         {note && <div className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{note}</div>}
       </div>
-      <div className="flex items-center gap-3 sm:flex-col sm:items-end">
-        <StatusBadge status={show.status} />
-        {price && <span className="text-sm text-zinc-600 dark:text-zinc-400">{price}</span>}
-      </div>
+      <StatusBadge status={show.status} />
       {show.url && (show.status === "onsale" || show.status === "presale") && (
         <a
           href={show.url}
@@ -63,7 +60,7 @@ export function ShowRow({ show }: { show: Show }) {
           rel="noopener noreferrer"
           className="rounded-lg bg-violet-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-violet-700"
         >
-          Tickets
+          Buy on Ticketmaster
         </a>
       )}
     </li>
