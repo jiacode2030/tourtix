@@ -12,6 +12,7 @@ import {
 import { getShows } from "./data";
 import { fmtDate, fmtDateTime } from "./format";
 import { sendToUser } from "./push";
+import { upcomingSaleStarts } from "./sales";
 import { showKey } from "./show-key";
 import type { Show } from "./types";
 
@@ -50,18 +51,6 @@ async function firstTime(userId: string, alertKey: string) {
 
 function place(s: Show) {
   return [s.city, s.region ?? s.country].filter(Boolean).join(", ") || "a new city";
-}
-
-function upcomingSaleStarts(s: Show, now: number) {
-  const starts = [
-    ...s.presales.map((p) => ({ label: p.name, start: p.start })),
-    { label: "General sale", start: s.publicSaleStart },
-  ];
-  return starts.filter((x): x is { label: string; start: string } => {
-    if (!x.start) return false;
-    const t = new Date(x.start).getTime();
-    return t > now && t - now <= SALE_REMINDER_WINDOW_MS;
-  });
 }
 
 export async function runAlertCheck() {
@@ -147,7 +136,7 @@ export async function runAlertCheck() {
 
       if (prefs.sales) {
         for (const s of shows.filter(relevant)) {
-          for (const sale of upcomingSaleStarts(s, now)) {
+          for (const sale of upcomingSaleStarts(s, SALE_REMINDER_WINDOW_MS, now)) {
             const key = `sale|${artistId}|${showKey(s)}|${sale.label}|${sale.start}`;
             if (!(await firstTime(userId, key))) continue;
             sent += await sendToUser(userId, {

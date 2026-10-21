@@ -10,7 +10,7 @@ async function sg(path: string, params: Record<string, string>) {
   if (!id) throw new Error("SEATGEEK_CLIENT_ID is not set");
   const qs = new URLSearchParams({ ...params, client_id: id });
   const res = await fetch(`${BASE}${path}?${qs}`, {
-    next: { revalidate: 900 },
+    next: { revalidate: 300 },
   });
   if (!res.ok) throw new Error(`SeatGeek ${res.status}: ${path}`);
   return res.json();

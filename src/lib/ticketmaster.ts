@@ -10,7 +10,7 @@ async function tm(path: string, params: Record<string, string>) {
   if (!key) throw new Error("TICKETMASTER_API_KEY is not set");
   const qs = new URLSearchParams({ ...params, apikey: key });
   const res = await fetch(`${BASE}${path}?${qs}`, {
-    next: { revalidate: 900 },
+    next: { revalidate: 300 },
   });
   if (!res.ok) throw new Error(`Ticketmaster ${res.status}: ${path}`);
   return res.json();
@@ -97,4 +97,45 @@ export async function tmGetShows(artistId: string): Promise<Show[]> {
     size: "100",
   });
   return (data._embedded?.events ?? []).map(toShow);
+}
+
+// Ticketmaster wants UTC timestamps without milliseconds.
+const tmTime = (ms: number) => new Date(ms).toISOString().slice(0, 19) + "Z";
+
+type EventWithArtist = { artist: Artist; show: Show };
+
+function withArtists(data: any): EventWithArtist[] {
+  return (data._embedded?.events ?? []).flatMap((e: any) => {
+    const a = e._embedded?.attractions?.[0];
+    return a ? [{ artist: toArtist(a), show: toShow(e) }] : [];
+  });
+}
+
+// Most relevant upcoming US music events, reduced to unique artists.
+export async function tmPopularArtists(limit: number): Promise<Artist[]> {
+  const data = await tm("/events.json", {
+    classificationName: "music",
+    countryCode: "US",
+    sort: "relevance,desc",
+    size: "100",
+  });
+  const seen = new Map<string, Artist>();
+  for (const { artist } of withArtists(data)) {
+    if (!seen.has(artist.id)) seen.set(artist.id, artist);
+  }
+  return [...seen.values()].slice(0, limit);
+}
+
+// US music events whose public sale starts within the window.
+export async function tmEventsGoingOnSale(windowMs: number): Promise<EventWithArtist[]> {
+  const now = Date.now();
+  const data = await tm("/events.json", {
+    classificationName: "music",
+    countryCode: "US",
+    onsaleStartDateTime: tmTime(now),
+    onsaleEndDateTime: tmTime(now + windowMs),
+    sort: "relevance,desc",
+    size: "100",
+  });
+  return withArtists(data);
 }

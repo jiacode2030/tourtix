@@ -56,7 +56,7 @@ export default async function ArtistPage({
         {shows.length > 0 && (
           <p className="text-sm text-zinc-500">
             Prices are the lowest listed on each site, including mandatory fees but not taxes,
-            and refresh about every 15 minutes. Always check the final total before you buy.
+            and refresh about every 5 minutes. Always check the final total before you buy.
           </p>
         )}
         {shows.length ? (

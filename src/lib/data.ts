@@ -1,6 +1,13 @@
 import { sampleArtists, sampleShows } from "./sample-data";
 import { mergeShows, sgGetShows } from "./seatgeek";
-import { tmGetArtist, tmGetShows, tmSearchArtists } from "./ticketmaster";
+import { groupDrops, type TicketDrop } from "./sales";
+import {
+  tmEventsGoingOnSale,
+  tmGetArtist,
+  tmGetShows,
+  tmPopularArtists,
+  tmSearchArtists,
+} from "./ticketmaster";
 import type { Artist, Show } from "./types";
 
 export const usingSampleData = !process.env.TICKETMASTER_API_KEY;
@@ -24,6 +31,33 @@ export async function getShows(artist: Artist): Promise<Show[]> {
   return mergeShows(tm, sg);
 }
 
-export function featuredArtists(): Artist[] {
-  return usingSampleData ? sampleArtists : [];
+// Homepage sections are extras: if Ticketmaster fails they're just hidden.
+export async function popularArtists(limit = 8): Promise<Artist[]> {
+  if (usingSampleData) return sampleArtists.slice(0, limit);
+  try {
+    return await tmPopularArtists(limit);
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+}
+
+export async function upcomingDrops(windowMs: number, limit = 8): Promise<TicketDrop[]> {
+  try {
+    const items = usingSampleData
+      ? sampleArtists.flatMap((a) => sampleShows(a.id).map((show) => ({ artist: a, show })))
+      : await tmEventsGoingOnSale(windowMs);
+    return groupDrops(
+      items.map(({ artist, show }) => ({
+        artistId: artist.id,
+        artistName: artist.name,
+        imageUrl: artist.imageUrl,
+        show,
+      })),
+      windowMs,
+    ).slice(0, limit);
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
 }
