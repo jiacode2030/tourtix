@@ -8,24 +8,25 @@ type Site = {
   // The site's own search page, when its URL format is known. Otherwise we
   // link to a Google search limited to the site's domain.
   search?: (q: string) => string;
-  domain: string;
+  // One or more domains for the Google fallback (e.g. a site's US and UK sites).
+  domains: string[];
 };
 
 // Resale marketplaces: tickets from other fans and brokers.
 const RESALE: Site[] = [
-  { name: "StubHub", domain: "stubhub.com", search: (q) => `https://www.stubhub.com/search?q=${q}` },
-  { name: "Vivid Seats", domain: "vividseats.com", search: (q) => `https://www.vividseats.com/search?searchTerm=${q}` },
-  { name: "SeatGeek", domain: "seatgeek.com", search: (q) => `https://seatgeek.com/search?search=${q}` },
-  { name: "Gametime", domain: "gametime.co", search: (q) => `https://gametime.co/search?q=${q}` },
+  { name: "StubHub", domains: ["stubhub.com"], search: (q) => `https://www.stubhub.com/search?q=${q}` },
+  { name: "Vivid Seats", domains: ["vividseats.com"], search: (q) => `https://www.vividseats.com/search?searchTerm=${q}` },
+  { name: "SeatGeek", domains: ["seatgeek.com"], search: (q) => `https://seatgeek.com/search?search=${q}` },
+  { name: "Gametime", domains: ["gametime.co"], search: (q) => `https://gametime.co/search?q=${q}` },
 ];
 
 // Official sellers some venues use instead of Ticketmaster.
 const PRIMARY: Site[] = [
-  { name: "AXS", domain: "axs.com" },
-  { name: "DICE", domain: "dice.fm" },
-  { name: "See Tickets", domain: "seetickets.com" },
-  { name: "Etix", domain: "etix.com" },
-  { name: "Eventbrite", domain: "eventbrite.com" },
+  { name: "AXS", domains: ["axs.com"] },
+  { name: "DICE", domains: ["dice.fm"] },
+  { name: "See Tickets", domains: ["seetickets.us", "seetickets.com"] },
+  { name: "Etix", domains: ["etix.com"] },
+  { name: "Eventbrite", domains: ["eventbrite.com"] },
 ];
 
 export type SearchLink = { name: string; url: string; viaGoogle: boolean };
@@ -39,7 +40,9 @@ function links(sites: Site[], query: string, connected: string[]): SearchLink[] 
         ? { name: s.name, url: s.search(q), viaGoogle: false }
         : {
             name: s.name,
-            url: `https://www.google.com/search?q=${encodeURIComponent(`${query} site:${s.domain}`)}`,
+            url: `https://www.google.com/search?q=${encodeURIComponent(
+              `${query} ${s.domains.map((d) => `site:${d}`).join(" OR ")}`,
+            )}`,
             viaGoogle: true,
           },
     );

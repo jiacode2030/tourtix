@@ -14,6 +14,11 @@ describe("otherSiteSearches", () => {
     expect(axs.url).toBe("https://www.google.com/search?q=Calvin%20Harris%20Las%20Vegas%20site%3Aaxs.com");
   });
 
+  it("searches every domain a site uses", () => {
+    const see = otherSiteSearches("Calvin Harris", null, []).official.find((l) => l.name === "See Tickets")!;
+    expect(decodeURIComponent(see.url)).toContain("Calvin Harris site:seetickets.us OR site:seetickets.com");
+  });
+
   it("never includes affiliate or tracking parameters", () => {
     const { resale, official } = otherSiteSearches("A & B", null, []);
     for (const l of [...resale, ...official]) {
