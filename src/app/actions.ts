@@ -10,6 +10,7 @@ import { getArtist } from "@/lib/data";
 import { DEFAULT_RADIUS, RADIUS_OPTIONS } from "@/lib/geo";
 import { sendToUser } from "@/lib/push";
 import { isUsState } from "@/lib/regions";
+import { isZip, lookupZip } from "@/lib/zip";
 
 async function requireUser() {
   const userId = await currentUserId();
@@ -36,33 +37,51 @@ export async function toggleFavorite(artistId: string, currentlyFavorite: boolea
   revalidatePath("/my-artists");
 }
 
+// Saves the user's location from a ZIP code, the browser's location, or
+// clears it. The distance setting is saved every time.
 export async function saveLocation(formData: FormData) {
   const userId = await requireUser();
-  const city = String(formData.get("city") ?? "").trim().slice(0, 100) || null;
-  const rawRegion = String(formData.get("region") ?? "");
-  const region = isUsState(rawRegion) ? rawRegion : null;
-  const coord = (key: string, limit: number) => {
-    const raw = String(formData.get(key) ?? "");
-    const n = Number(raw);
-    // Round to 2 decimals (~1 km) so we never store an exact location.
-    return raw && Number.isFinite(n) && Math.abs(n) <= limit ? Math.round(n * 100) / 100 : null;
-  };
-  let lat = coord("lat", 90);
-  let lng = coord("lng", 180);
-  if (lat == null || lng == null) lat = lng = null;
+  const mode = String(formData.get("mode") ?? "zip");
   const radius = Number(formData.get("radius"));
   const radiusMiles = RADIUS_OPTIONS.includes(radius) ? radius : DEFAULT_RADIUS;
-  const values = { city, region, lat, lng, radiusMiles };
+  // Round to 2 decimals (~1 km) so we never store an exact location.
+  const round = (n: number) => Math.round(n * 100) / 100;
+
+  type Location = { zip: string | null; city: string | null; region: string | null; lat: number | null; lng: number | null };
+  let location: Location | null = null; // null = keep the current location
+  if (mode === "clear") {
+    location = { zip: null, city: null, region: null, lat: null, lng: null };
+  } else if (mode === "here") {
+    const lat = Number(formData.get("lat"));
+    const lng = Number(formData.get("lng"));
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+      redirect("/settings?error=here#location");
+    }
+    location = { zip: null, city: null, region: null, lat: round(lat), lng: round(lng) };
+  } else {
+    const zip = String(formData.get("zip") ?? "").trim();
+    if (zip) {
+      if (!isZip(zip)) redirect("/settings?error=zip#location");
+      let place: Awaited<ReturnType<typeof lookupZip>>;
+      try {
+        place = await lookupZip(zip);
+      } catch (err) {
+        console.error(err);
+        redirect("/settings?error=zipservice#location");
+      }
+      if (!place) redirect("/settings?error=zip#location");
+      location = { zip, city: place.city, region: isUsState(place.region) ? place.region : null, lat: round(place.lat), lng: round(place.lng) };
+    }
+  }
+
+  const values = { radiusMiles, ...(location ?? {}) };
   await db()
     .insert(profiles)
     .values({ userId, ...values })
-    .onConflictDoUpdate({
-      target: profiles.userId,
-      set: { ...values, updatedAt: new Date() },
-    });
+    .onConflictDoUpdate({ target: profiles.userId, set: { ...values, updatedAt: new Date() } });
   revalidatePath("/settings");
   revalidatePath("/my-artists");
-  redirect("/settings?saved=1");
+  redirect("/settings?saved=1#location");
 }
 
 // Deletes everything we store about the user and signs them out. Accounts

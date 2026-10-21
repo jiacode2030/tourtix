@@ -27,6 +27,11 @@ export function GetStarted({
 
   return (
     <section className="space-y-3 rounded-xl border border-violet-200 bg-violet-50 p-4 dark:border-violet-900 dark:bg-violet-950/40">
+      <p className="rounded-lg bg-white p-3 text-sm dark:bg-zinc-900">
+        <strong>How TourTix works:</strong> we gather tour dates and on-sale times from ticket sites
+        and send you alerts. <strong>We don&apos;t sell tickets</strong>: when you&apos;re ready to
+        buy, we link you to the seller (like Ticketmaster), and you buy and pay on their site.
+      </p>
       <div className="flex items-baseline justify-between gap-2">
         <h2 className="font-semibold">Get started</h2>
         <span className="text-sm text-zinc-500">

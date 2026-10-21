@@ -25,9 +25,11 @@ export default function PrivacyPage() {
           <strong>Artists you follow</strong>, so we can show you their upcoming shows.
         </li>
         <li>
-          <strong>Your location</strong>: the city and state you enter in Settings, and, only if
-          you click &ldquo;Use my current location&rdquo;, your coordinates rounded to about 1 km,
-          plus the distance you choose. Used to find shows near you. You can remove it any time.
+          <strong>Your location</strong>: either the ZIP code you enter (with its city, state, and
+          approximate map position), or, only if you click &ldquo;Use my current location&rdquo;,
+          your coordinates rounded to about 1 km, plus the distance you choose. Used to find shows
+          near you. You can remove it any time. To look up a ZIP code we send only the ZIP itself
+          to Zippopotam.us, a free public ZIP code service.
         </li>
         <li>
           <strong>Notification settings</strong>, if you turn on notifications: which alerts you

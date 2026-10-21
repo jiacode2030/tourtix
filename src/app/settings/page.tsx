@@ -1,26 +1,23 @@
 import { currentUserId } from "@/auth";
 import type { Metadata } from "next";
-import { saveAlertPrefs, saveLocation } from "@/app/actions";
+import { saveAlertPrefs } from "@/app/actions";
 import { DeleteAccountButton } from "@/components/DeleteAccountButton";
 import { InstallButton } from "@/components/InstallButton";
-import { LocationFields } from "@/components/LocationFields";
+import { LocationForm } from "@/components/LocationForm";
 import { NotificationsToggle } from "@/components/NotificationsToggle";
 import { SignInPrompt } from "@/components/SignInPrompt";
-import { DEFAULT_RADIUS, RADIUS_OPTIONS } from "@/lib/geo";
+import { DEFAULT_RADIUS } from "@/lib/geo";
 import { currentAdminId } from "@/lib/admin";
 import { getVapidKeys } from "@/lib/push";
-import { usStates } from "@/lib/regions";
 import { getProfile } from "@/lib/user-data";
 
 export const metadata: Metadata = { title: "Settings" };
 
-const field =
-  "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900";
 
 export default async function SettingsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string }>;
+  searchParams: Promise<{ saved?: string; error?: string }>;
 }) {
   const userId = await currentUserId();
   if (!userId) {
@@ -31,12 +28,20 @@ export default async function SettingsPage({
       </div>
     );
   }
-  const saved = (await searchParams).saved;
+  const { saved, error } = await searchParams;
   const [profile, { publicKey }, adminId] = await Promise.all([
     getProfile(userId),
     getVapidKeys(),
     currentAdminId(),
   ]);
+  const radius = profile?.radiusMiles ?? DEFAULT_RADIUS;
+  const locationSummary = profile?.zip
+    ? `${profile.city ? `${profile.city}, ${profile.region ?? ""} ` : ""}${profile.zip} · within ${radius} miles`
+    : profile?.lat != null
+      ? `Your current location · within ${radius} miles`
+      : profile?.region
+        ? `${profile.city ? `${profile.city}, ` : ""}${profile.region}`
+        : null;
 
   return (
     <div className="mx-auto max-w-xl space-y-10">
@@ -50,55 +55,22 @@ export default async function SettingsPage({
         </a>
       )}
 
-      <section className="space-y-4">
+      <section id="location" className="scroll-mt-6 space-y-4">
         <div>
           <h2 className="text-lg font-semibold">Your location</h2>
           <p className="text-sm text-zinc-500">
-            Used to find shows near you. We store only what you save here, and precise locations
-            are rounded to about 1 km.
+            Used to find shows near you. Enter your ZIP code or share your current location (rounded
+            to about 1 km).
           </p>
         </div>
-        <form action={saveLocation} className="space-y-4">
-          <label className="block space-y-1">
-            <span className="text-sm font-medium">City</span>
-            <input name="city" defaultValue={profile?.city ?? ""} placeholder="e.g. Los Angeles" className={field} />
-          </label>
-          <label className="block space-y-1">
-            <span className="text-sm font-medium">State</span>
-            <select name="region" defaultValue={profile?.region ?? ""} className={field}>
-              <option value="">Choose a state</option>
-              {usStates.map(([code, name]) => (
-                <option key={code} value={code}>
-                  {name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <LocationFields lat={profile?.lat ?? null} lng={profile?.lng ?? null} />
-          <label className="block space-y-1">
-            <span className="text-sm font-medium">&ldquo;Near me&rdquo; means within</span>
-            <select name="radius" defaultValue={profile?.radiusMiles ?? DEFAULT_RADIUS} className={field}>
-              {RADIUS_OPTIONS.map((r) => (
-                <option key={r} value={r}>
-                  {r} miles
-                </option>
-              ))}
-            </select>
-            <span className="block text-xs text-zinc-500">
-              Distance is used when you share your location; otherwise &ldquo;near&rdquo; means
-              your state.
-            </span>
-          </label>
-          <div className="flex items-center gap-3">
-            <button
-              type="submit"
-              className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700"
-            >
-              Save
-            </button>
-            {saved === "1" && <span className="text-sm text-emerald-600">Saved!</span>}
-          </div>
-        </form>
+        <LocationForm
+          summary={locationSummary}
+          zip={profile?.zip ?? null}
+          radiusMiles={profile?.radiusMiles ?? DEFAULT_RADIUS}
+          hasLocation={locationSummary != null}
+          saved={saved === "1"}
+          error={error ?? null}
+        />
       </section>
 
       <section id="notifications" className="scroll-mt-6 space-y-4 border-t border-zinc-200 pt-8 dark:border-zinc-800">

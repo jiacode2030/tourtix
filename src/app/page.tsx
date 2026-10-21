@@ -57,7 +57,11 @@ export default async function Home({
     <section className="space-y-4 text-center">
       <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Never miss a ticket drop</h1>
       <p className="text-zinc-600 dark:text-zinc-400">
-        Follow artists, track their tours, and find the cheapest tickets when they go on sale.
+        Follow artists, track their tours, and get alerts when tickets go on sale.
+      </p>
+      <p className="text-sm text-zinc-500">
+        TourTix doesn&apos;t sell tickets. We gather shows from ticket sites and link you to them, so
+        you buy directly from the seller.
       </p>
       <div className="mx-auto max-w-xl">
         <SearchBar defaultValue={q} />

@@ -29,6 +29,7 @@ await sql`
 await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS alert_new_shows boolean NOT NULL DEFAULT true`;
 await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS alert_sales boolean NOT NULL DEFAULT true`;
 await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS alert_near_only boolean NOT NULL DEFAULT false`;
+await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS zip text`;
 await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS lat double precision`;
 await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS lng double precision`;
 await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS radius_miles integer NOT NULL DEFAULT 100`;

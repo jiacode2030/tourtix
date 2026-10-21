@@ -35,7 +35,7 @@ function SellerOptions({ links }: { links: SellerLink[] }) {
   if (priced === 0) {
     return (
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm text-zinc-500">Check prices on:</span>
+        <span className="text-sm text-zinc-500">Buy on:</span>
         {sorted.map((l) => (
           <a key={l.seller} href={l.url} target="_blank" rel="noopener noreferrer" className={sellerButton}>
             {l.seller}
@@ -91,7 +91,7 @@ function SiteLinks({ label, links }: { label: string; links: SearchLink[] }) {
             href={l.url}
             target="_blank"
             rel="nofollow noopener noreferrer"
-            title={l.viaGoogle ? `Google search of ${l.name}` : `Search ${l.name}`}
+            title={`Search ${l.name}`}
             className="font-medium text-violet-600 hover:underline"
           >
             {l.name}
@@ -113,8 +113,8 @@ function OtherSites({ artistName, show }: { artistName: string; show: Show }) {
         <SiteLinks label="Resale" links={resale} />
         <SiteLinks label="Other official sellers" links={official} />
         <p className="text-xs text-zinc-500">
-          Not checked by TourTix. These sites may not have this show. Some links open a Google
-          search of that site.
+          Opens each site&apos;s own search. Not checked by TourTix, so these sites may not have
+          this show.
         </p>
       </div>
     </details>
@@ -264,7 +264,14 @@ export function ShowRow({
         </div>
       </div>
 
-      {canBuy && show.links.length > 0 && <SellerOptions links={show.links} />}
+      {canBuy && show.links.length > 0 && (
+        <div className="space-y-1">
+          <SellerOptions links={show.links} />
+          <p className="text-xs text-zinc-500">
+            You&apos;ll buy on the seller&apos;s website. TourTix doesn&apos;t sell tickets or handle payments.
+          </p>
+        </div>
+      )}
 
       {canBuy && <OtherSites artistName={artistName} show={show} />}
 

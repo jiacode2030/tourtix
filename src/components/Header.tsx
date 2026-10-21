@@ -57,7 +57,7 @@ export async function Header() {
               </form>
             </>
           ) : (
-            <SignInPrompt label="Sign in" />
+            <SignInPrompt label="Sign in" redirectTo="/my-artists" />
           )}
         </div>
 
@@ -91,7 +91,7 @@ export async function Header() {
               </>
             ) : (
               <div className="border-t border-zinc-200 p-3 dark:border-zinc-700">
-                <SignInPrompt label="Sign in with Google" />
+                <SignInPrompt label="Sign in with Google" redirectTo="/my-artists" />
               </div>
             )}
           </div>

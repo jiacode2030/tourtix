@@ -25,6 +25,10 @@ export default async function MyArtistsPage({
         <h1 className="text-2xl font-bold">Follow your favorite artists</h1>
         <p className="text-zinc-500">Sign in to see all your artists&apos; upcoming shows in one place.</p>
         <SignInPrompt label="Sign in with Google" redirectTo="/my-artists" />
+        <p className="mx-auto max-w-md text-sm text-zinc-500">
+          TourTix is free and doesn&apos;t sell tickets. We collect shows from ticket sites and link
+          you to the seller to buy.
+        </p>
       </div>
     );
   }

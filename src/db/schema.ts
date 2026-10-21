@@ -14,6 +14,7 @@ export const profiles = pgTable("profiles", {
   userId: text("user_id").primaryKey(),
   city: text("city"),
   region: text("region"),
+  zip: text("zip"),
   // Rounded to ~1 km (2 decimals) before saving, for privacy.
   lat: doublePrecision("lat"),
   lng: doublePrecision("lng"),
