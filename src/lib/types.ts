@@ -12,6 +12,11 @@ export type Presale = {
   end: string | null;
 };
 
+export type SellerLink = {
+  seller: string;
+  url: string;
+};
+
 export type TicketStatus =
   | "announced"
   | "presale"
@@ -30,7 +35,7 @@ export type Show = {
   city: string | null;
   region: string | null;
   country: string | null;
-  url: string | null;
+  links: SellerLink[];
   status: TicketStatus;
   publicSaleStart: string | null;
   presales: Presale[];

@@ -1,4 +1,5 @@
 import { sampleArtists, sampleShows } from "./sample-data";
+import { mergeShows, sgGetShows } from "./seatgeek";
 import { tmGetArtist, tmGetShows, tmSearchArtists } from "./ticketmaster";
 import type { Artist, Show } from "./types";
 
@@ -17,9 +18,10 @@ export async function getArtist(id: string): Promise<Artist | null> {
   return tmGetArtist(id);
 }
 
-export async function getShows(artistId: string): Promise<Show[]> {
-  if (usingSampleData) return sampleShows(artistId);
-  return tmGetShows(artistId);
+export async function getShows(artist: Artist): Promise<Show[]> {
+  if (usingSampleData) return sampleShows(artist.id);
+  const [tm, sg] = await Promise.all([tmGetShows(artist.id), sgGetShows(artist.name)]);
+  return mergeShows(tm, sg);
 }
 
 export function featuredArtists(): Artist[] {

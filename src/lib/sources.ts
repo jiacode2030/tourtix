@@ -2,6 +2,7 @@
 // whenever a new seller is connected so the site-wide notice stays accurate.
 export const ticketSources: { name: string; enabled: boolean }[] = [
   { name: "Ticketmaster", enabled: !!process.env.TICKETMASTER_API_KEY },
+  { name: "SeatGeek", enabled: !!process.env.SEATGEEK_CLIENT_ID },
 ];
 
 export function activeSources(): string[] {

@@ -25,7 +25,7 @@ function show(r: Raw): Show {
 const base = {
   time: "21:00:00",
   timezone: "America/New_York",
-  url: null,
+  links: [],
   currency: "USD",
 };
 

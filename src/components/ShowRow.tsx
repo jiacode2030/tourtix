@@ -53,15 +53,20 @@ export function ShowRow({ show }: { show: Show }) {
         {note && <div className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{note}</div>}
       </div>
       <StatusBadge status={show.status} />
-      {show.url && (show.status === "onsale" || show.status === "presale") && (
-        <a
-          href={show.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="rounded-lg bg-violet-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-violet-700"
-        >
-          Buy on Ticketmaster
-        </a>
+      {show.links.length > 0 && (show.status === "onsale" || show.status === "presale") && (
+        <div className="flex flex-wrap gap-2 sm:flex-col">
+          {show.links.map((l) => (
+            <a
+              key={l.seller}
+              href={l.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg bg-violet-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-violet-700"
+            >
+              {l.seller}
+            </a>
+          ))}
+        </div>
       )}
     </li>
   );

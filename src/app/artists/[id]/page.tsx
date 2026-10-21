@@ -11,7 +11,7 @@ export default async function ArtistPage({
   const { id } = await params;
   const artist = await getArtist(id);
   if (!artist) notFound();
-  const shows = await getShows(id);
+  const shows = await getShows(artist);
 
   return (
     <div className="space-y-6">

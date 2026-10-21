@@ -55,7 +55,7 @@ function toShow(e: any): Show {
     city: venue?.city?.name ?? null,
     region: venue?.state?.stateCode ?? null,
     country: venue?.country?.countryCode ?? null,
-    url: e.url ?? null,
+    links: e.url ? [{ seller: "Ticketmaster", url: e.url }] : [],
     status: computeStatus(e.dates?.status?.code, publicSaleStart, presales),
     publicSaleStart,
     presales,
