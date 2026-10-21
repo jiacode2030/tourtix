@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 import {
   removePushSubscription,
@@ -22,6 +23,17 @@ function isIosBrowserTab() {
     window.matchMedia("(display-mode: standalone)").matches ||
     (navigator as Navigator & { standalone?: boolean }).standalone === true;
   return ios && !standalone;
+}
+
+// Jump straight to the most likely section of the help page.
+function helpAnchor() {
+  if (typeof navigator === "undefined") return "";
+  const ua = navigator.userAgent;
+  if (/iPhone|iPad|iPod/.test(ua)) return "#iphone";
+  if (/Android/.test(ua)) return "#android";
+  if (/Macintosh/.test(ua)) return "#mac";
+  if (/Windows/.test(ua)) return "#windows";
+  return "";
 }
 
 const button =
@@ -80,7 +92,7 @@ export function NotificationsToggle({ publicKey }: { publicKey: string }) {
   const test = () =>
     startTransition(async () => {
       const delivered = await sendTestNotification();
-      setMessage(delivered ? "Test sent! It should pop up in a few seconds." : "Couldn't send. Try turning notifications off and on again.");
+      setMessage(delivered ? "Test sent! It should pop up in a few seconds. If it doesn't, see the help link below." : "Couldn't send. Try turning notifications off and on again.");
     });
 
   return (
@@ -136,6 +148,14 @@ export function NotificationsToggle({ publicKey }: { publicKey: string }) {
       )}
 
       {message && <p className="text-sm text-zinc-600 dark:text-zinc-400">{message}</p>}
+
+      {(state === "on" || state === "denied") && (
+        <p className="text-sm">
+          <Link href={`/help/notifications${helpAnchor()}`} className="text-violet-600 hover:underline">
+            Not seeing notifications? Here&apos;s how to fix it →
+          </Link>
+        </p>
+      )}
     </div>
   );
 }
