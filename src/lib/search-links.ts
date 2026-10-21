@@ -17,7 +17,6 @@ const RESALE: Site[] = [
   { name: "Vivid Seats", domain: "vividseats.com", search: (q) => `https://www.vividseats.com/search?searchTerm=${q}` },
   { name: "SeatGeek", domain: "seatgeek.com", search: (q) => `https://seatgeek.com/search?search=${q}` },
   { name: "Gametime", domain: "gametime.co", search: (q) => `https://gametime.co/search?q=${q}` },
-  { name: "TickPick", domain: "tickpick.com" },
 ];
 
 // Official sellers some venues use instead of Ticketmaster.

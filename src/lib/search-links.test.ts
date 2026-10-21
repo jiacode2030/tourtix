@@ -4,7 +4,7 @@ import { otherSiteSearches } from "./search-links";
 describe("otherSiteSearches", () => {
   it("builds encoded site searches and skips sellers already linked", () => {
     const { resale } = otherSiteSearches("Calvin Harris", "Las Vegas", ["SeatGeek"]);
-    expect(resale.map((l) => l.name)).toEqual(["StubHub", "Vivid Seats", "Gametime", "TickPick"]);
+    expect(resale.map((l) => l.name)).toEqual(["StubHub", "Vivid Seats", "Gametime"]);
     expect(resale[0].url).toBe("https://www.stubhub.com/search?q=Calvin%20Harris%20Las%20Vegas");
   });
 
