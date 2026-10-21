@@ -5,7 +5,7 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
-import { favorites, profiles, pushSubscriptions, sentAlerts } from "@/db/schema";
+import { contactMessages, favorites, profiles, pushSubscriptions, sentAlerts } from "@/db/schema";
 import { getArtist } from "@/lib/data";
 import { DEFAULT_RADIUS, RADIUS_OPTIONS } from "@/lib/geo";
 import { sendToUser } from "@/lib/push";
@@ -73,6 +73,7 @@ export async function deleteMyAccount() {
   await db().delete(profiles).where(eq(profiles.userId, userId));
   await db().delete(pushSubscriptions).where(eq(pushSubscriptions.userId, userId));
   await db().delete(sentAlerts).where(eq(sentAlerts.userId, userId));
+  await db().delete(contactMessages).where(eq(contactMessages.userId, userId));
   await signOut({ redirectTo: "/?deleted=1" });
 }
 

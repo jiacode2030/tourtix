@@ -23,11 +23,21 @@ export default function TermsPage() {
         you buy.
       </p>
 
-      <h2>Affiliate links</h2>
+      <h2>Links to other sites</h2>
       <p>
-        Some links to ticket sellers may be affiliate links. If you buy through them, TourTix may
-        earn a commission at no extra cost to you. This never changes the order in which sellers are
-        shown.
+        TourTix links to ticket sellers and other ticket sites. We don&apos;t earn money from these
+        links. &ldquo;Also search&rdquo; links simply open another site&apos;s own search page; we
+        haven&apos;t checked whether that site has the show, and we&apos;re not responsible for other
+        sites&apos; content, prices, or policies.
+      </p>
+
+      <h2>Removal requests</h2>
+      <p>
+        Event organizers and rights holders can ask us to remove content through our{" "}
+        <a href="/contact?reason=removal" className="text-violet-600 hover:underline">
+          contact form
+        </a>
+        . We handle removal requests within 24 hours.
       </p>
 
       <h2>Acceptable use</h2>

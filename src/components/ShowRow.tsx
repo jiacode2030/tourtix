@@ -1,5 +1,6 @@
 import { fmtDate, fmtDateTime, zonedTimeToUtc } from "@/lib/format";
 import { upcomingSaleStarts } from "@/lib/sales";
+import { otherSiteSearches } from "@/lib/search-links";
 import type { SellerLink, Show } from "@/lib/types";
 import { AddToCalendar, type CalendarEvent } from "./AddToCalendar";
 import { Countdown } from "./Countdown";
@@ -222,6 +223,28 @@ export function ShowRow({
       </div>
 
       {canBuy && show.links.length > 0 && <SellerOptions links={show.links} />}
+
+      {canBuy && (
+        <p className="text-sm text-zinc-500">
+          Also search:{" "}
+          {otherSiteSearches(artistName, show.city, show.links.map((l) => l.seller)).map((s, i) => (
+            <span key={s.name}>
+              {i > 0 && " · "}
+              <a
+                href={s.url}
+                target="_blank"
+                rel="nofollow noopener noreferrer"
+                className="font-medium text-violet-600 hover:underline"
+              >
+                {s.name}
+              </a>
+            </span>
+          ))}
+          <span className="block text-xs">
+            Not checked by TourTix. These sites may not have this show.
+          </span>
+        </p>
+      )}
 
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
         {nextSale && (

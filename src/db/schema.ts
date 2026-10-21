@@ -1,4 +1,13 @@
-import { boolean, doublePrecision, integer, pgTable, primaryKey, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  doublePrecision,
+  integer,
+  pgTable,
+  primaryKey,
+  serial,
+  text,
+  timestamp,
+} from "drizzle-orm/pg-core";
 
 // One row per signed-in user who has saved settings. user_id is the Google account ID.
 export const profiles = pgTable("profiles", {
@@ -70,4 +79,14 @@ export const sentAlerts = pgTable(
 export const appState = pgTable("app_state", {
   key: text("key").primaryKey(),
   value: text("value").notNull(),
+});
+
+// Messages sent through the contact form, read at /admin/messages.
+export const contactMessages = pgTable("contact_messages", {
+  id: serial("id").primaryKey(),
+  reason: text("reason").notNull(),
+  email: text("email"),
+  message: text("message").notNull(),
+  userId: text("user_id"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });

@@ -18,6 +18,7 @@ export function Footer() {
           <Link href="/tips" className="hover:text-violet-600">Ticket buying tips</Link>
           <Link href="/help/notifications" className="hover:text-violet-600">Notification help</Link>
           <Link href="/settings" className="hover:text-violet-600">Settings</Link>
+          <Link href="/contact" className="hover:text-violet-600">Contact</Link>
           <Link href="/privacy" className="hover:text-violet-600">Privacy Policy</Link>
           <Link href="/terms" className="hover:text-violet-600">Terms of Use</Link>
         </nav>

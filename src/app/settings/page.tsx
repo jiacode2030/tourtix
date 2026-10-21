@@ -6,6 +6,7 @@ import { LocationFields } from "@/components/LocationFields";
 import { NotificationsToggle } from "@/components/NotificationsToggle";
 import { SignInPrompt } from "@/components/SignInPrompt";
 import { DEFAULT_RADIUS, RADIUS_OPTIONS } from "@/lib/geo";
+import { currentAdminId } from "@/lib/admin";
 import { getVapidKeys } from "@/lib/push";
 import { usStates } from "@/lib/regions";
 import { getProfile } from "@/lib/user-data";
@@ -30,11 +31,23 @@ export default async function SettingsPage({
     );
   }
   const saved = (await searchParams).saved;
-  const [profile, { publicKey }] = await Promise.all([getProfile(userId), getVapidKeys()]);
+  const [profile, { publicKey }, adminId] = await Promise.all([
+    getProfile(userId),
+    getVapidKeys(),
+    currentAdminId(),
+  ]);
 
   return (
     <div className="mx-auto max-w-xl space-y-10">
       <h1 className="text-3xl font-bold">Settings</h1>
+      {adminId && (
+        <a
+          href="/admin/messages"
+          className="block rounded-xl border border-violet-300 bg-violet-50 p-4 text-sm font-medium text-violet-800 hover:bg-violet-100 dark:border-violet-800 dark:bg-violet-950 dark:text-violet-200"
+        >
+          📬 Contact messages (only you can see this) →
+        </a>
+      )}
 
       <section className="space-y-4">
         <div>

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { LegalPage } from "@/components/LegalPage";
-import { contactEmail } from "@/lib/site";
 import { activeSources } from "@/lib/sources";
 
 export const metadata: Metadata = { title: "Privacy Policy · TourTix" };
@@ -54,8 +53,13 @@ export default function PrivacyPage() {
 
       <h2>Cookies</h2>
       <p>
-        We use cookies only to keep you signed in and to keep sign-in secure. We do not use advertising cookies or tracking
-        pixels.
+        TourTix itself uses cookies only to keep you signed in and to keep sign-in secure. We do
+        not use advertising cookies or tracking pixels, and we don&apos;t show ads.
+      </p>
+      <p>
+        Third parties may place or read their own cookies and collect information directly from
+        you: Google when you sign in, Ticketmaster when its artist photos and seat maps load, and
+        any ticket site you click through to. Their own privacy policies apply to that.
       </p>
 
       <h2>Who we share it with</h2>
@@ -84,6 +88,12 @@ export default function PrivacyPage() {
         followed artists, location, and notification settings.
       </p>
 
+      <h2>Contact messages</h2>
+      <p>
+        If you use our contact form, we store your message, the topic, and the email address you
+        choose to give (optional) so we can respond. We delete messages once they&apos;re handled.
+      </p>
+
       <h2>Children</h2>
       <p>TourTix is not intended for children under 13, and we do not knowingly collect information from them.</p>
 
@@ -92,15 +102,11 @@ export default function PrivacyPage() {
         Depending on where you live (for example California or the EU), you may have rights to
         access, correct, or delete your personal information. You can view and change your
         followed artists and location on the site, and delete everything from Settings.
-        {contactEmail && (
-          <>
-            {" "}For any other request, email{" "}
-            <a href={`mailto:${contactEmail}`} className="text-violet-600 hover:underline">
-              {contactEmail}
-            </a>
-            .
-          </>
-        )}
+        {" "}For any other request, use our{" "}
+        <a href="/contact?reason=privacy" className="text-violet-600 hover:underline">
+          contact form
+        </a>
+        .
       </p>
 
       <h2>Changes</h2>

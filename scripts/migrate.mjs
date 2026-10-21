@@ -64,4 +64,13 @@ await sql`
     key text PRIMARY KEY,
     value text NOT NULL
   )`;
+await sql`
+  CREATE TABLE IF NOT EXISTS contact_messages (
+    id serial PRIMARY KEY,
+    reason text NOT NULL,
+    email text,
+    message text NOT NULL,
+    user_id text,
+    created_at timestamptz NOT NULL DEFAULT now()
+  )`;
 console.log("migrate: tables ready");
