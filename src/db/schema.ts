@@ -1,10 +1,14 @@
-import { boolean, pgTable, primaryKey, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, doublePrecision, integer, pgTable, primaryKey, text, timestamp } from "drizzle-orm/pg-core";
 
 // One row per signed-in user who has saved settings. user_id is Clerk's ID.
 export const profiles = pgTable("profiles", {
   userId: text("user_id").primaryKey(),
   city: text("city"),
   region: text("region"),
+  // Rounded to ~1 km (2 decimals) before saving, for privacy.
+  lat: doublePrecision("lat"),
+  lng: doublePrecision("lng"),
+  radiusMiles: integer("radius_miles").notNull().default(100),
   alertNewShows: boolean("alert_new_shows").notNull().default(true),
   alertSales: boolean("alert_sales").notNull().default(true),
   alertNearOnly: boolean("alert_near_only").notNull().default(false),

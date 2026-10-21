@@ -12,7 +12,11 @@ export function Footer() {
           seller&apos;s website. We are not affiliated with or endorsed by any ticket seller or
           artist shown here. All trademarks belong to their owners.
         </p>
-        <nav className="flex gap-4">
+        <nav className="flex flex-wrap gap-x-4 gap-y-2">
+          <Link href="/concerts" className="hover:text-violet-600">Find concerts</Link>
+          <Link href="/tips" className="hover:text-violet-600">Ticket buying tips</Link>
+          <Link href="/help/notifications" className="hover:text-violet-600">Notification help</Link>
+          <Link href="/settings" className="hover:text-violet-600">Settings</Link>
           <Link href="/privacy" className="hover:text-violet-600">Privacy Policy</Link>
           <Link href="/terms" className="hover:text-violet-600">Terms of Use</Link>
         </nav>

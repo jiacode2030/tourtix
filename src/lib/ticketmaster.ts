@@ -1,5 +1,5 @@
 import { computeStatus } from "./status";
-import type { Artist, Presale, Show } from "./types";
+import type { Artist, Presale, Show, ShowExtras } from "./types";
 
 const BASE = "https://app.ticketmaster.com/discovery/v2";
 
@@ -40,6 +40,8 @@ function toShow(e: any): Show {
     name: p.name ?? "Presale",
     start: p.startDateTime ?? null,
     end: p.endDateTime ?? null,
+    url: p.url ?? null,
+    description: p.description ?? null,
   }));
   const publicSaleStart = e.sales?.public?.startTBD
     ? null
@@ -70,6 +72,29 @@ function toShow(e: any): Show {
     status: computeStatus(e.dates?.status?.code, publicSaleStart, presales),
     publicSaleStart,
     presales,
+    lat: num(venue?.location?.latitude),
+    lng: num(venue?.location?.longitude),
+    extras: tmExtras(e, venue),
+  };
+}
+
+function num(v: unknown): number | null {
+  const n = Number(v);
+  return v != null && Number.isFinite(n) ? n : null;
+}
+
+const text = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : undefined);
+
+function tmExtras(e: any, venue: any): ShowExtras {
+  return {
+    seatmapUrl: text(e.seatmap?.staticUrl),
+    ticketLimit: text(e.ticketLimit?.info),
+    ageRestriction: e.ageRestrictions?.legalAgeEnforced
+      ? "Age restrictions apply (legal age enforced)."
+      : undefined,
+    accessibility: text(e.accessibility?.info) ?? text(venue?.accessibleSeatingDetail),
+    pleaseNote: text(e.pleaseNote) ?? text(e.info),
+    parking: text(venue?.parkingDetail),
   };
 }
 
@@ -138,4 +163,29 @@ export async function tmEventsGoingOnSale(windowMs: number): Promise<EventWithAr
     size: "100",
   });
   return withArtists(data);
+}
+
+export type ConcertSearch =
+  | { city: string; stateCode?: string }
+  | { geoPoint: string; radiusMiles: number };
+
+// Upcoming music events in a city or around a point, soonest first.
+export async function tmConcerts(where: ConcertSearch, days: number): Promise<EventWithArtist[]> {
+  const now = Date.now();
+  const params: Record<string, string> = {
+    classificationName: "music",
+    startDateTime: tmTime(now),
+    endDateTime: tmTime(now + days * 24 * 60 * 60 * 1000),
+    sort: "date,asc",
+    size: "100",
+  };
+  if ("city" in where) {
+    params.city = where.city;
+    if (where.stateCode) params.stateCode = where.stateCode;
+  } else {
+    params.geoPoint = where.geoPoint;
+    params.radius = String(where.radiusMiles);
+    params.unit = "miles";
+  }
+  return withArtists(await tm("/events.json", params));
 }

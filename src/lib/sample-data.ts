@@ -25,14 +25,17 @@ function show(r: Raw): Show {
 const base = {
   time: "21:00:00",
   timezone: "America/New_York",
+  lat: null,
+  lng: null,
+  extras: {},
   links: [],
 };
 
 const raw: Record<string, Raw[]> = {
   "sample-calvin-harris": [
     { ...base, id: "s1", links: [{ seller: "Ticketmaster", url: "https://www.ticketmaster.com", allInPrice: 142, currency: "USD" }, { seller: "SeatGeek", url: "https://seatgeek.com", allInPrice: 118, currency: "USD" }], name: "Calvin Harris", date: daysFromNow(30).slice(0, 10), venue: "Sample Arena", city: "Las Vegas", region: "NV", country: "US", publicSaleStart: daysFromNow(-10), presales: [], code: "onsale" },
-    { ...base, id: "s2", links: [{ seller: "Ticketmaster", url: "https://www.ticketmaster.com", allInPrice: null, currency: "USD" }, { seller: "SeatGeek", url: "https://seatgeek.com", allInPrice: 96, currency: "USD" }], name: "Calvin Harris", date: daysFromNow(45).slice(0, 10), venue: "Sample Pavilion", city: "Los Angeles", region: "CA", country: "US", publicSaleStart: daysFromNow(2), presales: [{ name: "Artist Presale", start: daysFromNow(-1), end: daysFromNow(1) }], code: "onsale" },
-    { ...base, id: "s3", name: "Calvin Harris", date: daysFromNow(60).slice(0, 10), venue: "Sample Gardens", city: "New York", region: "NY", country: "US", publicSaleStart: daysFromNow(9), presales: [{ name: "Fan Presale", start: daysFromNow(7), end: daysFromNow(8) }], code: "onsale" },
+    { ...base, id: "s2", links: [{ seller: "Ticketmaster", url: "https://www.ticketmaster.com", allInPrice: null, currency: "USD" }, { seller: "SeatGeek", url: "https://seatgeek.com", allInPrice: 96, currency: "USD" }], name: "Calvin Harris", date: daysFromNow(45).slice(0, 10), venue: "Sample Pavilion", city: "Los Angeles", region: "CA", country: "US", publicSaleStart: daysFromNow(2), presales: [{ name: "Artist Presale", start: daysFromNow(-1), end: daysFromNow(1), url: null, description: null }], code: "onsale" },
+    { ...base, id: "s3", name: "Calvin Harris", date: daysFromNow(60).slice(0, 10), venue: "Sample Gardens", city: "New York", region: "NY", country: "US", publicSaleStart: daysFromNow(9), presales: [{ name: "Fan Presale", start: daysFromNow(6), end: daysFromNow(8), url: "https://www.ticketmaster.com", description: "Register by the day before to get a code." }], code: "onsale" },
     { ...base, id: "s4", name: "Calvin Harris", date: daysFromNow(75).slice(0, 10), venue: "Sample Field", city: "Miami", region: "FL", country: "US", publicSaleStart: daysFromNow(-20), presales: [], code: "offsale" },
   ],
   "sample-fred-again": [

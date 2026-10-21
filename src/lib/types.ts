@@ -10,6 +10,9 @@ export type Presale = {
   name: string;
   start: string | null;
   end: string | null;
+  // Sign-up or info page, e.g. Verified Fan registration.
+  url: string | null;
+  description: string | null;
 };
 
 export type SellerLink = {
@@ -27,7 +30,9 @@ export type TicketStatus =
   | "onsale"
   | "offsale"
   | "cancelled"
-  | "rescheduled";
+  | "rescheduled"
+  // Listed by a seller that doesn't tell us whether tickets are available.
+  | "listed";
 
 export type Show = {
   id: string;
@@ -43,4 +48,17 @@ export type Show = {
   status: TicketStatus;
   publicSaleStart: string | null;
   presales: Presale[];
+  lat: number | null;
+  lng: number | null;
+  // Extra info for the details panel; all optional.
+  extras: ShowExtras;
+};
+
+export type ShowExtras = {
+  seatmapUrl?: string;
+  ticketLimit?: string;
+  ageRestriction?: string;
+  accessibility?: string;
+  pleaseNote?: string;
+  parking?: string;
 };

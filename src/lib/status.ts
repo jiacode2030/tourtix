@@ -31,4 +31,5 @@ export const statusLabel: Record<TicketStatus, string> = {
   offsale: "Off sale",
   cancelled: "Cancelled",
   rescheduled: "Rescheduled",
+  listed: "Check availability",
 };

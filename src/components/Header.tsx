@@ -9,12 +9,15 @@ export function Header() {
         <Link href="/" className="text-xl font-bold tracking-tight">
           Tour<span className="text-violet-600">Tix</span>
         </Link>
-        <div className="flex items-center gap-4 text-sm">
+        <div className="flex items-center gap-3 whitespace-nowrap text-sm sm:gap-4">
+          <Link href="/concerts" className="font-medium hover:text-violet-600">
+            Concerts
+          </Link>
           <Show when="signed-in">
             <Link href="/my-artists" className="font-medium hover:text-violet-600">
               My Artists
             </Link>
-            <Link href="/settings" className="font-medium hover:text-violet-600">
+            <Link href="/settings" className="hidden font-medium hover:text-violet-600 sm:inline">
               Settings
             </Link>
             <UserButton />

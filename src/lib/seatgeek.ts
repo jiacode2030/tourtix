@@ -26,7 +26,8 @@ async function findPerformerId(artistName: string): Promise<number | null> {
 function toShow(e: any): Show {
   const v = e.venue ?? {};
   const [date, time] = (e.datetime_local ?? "").split("T");
-  const listed = (e.stats?.listing_count ?? 0) > 0;
+  // SeatGeek's free API often omits stats, so "unknown" is common.
+  const count = e.stats?.listing_count;
   return {
     id: `sg-${e.id}`,
     name: e.short_title ?? e.title,
@@ -49,9 +50,12 @@ function toShow(e: any): Show {
           },
         ]
       : [],
-    status: listed ? "onsale" : "announced",
+    status: count == null ? "listed" : count > 0 ? "onsale" : "announced",
     publicSaleStart: null,
     presales: [],
+    lat: typeof v.location?.lat === "number" ? v.location.lat : null,
+    lng: typeof v.location?.lon === "number" ? v.location.lon : null,
+    extras: {},
   };
 }
 

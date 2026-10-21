@@ -1,8 +1,11 @@
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { favorites, profiles } from "@/db/schema";
+import { DEFAULT_RADIUS, type UserLocation } from "./geo";
 
-export async function getProfile(userId: string) {
+export type Profile = typeof profiles.$inferSelect;
+
+export async function getProfile(userId: string): Promise<Profile | null> {
   const rows = await db().select().from(profiles).where(eq(profiles.userId, userId));
   return rows[0] ?? null;
 }
@@ -21,4 +24,14 @@ export async function isFavorite(userId: string, artistId: string) {
     .from(favorites)
     .where(and(eq(favorites.userId, userId), eq(favorites.artistId, artistId)));
   return rows.length > 0;
+}
+
+export function locationOf(profile: Profile | null): UserLocation | null {
+  if (!profile) return null;
+  return {
+    region: profile.region,
+    lat: profile.lat,
+    lng: profile.lng,
+    radiusMiles: profile.radiusMiles ?? DEFAULT_RADIUS,
+  };
 }

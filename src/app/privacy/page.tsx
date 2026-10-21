@@ -23,8 +23,9 @@ export default function PrivacyPage() {
           <strong>Artists you follow</strong>, so we can show you their upcoming shows.
         </li>
         <li>
-          <strong>Your location</strong>, only the city and state you enter in Settings, so we can
-          highlight shows near you.
+          <strong>Your location</strong>: the city and state you enter in Settings, and, only if
+          you click &ldquo;Use my current location&rdquo;, your coordinates rounded to about 1 km,
+          plus the distance you choose. Used to find shows near you. You can remove it any time.
         </li>
         <li>
           <strong>Notification settings</strong>, if you turn on notifications: which alerts you

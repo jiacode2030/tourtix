@@ -2,8 +2,10 @@ import { auth } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
 import { saveAlertPrefs, saveLocation } from "@/app/actions";
 import { DeleteAccountButton } from "@/components/DeleteAccountButton";
+import { LocationFields } from "@/components/LocationFields";
 import { NotificationsToggle } from "@/components/NotificationsToggle";
 import { SignInPrompt } from "@/components/SignInPrompt";
+import { DEFAULT_RADIUS, RADIUS_OPTIONS } from "@/lib/geo";
 import { getVapidKeys } from "@/lib/push";
 import { usStates } from "@/lib/regions";
 import { getProfile } from "@/lib/user-data";
@@ -38,7 +40,8 @@ export default async function SettingsPage({
         <div>
           <h2 className="text-lg font-semibold">Your location</h2>
           <p className="text-sm text-zinc-500">
-            Used to highlight shows near you. We only store the city and state you enter here.
+            Used to find shows near you. We store only what you save here, and precise locations
+            are rounded to about 1 km.
           </p>
         </div>
         <form action={saveLocation} className="space-y-4">
@@ -56,6 +59,21 @@ export default async function SettingsPage({
                 </option>
               ))}
             </select>
+          </label>
+          <LocationFields lat={profile?.lat ?? null} lng={profile?.lng ?? null} />
+          <label className="block space-y-1">
+            <span className="text-sm font-medium">&ldquo;Near me&rdquo; means within</span>
+            <select name="radius" defaultValue={profile?.radiusMiles ?? DEFAULT_RADIUS} className={field}>
+              {RADIUS_OPTIONS.map((r) => (
+                <option key={r} value={r}>
+                  {r} miles
+                </option>
+              ))}
+            </select>
+            <span className="block text-xs text-zinc-500">
+              Distance is used when you share your location; otherwise &ldquo;near&rdquo; means
+              your state.
+            </span>
           </label>
           <div className="flex items-center gap-3">
             <button
@@ -90,7 +108,7 @@ export default async function SettingsPage({
           </label>
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" name="nearOnly" defaultChecked={profile?.alertNearOnly ?? false} />
-            Only for shows in my state{!profile?.region && " (set your location above first)"}
+            Only for shows near me{!profile?.region && profile?.lat == null && " (set your location above first)"}
           </label>
           <div className="flex items-center gap-3">
             <button

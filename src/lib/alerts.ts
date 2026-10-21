@@ -11,9 +11,11 @@ import {
 } from "@/db/schema";
 import { getShows } from "./data";
 import { fmtDate, fmtDateTime } from "./format";
+import { hasLocation, isNear, type UserLocation } from "./geo";
 import { sendToUser } from "./push";
 import { upcomingSaleStarts } from "./sales";
 import { showKey } from "./show-key";
+import { locationOf } from "./user-data";
 import type { Show } from "./types";
 
 // The check endpoint is public, so it refuses to run more often than this.
@@ -22,8 +24,8 @@ const MIN_INTERVAL_MS = 25 * 60 * 1000;
 // Sale reminders go out once the start time is within this window.
 const SALE_REMINDER_WINDOW_MS = 24 * 60 * 60 * 1000;
 
-type Prefs = { newShows: boolean; sales: boolean; nearOnly: boolean; region: string | null };
-const defaultPrefs: Prefs = { newShows: true, sales: true, nearOnly: false, region: null };
+type Prefs = { newShows: boolean; sales: boolean; nearOnly: boolean; loc: UserLocation | null };
+const defaultPrefs: Prefs = { newShows: true, sales: true, nearOnly: false, loc: null };
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -68,7 +70,12 @@ export async function runAlertCheck() {
   const prefsByUser = new Map<string, Prefs>(
     profileRows.map((p) => [
       p.userId,
-      { newShows: p.alertNewShows, sales: p.alertSales, nearOnly: p.alertNearOnly, region: p.region },
+      {
+        newShows: p.alertNewShows,
+        sales: p.alertSales,
+        nearOnly: p.alertNearOnly,
+        loc: locationOf(p),
+      },
     ]),
   );
 
@@ -107,8 +114,7 @@ export async function runAlertCheck() {
 
     for (const userId of users) {
       const prefs = prefsByUser.get(userId) ?? defaultPrefs;
-      const relevant = (s: Show) =>
-        !prefs.nearOnly || !prefs.region || (s.country === "US" && s.region === prefs.region);
+      const relevant = (s: Show) => !prefs.nearOnly || !hasLocation(prefs.loc) || isNear(s, prefs.loc);
       const url = `/artists/${artistId}`;
 
       if (prefs.newShows) {

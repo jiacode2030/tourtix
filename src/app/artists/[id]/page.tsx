@@ -5,7 +5,8 @@ import { FavoriteButton } from "@/components/FavoriteButton";
 import { ShowRow } from "@/components/ShowRow";
 import { SignInPrompt } from "@/components/SignInPrompt";
 import { getArtist, getShows } from "@/lib/data";
-import { getProfile, isFavorite } from "@/lib/user-data";
+import { isNear } from "@/lib/geo";
+import { getProfile, isFavorite, locationOf } from "@/lib/user-data";
 
 export default async function ArtistPage({
   params,
@@ -21,6 +22,7 @@ export default async function ArtistPage({
     userId ? isFavorite(userId, id) : false,
     userId ? getProfile(userId) : null,
   ]);
+  const loc = locationOf(profile);
 
   return (
     <div className="space-y-6">
@@ -55,14 +57,21 @@ export default async function ArtistPage({
         </h2>
         {shows.length > 0 && (
           <p className="text-sm text-zinc-500">
-            Prices are the lowest listed on each site, including mandatory fees but not taxes,
-            and refresh about every 5 minutes. Always check the final total before you buy.
+            Show info refreshes about every 5 minutes. Where prices are shown, they&apos;re the
+            lowest listed on each site including mandatory fees (not taxes). Always check the final
+            total before you buy.
           </p>
         )}
         {shows.length ? (
           <ul className="space-y-3">
             {shows.map((s) => (
-              <ShowRow key={s.id} show={s} homeRegion={profile?.region ?? null} />
+              <ShowRow
+                key={s.id}
+                show={s}
+                artistId={artist.id}
+                artistName={artist.name}
+                nearYou={isNear(s, loc)}
+              />
             ))}
           </ul>
         ) : (

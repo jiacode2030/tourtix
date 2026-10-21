@@ -4,7 +4,8 @@ import Link from "next/link";
 import { ShowRow } from "@/components/ShowRow";
 import { SignInPrompt } from "@/components/SignInPrompt";
 import { getArtist, getShows } from "@/lib/data";
-import { getProfile, listFavorites } from "@/lib/user-data";
+import { hasLocation, isNear } from "@/lib/geo";
+import { getProfile, listFavorites, locationOf } from "@/lib/user-data";
 
 export const metadata: Metadata = { title: "My Artists · TourTix" };
 
@@ -28,15 +29,14 @@ export default async function MyArtistsPage({
 
   const nearOnly = (await searchParams).near === "1";
   const [favs, profile] = await Promise.all([listFavorites(userId), getProfile(userId)]);
-  const homeRegion = profile?.region ?? null;
+  const loc = locationOf(profile);
+  const located = hasLocation(loc);
 
   const sections = await Promise.all(
     favs.map(async (f) => {
       const artist = await getArtist(f.artistId);
       let shows = artist ? await getShows(artist) : [];
-      if (nearOnly && homeRegion) {
-        shows = shows.filter((s) => s.country === "US" && s.region === homeRegion);
-      }
+      if (nearOnly && located) shows = shows.filter((s) => isNear(s, loc));
       return { fav: f, shows: shows.slice(0, SHOWS_PER_ARTIST), total: shows.length };
     }),
   );
@@ -50,7 +50,7 @@ export default async function MyArtistsPage({
             {favs.length} {favs.length === 1 ? "artist" : "artists"} followed
           </p>
         </div>
-        {homeRegion ? (
+        {located ? (
           <div className="flex rounded-lg border border-zinc-200 p-1 text-sm dark:border-zinc-800">
             <Link
               href="/my-artists"
@@ -62,7 +62,7 @@ export default async function MyArtistsPage({
               href="/my-artists?near=1"
               className={`rounded-md px-3 py-1 ${nearOnly ? "bg-violet-600 text-white" : ""}`}
             >
-              Near me ({homeRegion})
+              Near me
             </Link>
           </div>
         ) : (
@@ -99,7 +99,13 @@ export default async function MyArtistsPage({
           {shows.length ? (
             <ul className="space-y-3">
               {shows.map((s) => (
-                <ShowRow key={s.id} show={s} homeRegion={homeRegion} />
+                <ShowRow
+                  key={s.id}
+                  show={s}
+                  artistId={fav.artistId}
+                  artistName={fav.artistName}
+                  nearYou={isNear(s, loc)}
+                />
               ))}
             </ul>
           ) : (

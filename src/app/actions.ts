@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { favorites, profiles, pushSubscriptions, sentAlerts } from "@/db/schema";
 import { getArtist } from "@/lib/data";
+import { DEFAULT_RADIUS, RADIUS_OPTIONS } from "@/lib/geo";
 import { sendToUser } from "@/lib/push";
 import { isUsState } from "@/lib/regions";
 
@@ -40,12 +41,24 @@ export async function saveLocation(formData: FormData) {
   const city = String(formData.get("city") ?? "").trim().slice(0, 100) || null;
   const rawRegion = String(formData.get("region") ?? "");
   const region = isUsState(rawRegion) ? rawRegion : null;
+  const coord = (key: string, limit: number) => {
+    const raw = String(formData.get(key) ?? "");
+    const n = Number(raw);
+    // Round to 2 decimals (~1 km) so we never store an exact location.
+    return raw && Number.isFinite(n) && Math.abs(n) <= limit ? Math.round(n * 100) / 100 : null;
+  };
+  let lat = coord("lat", 90);
+  let lng = coord("lng", 180);
+  if (lat == null || lng == null) lat = lng = null;
+  const radius = Number(formData.get("radius"));
+  const radiusMiles = RADIUS_OPTIONS.includes(radius) ? radius : DEFAULT_RADIUS;
+  const values = { city, region, lat, lng, radiusMiles };
   await db()
     .insert(profiles)
-    .values({ userId, city, region })
+    .values({ userId, ...values })
     .onConflictDoUpdate({
       target: profiles.userId,
-      set: { city, region, updatedAt: new Date() },
+      set: { ...values, updatedAt: new Date() },
     });
   revalidatePath("/settings");
   revalidatePath("/my-artists");

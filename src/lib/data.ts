@@ -2,6 +2,8 @@ import { sampleArtists, sampleShows } from "./sample-data";
 import { mergeShows, sgGetShows } from "./seatgeek";
 import { groupDrops, type TicketDrop } from "./sales";
 import {
+  type ConcertSearch,
+  tmConcerts,
   tmEventsGoingOnSale,
   tmGetArtist,
   tmGetShows,
@@ -60,4 +62,11 @@ export async function upcomingDrops(windowMs: number, limit = 8): Promise<Ticket
     console.error(err);
     return [];
   }
+}
+
+export async function concerts(where: ConcertSearch, days = 30) {
+  if (usingSampleData) {
+    return sampleArtists.flatMap((a) => sampleShows(a.id).map((show) => ({ artist: a, show })));
+  }
+  return tmConcerts(where, days);
 }
