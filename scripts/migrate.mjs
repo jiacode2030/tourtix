@@ -26,4 +26,39 @@ await sql`
     created_at timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY (user_id, artist_id)
   )`;
+await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS alert_new_shows boolean NOT NULL DEFAULT true`;
+await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS alert_sales boolean NOT NULL DEFAULT true`;
+await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS alert_near_only boolean NOT NULL DEFAULT false`;
+await sql`
+  CREATE TABLE IF NOT EXISTS push_subscriptions (
+    endpoint text PRIMARY KEY,
+    user_id text NOT NULL,
+    p256dh text NOT NULL,
+    auth text NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now()
+  )`;
+await sql`
+  CREATE TABLE IF NOT EXISTS known_shows (
+    artist_id text NOT NULL,
+    show_key text NOT NULL,
+    first_seen timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (artist_id, show_key)
+  )`;
+await sql`
+  CREATE TABLE IF NOT EXISTS tracked_artists (
+    artist_id text PRIMARY KEY,
+    seeded_at timestamptz NOT NULL DEFAULT now()
+  )`;
+await sql`
+  CREATE TABLE IF NOT EXISTS sent_alerts (
+    user_id text NOT NULL,
+    alert_key text NOT NULL,
+    sent_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, alert_key)
+  )`;
+await sql`
+  CREATE TABLE IF NOT EXISTS app_state (
+    key text PRIMARY KEY,
+    value text NOT NULL
+  )`;
 console.log("migrate: tables ready");

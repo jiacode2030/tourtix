@@ -1,0 +1,16 @@
+# Hourly trigger for notification alerts. Vercel's free plan only allows
+# daily cron jobs, so GitHub Actions does the scheduling instead.
+name: Check alerts
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Run alert check
+        run: curl --fail --silent --show-error --max-time 300 https://tourtix.vercel.app/api/alerts/check

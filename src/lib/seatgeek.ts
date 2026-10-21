@@ -1,3 +1,4 @@
+import { normalize, showKey } from "./show-key";
 import type { Show } from "./types";
 
 const BASE = "https://api.seatgeek.com/2";
@@ -14,8 +15,6 @@ async function sg(path: string, params: Record<string, string>) {
   if (!res.ok) throw new Error(`SeatGeek ${res.status}: ${path}`);
   return res.json();
 }
-
-const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
 async function findPerformerId(artistName: string): Promise<number | null> {
   const data = await sg("/performers", { q: artistName, per_page: "10" });
@@ -75,9 +74,6 @@ export async function sgGetShows(artistName: string): Promise<Show[]> {
     return [];
   }
 }
-
-// Same show on two sites = same date and same city.
-const showKey = (s: Show) => `${s.date}|${normalize(s.city ?? "")}`;
 
 export function mergeShows(primary: Show[], extra: Show[]): Show[] {
   const merged = primary.map((s) => ({ ...s, links: [...s.links] }));

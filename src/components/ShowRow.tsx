@@ -1,28 +1,6 @@
 import type { SellerLink, Show } from "@/lib/types";
+import { fmtDate, fmtDateTime } from "@/lib/format";
 import { StatusBadge } from "./StatusBadge";
-
-function fmtDate(d: string | null) {
-  if (!d) return "Date TBA";
-  return new Date(`${d}T12:00:00`).toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-// Sale times are shown in the venue's time zone with its abbreviation,
-// since the server's own time zone means nothing to visitors.
-function fmtDateTime(iso: string, timeZone: string | null) {
-  return new Date(iso).toLocaleString("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    timeZone: timeZone ?? "UTC",
-    timeZoneName: "short",
-  });
-}
 
 function saleNote(show: Show): string | null {
   const now = new Date();

@@ -26,6 +26,12 @@ export default function PrivacyPage() {
           <strong>Your location</strong>, only the city and state you enter in Settings, so we can
           highlight shows near you.
         </li>
+        <li>
+          <strong>Notification settings</strong>, if you turn on notifications: which alerts you
+          want, a record of alerts already sent, and the push address your browser gives us for
+          delivering them. Turning notifications off on a device deletes that device&apos;s push
+          address.
+        </li>
       </ul>
       <p>
         When you search, your search term is sent to our ticket data providers (currently
@@ -53,6 +59,10 @@ export default function PrivacyPage() {
         <li><strong>Clerk</strong>: sign-in and account management</li>
         <li><strong>Neon</strong>: database storing followed artists and location</li>
         <li><strong>Vercel</strong>: website hosting</li>
+        <li>
+          <strong>Your browser&apos;s push service</strong> (for example Google, Apple, or Mozilla):
+          delivers notifications to your device
+        </li>
       </ul>
       <p>These providers are based in the United States, so your data is stored there.</p>
 
@@ -66,7 +76,7 @@ export default function PrivacyPage() {
       <p>
         We keep your account data until you delete your account. You can delete it at any time
         from <strong>Settings → Delete my account</strong>, which permanently removes your login,
-        followed artists, and location.
+        followed artists, location, and notification settings.
       </p>
 
       <h2>Children</h2>

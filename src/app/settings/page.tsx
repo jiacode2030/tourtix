@@ -1,8 +1,10 @@
 import { auth } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
-import { saveLocation } from "@/app/actions";
+import { saveAlertPrefs, saveLocation } from "@/app/actions";
 import { DeleteAccountButton } from "@/components/DeleteAccountButton";
+import { NotificationsToggle } from "@/components/NotificationsToggle";
 import { SignInPrompt } from "@/components/SignInPrompt";
+import { getVapidKeys } from "@/lib/push";
 import { usStates } from "@/lib/regions";
 import { getProfile } from "@/lib/user-data";
 
@@ -25,8 +27,8 @@ export default async function SettingsPage({
       </div>
     );
   }
-  const saved = (await searchParams).saved === "1";
-  const profile = await getProfile(userId);
+  const saved = (await searchParams).saved;
+  const [profile, { publicKey }] = await Promise.all([getProfile(userId), getVapidKeys()]);
 
   return (
     <div className="mx-auto max-w-xl space-y-10">
@@ -62,7 +64,42 @@ export default async function SettingsPage({
             >
               Save
             </button>
-            {saved && <span className="text-sm text-emerald-600">Saved!</span>}
+            {saved === "1" && <span className="text-sm text-emerald-600">Saved!</span>}
+          </div>
+        </form>
+      </section>
+
+      <section className="space-y-4 border-t border-zinc-200 pt-8 dark:border-zinc-800">
+        <div>
+          <h2 className="text-lg font-semibold">Notifications</h2>
+          <p className="text-sm text-zinc-500">
+            Get a pop-up alert on this device about artists you follow. Turn it on for each device
+            you want alerts on.
+          </p>
+        </div>
+        <NotificationsToggle publicKey={publicKey} />
+        <form action={saveAlertPrefs} className="space-y-3">
+          <p className="text-sm font-medium">Alert me when:</p>
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" name="newShows" defaultChecked={profile?.alertNewShows ?? true} />
+            An artist I follow announces a new show
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" name="sales" defaultChecked={profile?.alertSales ?? true} />
+            A presale or general sale starts within 24 hours
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" name="nearOnly" defaultChecked={profile?.alertNearOnly ?? false} />
+            Only for shows in my state{!profile?.region && " (set your location above first)"}
+          </label>
+          <div className="flex items-center gap-3">
+            <button
+              type="submit"
+              className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700"
+            >
+              Save alert settings
+            </button>
+            {saved === "alerts" && <span className="text-sm text-emerald-600">Saved!</span>}
           </div>
         </form>
       </section>
@@ -70,7 +107,7 @@ export default async function SettingsPage({
       <section className="space-y-3 border-t border-zinc-200 pt-8 dark:border-zinc-800">
         <h2 className="text-lg font-semibold">Delete account</h2>
         <p className="text-sm text-zinc-500">
-          Permanently deletes your login, followed artists, and location. This can&apos;t be undone.
+          Permanently deletes your login, followed artists, location, and notification settings. This can&apos;t be undone.
         </p>
         <DeleteAccountButton />
       </section>
