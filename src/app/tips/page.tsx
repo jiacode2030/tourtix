@@ -39,7 +39,7 @@ const tips: { title: string; body: React.ReactNode }[] = [
     body: (
       <>
         Fees can add a lot. Look at the final total, including fees, before you buy, and compare it
-        across sellers. TourTix shows fee-included prices when sellers provide them.
+        across sellers. Ticket prices aren&apos;t shown on TourTix, so check the total on each seller&apos;s site.
       </>
     ),
   },

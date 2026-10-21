@@ -75,10 +75,10 @@ export default function PrivacyPage() {
       <p>We use these service providers, which process data on our behalf:</p>
       <ul>
         <li><strong>Google</strong>: sign-in</li>
-        <li><strong>Neon</strong>: database storing followed artists and location</li>
+        <li><strong>Neon</strong>: database storing followed artists, location, notification settings, and contact messages</li>
         <li><strong>Vercel</strong>: website hosting and visitor statistics</li>
         <li>
-          <strong>Your browser&apos;s push service</strong> (for example Google, Apple, or Mozilla):
+          <strong>Your browser&apos;s push service</strong> (for example Google, Apple, Mozilla, or Microsoft):
           delivers notifications to your device
         </li>
       </ul>
@@ -94,7 +94,8 @@ export default function PrivacyPage() {
       <p>
         We keep your account data until you delete your account. You can delete it at any time
         from <strong>Settings → Delete my account</strong>, which permanently removes your
-        followed artists, location, and notification settings.
+        followed artists, location, notification settings, and any contact messages you sent while
+        signed in.
       </p>
 
       <h2>Contact messages</h2>

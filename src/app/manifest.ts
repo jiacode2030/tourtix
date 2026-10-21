@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "TourTix",
     short_name: "TourTix",
-    description: "Track your favorite artists' tours and find the cheapest tickets.",
+    description: "Track your favorite artists' tours and get alerts when tickets go on sale.",
     start_url: "/my-artists",
     display: "standalone",
     background_color: "#ffffff",

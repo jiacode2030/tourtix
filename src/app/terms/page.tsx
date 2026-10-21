@@ -26,7 +26,7 @@ export default function TermsPage() {
       <h2>Links to other sites</h2>
       <p>
         TourTix links to ticket sellers and other ticket sites. We don&apos;t earn money from these
-        links. &ldquo;Also search&rdquo; links simply open another site&apos;s own search page; we
+        links. &ldquo;Search other ticket sites&rdquo; links simply open another site&apos;s own search page; we
         haven&apos;t checked whether that site has the show, and we&apos;re not responsible for other
         sites&apos; content, prices, or policies.
       </p>
@@ -57,6 +57,8 @@ export default function TermsPage() {
       <p>
         TourTix is provided &ldquo;as is.&rdquo; To the extent allowed by law, we are not liable for
         missed sales, price changes, sold-out shows, or problems with purchases made on other sites.
+        Notifications are checked about once an hour and can be late or missed, so don&apos;t rely
+        on them alone for important ticket sales.
       </p>
 
       <h2>Changes</h2>
