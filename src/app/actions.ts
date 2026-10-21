@@ -94,10 +94,31 @@ export async function saveAlertPrefs(formData: FormData) {
 
 type BrowserSubscription = { endpoint?: string; keys?: { p256dh?: string; auth?: string } };
 
+// Browsers' push services. Only these are accepted, so nobody can make the
+// alert job send requests to arbitrary servers.
+const PUSH_HOST_SUFFIXES = [
+  "fcm.googleapis.com",
+  "push.services.mozilla.com",
+  "push.apple.com",
+  "notify.windows.com",
+];
+
+function isPushServiceUrl(endpoint: string) {
+  try {
+    const url = new URL(endpoint);
+    return (
+      url.protocol === "https:" &&
+      PUSH_HOST_SUFFIXES.some((h) => url.hostname === h || url.hostname.endsWith(`.${h}`))
+    );
+  } catch {
+    return false;
+  }
+}
+
 export async function savePushSubscription(sub: BrowserSubscription) {
   const userId = await requireUser();
   const { endpoint, keys } = sub;
-  if (!endpoint?.startsWith("https://") || !keys?.p256dh || !keys?.auth) {
+  if (!endpoint || !isPushServiceUrl(endpoint) || !keys?.p256dh || !keys?.auth) {
     throw new Error("Invalid subscription");
   }
   await db()

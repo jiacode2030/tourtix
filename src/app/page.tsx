@@ -22,6 +22,9 @@ async function followedDrops(userId: string) {
         imageUrl: f.imageUrl,
         genre: null,
         upcomingShows: 0,
+      }).catch((err) => {
+        console.error(err);
+        return [];
       });
       return shows.map((show) => ({
         artistId: f.artistId,

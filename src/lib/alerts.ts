@@ -89,10 +89,19 @@ export async function runAlertCheck() {
   }
 
   let sent = 0;
+  let failures = 0;
   for (const [artistId, { name, users }] of followersByArtist) {
-    const shows = (
-      await getShows({ id: artistId, name, imageUrl: null, genre: null, upcomingShows: 0 })
-    ).filter((s) => !s.date || s.date >= today);
+    let shows: Show[];
+    try {
+      shows = (
+        await getShows({ id: artistId, name, imageUrl: null, genre: null, upcomingShows: 0 })
+      ).filter((s) => (!s.date || s.date >= today) && s.status !== "cancelled" && s.status !== "offsale");
+    } catch (err) {
+      // Skip this artist this time; one failure shouldn't stop everyone's alerts.
+      console.error(`alerts: ${name}`, err);
+      failures++;
+      continue;
+    }
 
     const [known, tracked] = await Promise.all([
       db().select().from(knownShows).where(eq(knownShows.artistId, artistId)),
@@ -158,5 +167,5 @@ export async function runAlertCheck() {
     await sleep(500); // stay well under Ticketmaster's requests-per-second limit
   }
 
-  return { artistsChecked: followersByArtist.size, notificationsSent: sent };
+  return { artistsChecked: followersByArtist.size, notificationsSent: sent, failures };
 }

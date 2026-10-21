@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ShowRow } from "@/components/ShowRow";
 import { SignInPrompt } from "@/components/SignInPrompt";
-import { getArtist, getShows } from "@/lib/data";
+import { getShows } from "@/lib/data";
 import { hasLocation, isNear } from "@/lib/geo";
 import { getProfile, listFavorites, locationOf } from "@/lib/user-data";
 
@@ -34,10 +34,20 @@ export default async function MyArtistsPage({
 
   const sections = await Promise.all(
     favs.map(async (f) => {
-      const artist = await getArtist(f.artistId);
-      let shows = artist ? await getShows(artist) : [];
-      if (nearOnly && located) shows = shows.filter((s) => isNear(s, loc));
-      return { fav: f, shows: shows.slice(0, SHOWS_PER_ARTIST), total: shows.length };
+      try {
+        let shows = await getShows({
+          id: f.artistId,
+          name: f.artistName,
+          imageUrl: f.imageUrl,
+          genre: null,
+          upcomingShows: 0,
+        });
+        if (nearOnly && located) shows = shows.filter((s) => isNear(s, loc));
+        return { fav: f, shows: shows.slice(0, SHOWS_PER_ARTIST), total: shows.length, failed: false };
+      } catch (err) {
+        console.error(err);
+        return { fav: f, shows: [], total: 0, failed: true };
+      }
     }),
   );
 
@@ -82,7 +92,7 @@ export default async function MyArtistsPage({
         </p>
       )}
 
-      {sections.map(({ fav, shows, total }) => (
+      {sections.map(({ fav, shows, total, failed }) => (
         <section key={fav.artistId} className="space-y-3">
           <div className="flex items-baseline justify-between gap-4">
             <h2 className="text-xl font-semibold">
@@ -110,7 +120,11 @@ export default async function MyArtistsPage({
             </ul>
           ) : (
             <p className="text-sm text-zinc-500">
-              {nearOnly ? "No upcoming shows near you." : "No upcoming shows right now."}
+              {failed
+                ? "Couldn't load shows right now. Try again in a minute."
+                : nearOnly
+                  ? "No upcoming shows near you."
+                  : "No upcoming shows right now."}
             </p>
           )}
         </section>

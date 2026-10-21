@@ -1,3 +1,4 @@
+import { apiFetch } from "./http";
 import { normalize, showKey } from "./show-key";
 import type { Show } from "./types";
 
@@ -9,11 +10,7 @@ async function sg(path: string, params: Record<string, string>) {
   const id = process.env.SEATGEEK_CLIENT_ID;
   if (!id) throw new Error("SEATGEEK_CLIENT_ID is not set");
   const qs = new URLSearchParams({ ...params, client_id: id });
-  const res = await fetch(`${BASE}${path}?${qs}`, {
-    next: { revalidate: 300 },
-  });
-  if (!res.ok) throw new Error(`SeatGeek ${res.status}: ${path}`);
-  return res.json();
+  return apiFetch(`${BASE}${path}?${qs}`, 300, `SeatGeek ${path}`);
 }
 
 async function findPerformerId(artistName: string): Promise<number | null> {

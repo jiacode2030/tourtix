@@ -1,3 +1,4 @@
+import { apiFetch } from "./http";
 import { computeStatus } from "./status";
 import type { Artist, Presale, Show, ShowExtras } from "./types";
 
@@ -9,11 +10,7 @@ async function tm(path: string, params: Record<string, string>) {
   const key = process.env.TICKETMASTER_API_KEY;
   if (!key) throw new Error("TICKETMASTER_API_KEY is not set");
   const qs = new URLSearchParams({ ...params, apikey: key });
-  const res = await fetch(`${BASE}${path}?${qs}`, {
-    next: { revalidate: 300 },
-  });
-  if (!res.ok) throw new Error(`Ticketmaster ${res.status}: ${path}`);
-  return res.json();
+  return apiFetch(`${BASE}${path}?${qs}`, 300, `Ticketmaster ${path}`);
 }
 
 function pickImage(images: any[] | undefined): string | null {
@@ -110,8 +107,9 @@ export async function tmSearchArtists(query: string): Promise<Artist[]> {
 export async function tmGetArtist(id: string): Promise<Artist | null> {
   try {
     return toArtist(await tm(`/attractions/${id}.json`, {}));
-  } catch {
-    return null;
+  } catch (err) {
+    if (String(err).endsWith(" 404")) return null;
+    throw err;
   }
 }
 

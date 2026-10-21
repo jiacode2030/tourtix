@@ -2,8 +2,9 @@
 
 export type CalendarEvent = {
   title: string;
-  start: string; // ISO
-  end: string; // ISO
+  start: string; // ISO, or YYYY-MM-DD when allDay
+  end: string; // ISO, or the day after when allDay
+  allDay?: boolean;
   location?: string;
   details?: string;
 };
@@ -11,11 +12,13 @@ export type CalendarEvent = {
 // 20261028T170000Z
 const stamp = (iso: string) => new Date(iso).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 
+const day = (d: string) => d.replace(/-/g, "");
+
 function googleUrl(e: CalendarEvent) {
   const q = new URLSearchParams({
     action: "TEMPLATE",
     text: e.title,
-    dates: `${stamp(e.start)}/${stamp(e.end)}`,
+    dates: e.allDay ? `${day(e.start)}/${day(e.end)}` : `${stamp(e.start)}/${stamp(e.end)}`,
     details: e.details ?? "",
     location: e.location ?? "",
   });
@@ -30,10 +33,10 @@ function downloadIcs(e: CalendarEvent) {
     "VERSION:2.0",
     "PRODID:-//TourTix//EN",
     "BEGIN:VEVENT",
-    `UID:${stamp(e.start)}-${Math.random().toString(36).slice(2)}@tourtix`,
+    `UID:${e.allDay ? day(e.start) : stamp(e.start)}-${Math.random().toString(36).slice(2)}@tourtix`,
     `DTSTAMP:${stamp(new Date().toISOString())}`,
-    `DTSTART:${stamp(e.start)}`,
-    `DTEND:${stamp(e.end)}`,
+    e.allDay ? `DTSTART;VALUE=DATE:${day(e.start)}` : `DTSTART:${stamp(e.start)}`,
+    e.allDay ? `DTEND;VALUE=DATE:${day(e.end)}` : `DTEND:${stamp(e.end)}`,
     `SUMMARY:${escapeIcs(e.title)}`,
     e.location ? `LOCATION:${escapeIcs(e.location)}` : "",
     e.details ? `DESCRIPTION:${escapeIcs(e.details)}` : "",

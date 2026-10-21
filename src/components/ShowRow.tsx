@@ -80,18 +80,20 @@ function SellerOptions({ links }: { links: SellerLink[] }) {
 
 function showEvent(show: Show, artistName: string): CalendarEvent | null {
   if (!show.date) return null;
-  const start =
-    show.time && show.timezone
-      ? zonedTimeToUtc(show.date, show.time, show.timezone)
-      : new Date(`${show.date}T20:00:00Z`);
-  const end = new Date(start.getTime() + 3 * 60 * 60 * 1000);
-  return {
+  const common = {
     title: `${artistName} concert`,
-    start: start.toISOString(),
-    end: end.toISOString(),
     location: [show.venue, placeOf(show)].filter(Boolean).join(", "),
     details: show.links.map((l) => `${l.seller}: ${l.url}`).join("\n"),
   };
+  // Without a start time and time zone, an all-day event is the honest choice.
+  if (!show.time || !show.timezone) {
+    const next = new Date(`${show.date}T12:00:00Z`);
+    next.setUTCDate(next.getUTCDate() + 1);
+    return { ...common, allDay: true, start: show.date, end: next.toISOString().slice(0, 10) };
+  }
+  const start = zonedTimeToUtc(show.date, show.time, show.timezone);
+  const end = new Date(start.getTime() + 3 * 60 * 60 * 1000);
+  return { ...common, start: start.toISOString(), end: end.toISOString() };
 }
 
 function Details({ show }: { show: Show }) {
