@@ -109,6 +109,6 @@ export async function sendTestNotification() {
     title: "TourTix notifications are on",
     body: "You'll get alerts here when your artists announce shows or tickets go on sale.",
     url: "/my-artists",
-    tag: "test",
+    tag: `test-${Date.now()}`,
   });
 }

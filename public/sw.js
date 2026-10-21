@@ -13,6 +13,8 @@ self.addEventListener("push", (event) => {
       icon: "/icon-192.png",
       badge: "/icon-192.png",
       tag: data.tag,
+      // Re-alert even when replacing an earlier notification with the same tag.
+      renotify: Boolean(data.tag),
       data: { url: data.url || "/" },
     }),
   );
