@@ -9,6 +9,7 @@ export function computeStatus(
   if (code === "cancelled" || code === "canceled") return "cancelled";
   if (code === "offsale") return "offsale";
   if (code === "rescheduled") return "rescheduled";
+  if (code === "postponed") return "postponed";
 
   if (publicSaleStart && new Date(publicSaleStart) <= now) return "onsale";
 
@@ -31,5 +32,6 @@ export const statusLabel: Record<TicketStatus, string> = {
   offsale: "Off sale",
   cancelled: "Cancelled",
   rescheduled: "Rescheduled",
+  postponed: "Postponed",
   listed: "Check availability",
 };

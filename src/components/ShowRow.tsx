@@ -233,7 +233,7 @@ export function ShowRow({
 }) {
   const place = placeOf(show);
   const nextSale = upcomingSaleStarts(show, FOREVER)[0];
-  const canBuy = show.status !== "cancelled" && show.status !== "offsale";
+  const canBuy = show.status !== "cancelled" && show.status !== "offsale" && show.status !== "postponed";
   const concert = showEvent(show, artistName);
 
   return (

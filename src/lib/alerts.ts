@@ -95,7 +95,7 @@ export async function runAlertCheck() {
     try {
       shows = (
         await getShows({ id: artistId, name, imageUrl: null, genre: null, upcomingShows: 0 })
-      ).filter((s) => (!s.date || s.date >= today) && s.status !== "cancelled" && s.status !== "offsale");
+      ).filter((s) => (!s.date || s.date >= today) && s.status !== "cancelled" && s.status !== "offsale" && s.status !== "postponed");
     } catch (err) {
       // Skip this artist this time; one failure shouldn't stop everyone's alerts.
       console.error(`alerts: ${name}`, err);

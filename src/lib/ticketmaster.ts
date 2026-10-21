@@ -31,18 +31,23 @@ function toArtist(a: any): Artist {
   };
 }
 
+// Ticketmaster uses dates like 1900-01-01 as "to be announced" placeholders.
+function realTime(iso: unknown): string | null {
+  if (typeof iso !== "string") return null;
+  const t = Date.parse(iso);
+  return Number.isFinite(t) && new Date(t).getUTCFullYear() >= 2000 ? iso : null;
+}
+
 function toShow(e: any): Show {
   const venue = e._embedded?.venues?.[0];
   const presales: Presale[] = (e.sales?.presales ?? []).map((p: any) => ({
     name: p.name ?? "Presale",
-    start: p.startDateTime ?? null,
-    end: p.endDateTime ?? null,
+    start: realTime(p.startDateTime),
+    end: realTime(p.endDateTime),
     url: p.url ?? null,
     description: p.description ?? null,
   }));
-  const publicSaleStart = e.sales?.public?.startTBD
-    ? null
-    : (e.sales?.public?.startDateTime ?? null);
+  const publicSaleStart = e.sales?.public?.startTBD ? null : realTime(e.sales?.public?.startDateTime);
   // Discovery price ranges are usually face value before fees; only use one
   // that says it includes fees.
   const allIn = (e.priceRanges ?? []).find((r: any) => /fee/i.test(r.type ?? ""));
@@ -94,6 +99,8 @@ function tmExtras(e: any, venue: any): ShowExtras {
     parking: text(venue?.parkingDetail),
   };
 }
+
+export const _test = { toShow };
 
 export async function tmSearchArtists(query: string): Promise<Artist[]> {
   const data = await tm("/attractions.json", {

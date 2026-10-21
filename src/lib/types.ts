@@ -31,6 +31,7 @@ export type TicketStatus =
   | "offsale"
   | "cancelled"
   | "rescheduled"
+  | "postponed"
   // Listed by a seller that doesn't tell us whether tickets are available.
   | "listed";
 

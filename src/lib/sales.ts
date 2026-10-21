@@ -4,7 +4,11 @@ export type SaleStart = { label: string; start: string };
 
 // Presale and general-sale start times that fall within the next `windowMs`,
 // earliest first.
+// Shows whose sale times no longer mean anything.
+const NOT_SELLING = new Set(["cancelled", "offsale", "postponed"]);
+
 export function upcomingSaleStarts(show: Show, windowMs: number, now = Date.now()): SaleStart[] {
+  if (NOT_SELLING.has(show.status)) return [];
   const starts = [
     ...show.presales.map((p) => ({ label: p.name, start: p.start })),
     { label: "General sale", start: show.publicSaleStart },

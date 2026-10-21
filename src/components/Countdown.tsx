@@ -1,6 +1,7 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useSyncExternalStore } from "react";
 
 function format(ms: number) {
   const s = Math.floor(ms / 1000);
@@ -44,6 +45,16 @@ export function Countdown({ to, label }: { to: string; label: string }) {
     () => now,
     () => null,
   );
+  const router = useRouter();
+  const live = current != null && current >= new Date(to).getTime();
+  // When a sale starts, reload the page data so the status label and the
+  // next countdown (e.g. presale -> general sale) update without a manual refresh.
+  useEffect(() => {
+    if (!live) return;
+    const t = setTimeout(() => router.refresh(), 3000);
+    return () => clearTimeout(t);
+  }, [live, router]);
+
   if (current == null) return null;
   const left = new Date(to).getTime() - current;
   if (left <= 0) return <span className="font-medium text-emerald-600">{label} is live now</span>;
