@@ -6,6 +6,7 @@ const SITES: { name: string; url: (q: string) => string }[] = [
   { name: "StubHub", url: (q) => `https://www.stubhub.com/search?q=${q}` },
   { name: "Vivid Seats", url: (q) => `https://www.vividseats.com/search?searchTerm=${q}` },
   { name: "SeatGeek", url: (q) => `https://seatgeek.com/search?search=${q}` },
+  { name: "Gametime", url: (q) => `https://gametime.co/search?q=${q}` },
 ];
 
 export function otherSiteSearches(artistName: string, city: string | null, connected: string[]) {
