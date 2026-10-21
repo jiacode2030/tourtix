@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { currentUserId } from "@/auth";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { FavoriteButton } from "@/components/FavoriteButton";
@@ -16,7 +16,7 @@ export default async function ArtistPage({
   const { id } = await params;
   const artist = await getArtist(id);
   if (!artist) notFound();
-  const { userId } = await auth();
+  const userId = await currentUserId();
   const [shows, following, profile] = await Promise.all([
     getShows(artist),
     userId ? isFavorite(userId, id) : false,
@@ -47,7 +47,7 @@ export default async function ArtistPage({
         {userId ? (
           <FavoriteButton artistId={artist.id} isFavorite={following} />
         ) : (
-          <SignInPrompt label="☆ Sign in to follow" />
+          <SignInPrompt label="☆ Sign in to follow" redirectTo={`/artists/${artist.id}`} />
         )}
       </div>
 

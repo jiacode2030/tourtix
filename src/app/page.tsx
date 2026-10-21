@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { currentUserId } from "@/auth";
 import Link from "next/link";
 import { ArtistCard } from "@/components/ArtistCard";
 import { DropList } from "@/components/DropList";
@@ -84,7 +84,7 @@ export default async function Home({
     );
   }
 
-  const { userId } = await auth();
+  const userId = await currentUserId();
   const [mine, drops, popular] = await Promise.all([
     userId ? followedDrops(userId) : null,
     upcomingDrops(WEEK_MS),

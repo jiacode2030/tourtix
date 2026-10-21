@@ -17,8 +17,10 @@ export default function PrivacyPage() {
       <p>You can search artists and view shows without an account. If you create an account, we collect:</p>
       <ul>
         <li>
-          <strong>Account details:</strong> your email address and name, and your Google profile
-          basics if you sign in with Google. These are handled by our login provider, Clerk.
+          <strong>Account details:</strong> you sign in with Google, which shares your Google
+          account ID, name, email address, and profile picture with us. We keep these in a secure
+          sign-in cookie on your device; our database stores only your Google account ID, linked
+          to the data below.
         </li>
         <li>
           <strong>Artists you follow</strong>, so we can show you their upcoming shows.
@@ -52,14 +54,14 @@ export default function PrivacyPage() {
 
       <h2>Cookies</h2>
       <p>
-        We use cookies only to keep you signed in. We do not use advertising cookies or tracking
+        We use cookies only to keep you signed in and to keep sign-in secure. We do not use advertising cookies or tracking
         pixels.
       </p>
 
       <h2>Who we share it with</h2>
       <p>We use these service providers, which process data on our behalf:</p>
       <ul>
-        <li><strong>Clerk</strong>: sign-in and account management</li>
+        <li><strong>Google</strong>: sign-in</li>
         <li><strong>Neon</strong>: database storing followed artists and location</li>
         <li><strong>Vercel</strong>: website hosting</li>
         <li>
@@ -78,7 +80,7 @@ export default function PrivacyPage() {
       <h2>Keeping and deleting your data</h2>
       <p>
         We keep your account data until you delete your account. You can delete it at any time
-        from <strong>Settings → Delete my account</strong>, which permanently removes your login,
+        from <strong>Settings → Delete my account</strong>, which permanently removes your
         followed artists, location, and notification settings.
       </p>
 

@@ -1,6 +1,6 @@
 import { boolean, doublePrecision, integer, pgTable, primaryKey, text, timestamp } from "drizzle-orm/pg-core";
 
-// One row per signed-in user who has saved settings. user_id is Clerk's ID.
+// One row per signed-in user who has saved settings. user_id is the Google account ID.
 export const profiles = pgTable("profiles", {
   userId: text("user_id").primaryKey(),
   city: text("city"),

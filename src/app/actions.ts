@@ -1,6 +1,6 @@
 "use server";
 
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { currentUserId, signOut } from "@/auth";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -12,7 +12,7 @@ import { sendToUser } from "@/lib/push";
 import { isUsState } from "@/lib/regions";
 
 async function requireUser() {
-  const { userId } = await auth();
+  const userId = await currentUserId();
   if (!userId) throw new Error("Not signed in");
   return userId;
 }
@@ -65,16 +65,15 @@ export async function saveLocation(formData: FormData) {
   redirect("/settings?saved=1");
 }
 
-// Deletes everything we store about the user, then their login account.
+// Deletes everything we store about the user and signs them out. Accounts
+// are just a Google sign-in, so there's no separate login record to remove.
 export async function deleteMyAccount() {
   const userId = await requireUser();
   await db().delete(favorites).where(eq(favorites.userId, userId));
   await db().delete(profiles).where(eq(profiles.userId, userId));
   await db().delete(pushSubscriptions).where(eq(pushSubscriptions.userId, userId));
   await db().delete(sentAlerts).where(eq(sentAlerts.userId, userId));
-  const clerk = await clerkClient();
-  await clerk.users.deleteUser(userId);
-  redirect("/?deleted=1");
+  await signOut({ redirectTo: "/?deleted=1" });
 }
 
 export async function saveAlertPrefs(formData: FormData) {

@@ -1,14 +1,20 @@
-import { SignInButton } from "@clerk/nextjs";
+import { signIn } from "@/auth";
 
-export function SignInPrompt({ label }: { label: string }) {
+export function SignInPrompt({ label, redirectTo = "/" }: { label: string; redirectTo?: string }) {
   return (
-    <SignInButton mode="modal">
+    <form
+      action={async () => {
+        "use server";
+        await signIn("google", { redirectTo });
+      }}
+      className="inline-block"
+    >
       <button
-        type="button"
+        type="submit"
         className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700"
       >
         {label}
       </button>
-    </SignInButton>
+    </form>
   );
 }

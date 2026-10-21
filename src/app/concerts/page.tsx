@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { currentUserId } from "@/auth";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { concerts } from "@/lib/data";
@@ -21,7 +21,7 @@ export default async function ConcertsPage({
   const city = params.city?.trim().slice(0, 100) ?? "";
   const state = usStates.some(([c]) => c === params.state) ? params.state : undefined;
 
-  const { userId } = await auth();
+  const userId = await currentUserId();
   const profile = userId ? await getProfile(userId) : null;
   const canUseNearMe = profile?.lat != null && profile?.lng != null;
   const nearMe = params.near === "1" && canUseNearMe;

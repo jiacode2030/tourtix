@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { currentUserId } from "@/auth";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ShowRow } from "@/components/ShowRow";
@@ -16,13 +16,13 @@ export default async function MyArtistsPage({
 }: {
   searchParams: Promise<{ near?: string }>;
 }) {
-  const { userId } = await auth();
+  const userId = await currentUserId();
   if (!userId) {
     return (
       <div className="space-y-4 py-12 text-center">
         <h1 className="text-2xl font-bold">Follow your favorite artists</h1>
         <p className="text-zinc-500">Sign in to see all your artists&apos; upcoming shows in one place.</p>
-        <SignInPrompt label="Sign in" />
+        <SignInPrompt label="Sign in with Google" redirectTo="/my-artists" />
       </div>
     );
   }

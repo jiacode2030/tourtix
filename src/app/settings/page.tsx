@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { currentUserId } from "@/auth";
 import type { Metadata } from "next";
 import { saveAlertPrefs, saveLocation } from "@/app/actions";
 import { DeleteAccountButton } from "@/components/DeleteAccountButton";
@@ -20,12 +20,12 @@ export default async function SettingsPage({
 }: {
   searchParams: Promise<{ saved?: string }>;
 }) {
-  const { userId } = await auth();
+  const userId = await currentUserId();
   if (!userId) {
     return (
       <div className="space-y-4 py-12 text-center">
         <h1 className="text-2xl font-bold">Settings</h1>
-        <SignInPrompt label="Sign in" />
+        <SignInPrompt label="Sign in with Google" redirectTo="/settings" />
       </div>
     );
   }
@@ -125,7 +125,7 @@ export default async function SettingsPage({
       <section className="space-y-3 border-t border-zinc-200 pt-8 dark:border-zinc-800">
         <h2 className="text-lg font-semibold">Delete account</h2>
         <p className="text-sm text-zinc-500">
-          Permanently deletes your login, followed artists, location, and notification settings. This can&apos;t be undone.
+          Permanently deletes your followed artists, location, and notification settings, and signs you out. This can&apos;t be undone.
         </p>
         <DeleteAccountButton />
       </section>

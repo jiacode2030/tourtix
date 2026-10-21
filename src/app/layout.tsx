@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import { ClerkProvider } from "@clerk/nextjs";
 import { Header } from "@/components/Header";
 import { SampleBanner } from "@/components/SampleBanner";
 import { SourcesBar } from "@/components/SourcesBar";
@@ -33,13 +32,11 @@ export default function RootLayout({
         />
       </head>
       <body className={`${geistSans.variable} antialiased`}>
-        <ClerkProvider>
-          <SampleBanner />
-          <SourcesBar />
-          <Header />
-          <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
-          <Footer />
-        </ClerkProvider>
+        <SampleBanner />
+        <SourcesBar />
+        <Header />
+        <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
+        <Footer />
       </body>
     </html>
   );
