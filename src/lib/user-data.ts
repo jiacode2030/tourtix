@@ -1,6 +1,6 @@
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { favorites, profiles } from "@/db/schema";
+import { favorites, profiles, pushSubscriptions } from "@/db/schema";
 import { DEFAULT_RADIUS, type UserLocation } from "./geo";
 
 export type Profile = typeof profiles.$inferSelect;
@@ -34,4 +34,14 @@ export function locationOf(profile: Profile | null): UserLocation | null {
     lng: profile.lng,
     radiusMiles: profile.radiusMiles ?? DEFAULT_RADIUS,
   };
+}
+
+// Whether the user turned on notifications on at least one device.
+export async function hasNotifications(userId: string) {
+  const rows = await db()
+    .select({ endpoint: pushSubscriptions.endpoint })
+    .from(pushSubscriptions)
+    .where(eq(pushSubscriptions.userId, userId))
+    .limit(1);
+  return rows.length > 0;
 }

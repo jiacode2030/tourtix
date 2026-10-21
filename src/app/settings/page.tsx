@@ -101,7 +101,7 @@ export default async function SettingsPage({
         </form>
       </section>
 
-      <section className="space-y-4 border-t border-zinc-200 pt-8 dark:border-zinc-800">
+      <section id="notifications" className="scroll-mt-6 space-y-4 border-t border-zinc-200 pt-8 dark:border-zinc-800">
         <div>
           <h2 className="text-lg font-semibold">Notifications</h2>
           <p className="text-sm text-zinc-500">

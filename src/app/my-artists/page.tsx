@@ -2,11 +2,12 @@ import { currentUserId } from "@/auth";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ShowRow } from "@/components/ShowRow";
+import { GetStarted } from "@/components/GetStarted";
 import { InstallButton } from "@/components/InstallButton";
 import { SignInPrompt } from "@/components/SignInPrompt";
 import { getShows } from "@/lib/data";
 import { hasLocation, isNear } from "@/lib/geo";
-import { getProfile, listFavorites, locationOf } from "@/lib/user-data";
+import { getProfile, hasNotifications, listFavorites, locationOf } from "@/lib/user-data";
 
 export const metadata: Metadata = { title: "My Artists" };
 
@@ -29,7 +30,11 @@ export default async function MyArtistsPage({
   }
 
   const nearOnly = (await searchParams).near === "1";
-  const [favs, profile] = await Promise.all([listFavorites(userId), getProfile(userId)]);
+  const [favs, profile, notifying] = await Promise.all([
+    listFavorites(userId),
+    getProfile(userId),
+    hasNotifications(userId),
+  ]);
   const loc = locationOf(profile);
   const located = hasLocation(loc);
 
@@ -83,6 +88,7 @@ export default async function MyArtistsPage({
         )}
       </div>
 
+      <GetStarted following={favs.length > 0} located={located} notifying={notifying} />
       <InstallButton />
 
       {favs.length === 0 && (

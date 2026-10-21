@@ -10,7 +10,7 @@ import { fmtDate } from "@/lib/format";
 import { hasLocation, isNear } from "@/lib/geo";
 import { upcomingSaleStarts } from "@/lib/sales";
 import type { Show } from "@/lib/types";
-import { getProfile, isFavorite, locationOf } from "@/lib/user-data";
+import { getProfile, hasNotifications, isFavorite, locationOf } from "@/lib/user-data";
 
 export async function generateMetadata({
   params,
@@ -51,10 +51,11 @@ export default async function ArtistPage({
   const artist = await getArtist(id);
   if (!artist) notFound();
   const userId = await currentUserId();
-  const [shows, following, profile] = await Promise.all([
+  const [shows, following, profile, notifying] = await Promise.all([
     getShows(artist),
     userId ? isFavorite(userId, id) : false,
     userId ? getProfile(userId) : null,
+    userId ? hasNotifications(userId) : false,
   ]);
   const loc = locationOf(profile);
   const located = hasLocation(loc);
@@ -96,11 +97,24 @@ export default async function ArtistPage({
           </p>
         </div>
       </div>
-      <div>
+      <div className="space-y-3">
         {userId ? (
           <FavoriteButton artistId={artist.id} isFavorite={following} />
         ) : (
           <SignInPrompt label="☆ Sign in to follow" redirectTo={`/artists/${artist.id}`} />
+        )}
+        {following && !notifying && (
+          <div className="flex flex-wrap items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm dark:border-amber-900 dark:bg-amber-950/40">
+            <span className="flex-1">
+              🔔 Want an alert when {artist.name} announces shows or tickets go on sale?
+            </span>
+            <Link
+              href="/settings#notifications"
+              className="rounded-lg bg-violet-600 px-3 py-1.5 font-medium text-white hover:bg-violet-700"
+            >
+              Turn on notifications
+            </Link>
+          </div>
         )}
       </div>
 
