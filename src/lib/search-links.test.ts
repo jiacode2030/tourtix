@@ -14,15 +14,14 @@ describe("otherSiteSearches", () => {
     expect(axs.url).toBe("https://www.google.com/search?q=Calvin%20Harris%20Las%20Vegas%20site%3Aaxs.com");
   });
 
-  it("links Eventbrite to its own search by artist name", () => {
-    const eb = otherSiteSearches("Beyoncé & Jay-Z", "Atlanta", []).official.find((l) => l.name === "Eventbrite")!;
-    expect(eb.viaGoogle).toBe(false);
-    expect(eb.url).toBe("https://www.eventbrite.com/d/united-states/beyonce-jay-z/");
-  });
-
   it("searches every domain a site uses", () => {
     const see = otherSiteSearches("Calvin Harris", null, []).official.find((l) => l.name === "See Tickets")!;
     expect(decodeURIComponent(see.url)).toContain("Calvin Harris site:seetickets.us OR site:seetickets.com");
+  });
+
+  it("lists only concert-focused official sellers", () => {
+    const { official } = otherSiteSearches("Calvin Harris", null, []);
+    expect(official.map((l) => l.name)).toEqual(["AXS", "DICE", "See Tickets"]);
   });
 
   it("never includes affiliate or tracking parameters", () => {
