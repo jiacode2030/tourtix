@@ -91,6 +91,9 @@ export default async function ArtistPage({
             {artist.genre ?? "Music"}
             {nextShow && ` · Next show ${fmtDate(nextShow.date)}`}
           </p>
+          <p className="text-xs text-zinc-400">
+            Unofficial fan tool. Not affiliated with {artist.name} or their team.
+          </p>
         </div>
       </div>
       <div>
