@@ -15,6 +15,10 @@ export type Presale = {
 export type SellerLink = {
   seller: string;
   url: string;
+  // Lowest listed price including the seller's mandatory fees. Null when the
+  // seller doesn't report an all-in price, so we never show a pre-fee price.
+  allInPrice: number | null;
+  currency: string | null;
 };
 
 export type TicketStatus =
@@ -39,7 +43,4 @@ export type Show = {
   status: TicketStatus;
   publicSaleStart: string | null;
   presales: Presale[];
-  priceMin: number | null;
-  priceMax: number | null;
-  currency: string | null;
 };

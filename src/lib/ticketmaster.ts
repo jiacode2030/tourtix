@@ -44,7 +44,9 @@ function toShow(e: any): Show {
   const publicSaleStart = e.sales?.public?.startTBD
     ? null
     : (e.sales?.public?.startDateTime ?? null);
-  const price = e.priceRanges?.[0];
+  // Discovery price ranges are usually face value before fees; only use one
+  // that says it includes fees.
+  const allIn = (e.priceRanges ?? []).find((r: any) => /fee/i.test(r.type ?? ""));
   return {
     id: e.id,
     name: e.name,
@@ -55,13 +57,19 @@ function toShow(e: any): Show {
     city: venue?.city?.name ?? null,
     region: venue?.state?.stateCode ?? null,
     country: venue?.country?.countryCode ?? null,
-    links: e.url ? [{ seller: "Ticketmaster", url: e.url }] : [],
+    links: e.url
+      ? [
+          {
+            seller: "Ticketmaster",
+            url: e.url,
+            allInPrice: allIn?.min ?? null,
+            currency: allIn?.currency ?? null,
+          },
+        ]
+      : [],
     status: computeStatus(e.dates?.status?.code, publicSaleStart, presales),
     publicSaleStart,
     presales,
-    priceMin: price?.min ?? null,
-    priceMax: price?.max ?? null,
-    currency: price?.currency ?? null,
   };
 }
 

@@ -38,13 +38,21 @@ function toShow(e: any): Show {
     city: v.city ?? null,
     region: v.state ?? null,
     country: v.country ?? null,
-    links: e.url ? [{ seller: "SeatGeek", url: e.url }] : [],
+    links: e.url
+      ? [
+          {
+            seller: "SeatGeek",
+            url: e.url,
+            // stats.lowest_price is SeatGeek's all-in floor (fees included);
+            // lowest_sg_base_price is the pre-fee one, which we don't use.
+            allInPrice: e.stats?.lowest_price ?? null,
+            currency: "USD",
+          },
+        ]
+      : [],
     status: listed ? "onsale" : "announced",
     publicSaleStart: null,
     presales: [],
-    priceMin: null,
-    priceMax: null,
-    currency: null,
   };
 }
 
