@@ -2,6 +2,7 @@ import { currentUserId } from "@/auth";
 import type { Metadata } from "next";
 import { saveAlertPrefs, saveLocation } from "@/app/actions";
 import { DeleteAccountButton } from "@/components/DeleteAccountButton";
+import { InstallButton } from "@/components/InstallButton";
 import { LocationFields } from "@/components/LocationFields";
 import { NotificationsToggle } from "@/components/NotificationsToggle";
 import { SignInPrompt } from "@/components/SignInPrompt";
@@ -11,7 +12,7 @@ import { getVapidKeys } from "@/lib/push";
 import { usStates } from "@/lib/regions";
 import { getProfile } from "@/lib/user-data";
 
-export const metadata: Metadata = { title: "Settings · TourTix" };
+export const metadata: Metadata = { title: "Settings" };
 
 const field =
   "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900";
@@ -108,6 +109,7 @@ export default async function SettingsPage({
             you want alerts on.
           </p>
         </div>
+        <InstallButton />
         <NotificationsToggle publicKey={publicKey} />
         <form action={saveAlertPrefs} className="space-y-3">
           <p className="text-sm font-medium">Alert me when:</p>

@@ -187,3 +187,13 @@ export async function tmConcerts(where: ConcertSearch, days: number): Promise<Ev
   }
   return withArtists(await tm("/events.json", params));
 }
+
+// Lightweight artist suggestions for the search box.
+export async function tmSuggestArtists(query: string): Promise<Artist[]> {
+  const data = await tm("/attractions.json", {
+    keyword: query,
+    classificationName: "music",
+    size: "6",
+  });
+  return (data._embedded?.attractions ?? []).map(toArtist);
+}

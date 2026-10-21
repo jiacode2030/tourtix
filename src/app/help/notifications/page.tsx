@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = { title: "Notification help · TourTix" };
+export const metadata: Metadata = { title: "Notification help" };
 
 const sections: { id: string; title: string; steps: React.ReactNode[] }[] = [
   {

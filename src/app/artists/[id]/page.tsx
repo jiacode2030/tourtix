@@ -1,19 +1,53 @@
-import { currentUserId } from "@/auth";
+import type { Metadata } from "next";
 import Link from "next/link";
+import { currentUserId } from "@/auth";
 import { notFound } from "next/navigation";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ShowRow } from "@/components/ShowRow";
 import { SignInPrompt } from "@/components/SignInPrompt";
 import { getArtist, getShows } from "@/lib/data";
-import { isNear } from "@/lib/geo";
+import { fmtDate } from "@/lib/format";
+import { hasLocation, isNear } from "@/lib/geo";
+import { upcomingSaleStarts } from "@/lib/sales";
+import type { Show } from "@/lib/types";
 import { getProfile, isFavorite, locationOf } from "@/lib/user-data";
 
-export default async function ArtistPage({
+export async function generateMetadata({
   params,
 }: {
   params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const artist = await getArtist((await params).id).catch(() => null);
+  if (!artist) return { title: "Artist not found" };
+  const title = `${artist.name} Tour Dates & Ticket Drops`;
+  const description = `See every upcoming ${artist.name} show, presale and on-sale times, and where to buy tickets. Get alerts when ${artist.name} tickets drop.`;
+  return {
+    title,
+    description,
+    alternates: { canonical: `/artists/${artist.id}` },
+    openGraph: { title, description },
+  };
+}
+
+const FILTERS = [
+  { key: "all", label: "All" },
+  { key: "onsale", label: "On sale now" },
+  { key: "upcoming", label: "Sale coming up" },
+  { key: "near", label: "Near me" },
+] as const;
+type FilterKey = (typeof FILTERS)[number]["key"];
+
+const FOREVER = Number.MAX_SAFE_INTEGER;
+
+export default async function ArtistPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ filter?: string }>;
 }) {
   const { id } = await params;
+  const requested = (await searchParams).filter;
   const artist = await getArtist(id);
   if (!artist) notFound();
   const userId = await currentUserId();
@@ -23,6 +57,19 @@ export default async function ArtistPage({
     userId ? getProfile(userId) : null,
   ]);
   const loc = locationOf(profile);
+  const located = hasLocation(loc);
+  const filter: FilterKey =
+    FILTERS.some((f) => f.key === requested) && (requested !== "near" || located)
+      ? (requested as FilterKey)
+      : "all";
+  const matches: Record<FilterKey, (s: Show) => boolean> = {
+    all: () => true,
+    onsale: (s) => s.status === "onsale" || s.status === "presale",
+    upcoming: (s) => upcomingSaleStarts(s, FOREVER).length > 0,
+    near: (s) => isNear(s, loc),
+  };
+  const visible = shows.filter(matches[filter]);
+  const nextShow = shows.find((s) => s.status !== "cancelled");
 
   return (
     <div className="space-y-6">
@@ -40,7 +87,10 @@ export default async function ArtistPage({
         </div>
         <div className="min-w-0 flex-1">
           <h1 className="text-3xl font-bold">{artist.name}</h1>
-          <p className="text-zinc-500">{artist.genre ?? "Music"}</p>
+          <p className="text-zinc-500">
+            {artist.genre ?? "Music"}
+            {nextShow && ` · Next show ${fmtDate(nextShow.date)}`}
+          </p>
         </div>
       </div>
       <div>
@@ -56,15 +106,33 @@ export default async function ArtistPage({
           Upcoming shows <span className="text-zinc-400">({shows.length})</span>
         </h2>
         {shows.length > 0 && (
+          <nav className="flex flex-wrap gap-2" aria-label="Filter shows">
+            {FILTERS.filter((f) => f.key !== "near" || located).map((f) => (
+              <Link
+                key={f.key}
+                href={f.key === "all" ? `/artists/${artist.id}` : `/artists/${artist.id}?filter=${f.key}`}
+                scroll={false}
+                className={`rounded-full border px-3 py-1 text-sm ${
+                  filter === f.key
+                    ? "border-violet-600 bg-violet-600 text-white"
+                    : "border-zinc-300 hover:border-violet-500 dark:border-zinc-700"
+                }`}
+              >
+                {f.label} ({shows.filter(matches[f.key]).length})
+              </Link>
+            ))}
+          </nav>
+        )}
+        {shows.length > 0 && (
           <p className="text-sm text-zinc-500">
             Show info refreshes about every 5 minutes. Where prices are shown, they&apos;re the
             lowest listed on each site including mandatory fees (not taxes). Always check the final
             total before you buy.
           </p>
         )}
-        {shows.length ? (
+        {visible.length ? (
           <ul className="space-y-3">
-            {shows.map((s) => (
+            {visible.map((s) => (
               <ShowRow
                 key={s.id}
                 show={s}
@@ -76,7 +144,7 @@ export default async function ArtistPage({
           </ul>
         ) : (
           <p className="rounded-xl border border-dashed border-zinc-300 p-6 text-center text-zinc-500 dark:border-zinc-700">
-            No upcoming shows right now.
+            {shows.length ? "No shows match this filter." : "No upcoming shows right now."}
           </p>
         )}
       </section>

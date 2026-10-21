@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = { title: "Ticket buying tips · TourTix" };
+export const metadata: Metadata = { title: "Ticket buying tips" };
 
 const tips: { title: string; body: React.ReactNode }[] = [
   {

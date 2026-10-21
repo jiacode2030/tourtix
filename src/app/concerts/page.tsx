@@ -7,7 +7,7 @@ import { geohash } from "@/lib/geo";
 import { usStates } from "@/lib/regions";
 import { getProfile } from "@/lib/user-data";
 
-export const metadata: Metadata = { title: "Concerts near you · TourTix" };
+export const metadata: Metadata = { title: "Concerts near you" };
 
 const field =
   "rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900";

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { sampleArtists, sampleShows } from "./sample-data";
 import { mergeShows, sgGetShows } from "./seatgeek";
 import { groupDrops, type TicketDrop } from "./sales";
@@ -9,6 +10,7 @@ import {
   tmGetShows,
   tmPopularArtists,
   tmSearchArtists,
+  tmSuggestArtists,
 } from "./ticketmaster";
 import type { Artist, Show } from "./types";
 
@@ -22,10 +24,12 @@ export async function searchArtists(query: string): Promise<Artist[]> {
   return tmSearchArtists(query);
 }
 
-export async function getArtist(id: string): Promise<Artist | null> {
+// Wrapped in cache() so the page, its metadata and its preview image share
+// one lookup per request.
+export const getArtist = cache(async (id: string): Promise<Artist | null> => {
   if (usingSampleData) return sampleArtists.find((a) => a.id === id) ?? null;
   return tmGetArtist(id);
-}
+});
 
 export async function getShows(artist: Artist): Promise<Show[]> {
   if (usingSampleData) return sampleShows(artist.id);
@@ -69,4 +73,9 @@ export async function concerts(where: ConcertSearch, days = 30) {
     return sampleArtists.flatMap((a) => sampleShows(a.id).map((show) => ({ artist: a, show })));
   }
   return tmConcerts(where, days);
+}
+
+export async function suggestArtists(query: string): Promise<Artist[]> {
+  if (usingSampleData) return (await searchArtists(query)).slice(0, 6);
+  return tmSuggestArtists(query);
 }

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { REASONS } from "@/lib/contact";
 import { sendContactMessage } from "./actions";
 
-export const metadata: Metadata = { title: "Contact · TourTix" };
+export const metadata: Metadata = { title: "Contact" };
 
 const field =
   "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900";

@@ -2,12 +2,13 @@ import { currentUserId } from "@/auth";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ShowRow } from "@/components/ShowRow";
+import { InstallButton } from "@/components/InstallButton";
 import { SignInPrompt } from "@/components/SignInPrompt";
 import { getShows } from "@/lib/data";
 import { hasLocation, isNear } from "@/lib/geo";
 import { getProfile, listFavorites, locationOf } from "@/lib/user-data";
 
-export const metadata: Metadata = { title: "My Artists · TourTix" };
+export const metadata: Metadata = { title: "My Artists" };
 
 const SHOWS_PER_ARTIST = 5;
 
@@ -81,6 +82,8 @@ export default async function MyArtistsPage({
           </Link>
         )}
       </div>
+
+      <InstallButton />
 
       {favs.length === 0 && (
         <p className="rounded-xl border border-dashed border-zinc-300 p-8 text-center text-zinc-500 dark:border-zinc-700">

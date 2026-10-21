@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { deleteContactMessage, listContactMessages } from "@/app/contact/actions";
 import { reasonLabel } from "@/lib/contact";
 
-export const metadata: Metadata = { title: "Messages · TourTix", robots: { index: false } };
+export const metadata: Metadata = { title: "Messages", robots: { index: false } };
 
 export default async function AdminMessagesPage() {
   const messages = await listContactMessages();

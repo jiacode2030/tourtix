@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LegalPage } from "@/components/LegalPage";
 import { activeSources } from "@/lib/sources";
 
-export const metadata: Metadata = { title: "Privacy Policy · TourTix" };
+export const metadata: Metadata = { title: "Privacy Policy" };
 
 export default function PrivacyPage() {
   return (
@@ -44,6 +44,13 @@ export default function PrivacyPage() {
         reliability.
       </p>
 
+      <h2>Visitor statistics</h2>
+      <p>
+        We use Vercel Web Analytics to count visits and see which pages are popular. It doesn&apos;t
+        use cookies, doesn&apos;t track you across sites, and doesn&apos;t identify you personally;
+        it records things like the page visited, referring site, country, and device type.
+      </p>
+
       <h2>How we use it</h2>
       <p>
         Only to run TourTix: signing you in, showing your artists and nearby shows, and keeping the
@@ -67,7 +74,7 @@ export default function PrivacyPage() {
       <ul>
         <li><strong>Google</strong>: sign-in</li>
         <li><strong>Neon</strong>: database storing followed artists and location</li>
-        <li><strong>Vercel</strong>: website hosting</li>
+        <li><strong>Vercel</strong>: website hosting and visitor statistics</li>
         <li>
           <strong>Your browser&apos;s push service</strong> (for example Google, Apple, or Mozilla):
           delivers notifications to your device

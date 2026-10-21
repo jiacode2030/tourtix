@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import webpush from "web-push";
 import { db } from "@/db";
 import { appState, pushSubscriptions } from "@/db/schema";
+import { siteUrl } from "./site";
 
 export type PushPayload = { title: string; body: string; url: string; tag?: string };
 
@@ -27,11 +28,6 @@ export async function getVapidKeys(): Promise<VapidKeys> {
   }
   cached = JSON.parse(row!.value) as VapidKeys;
   return cached;
-}
-
-function siteUrl() {
-  const host = process.env.VERCEL_PROJECT_PRODUCTION_URL;
-  return host ? `https://${host}` : "http://localhost:3000";
 }
 
 // Sends to every device the user enabled. Returns how many got it.
