@@ -23,6 +23,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* impact.com (Vivid Seats affiliate) site ownership verification.
+            impact.com's tag uses `value` rather than the usual `content`. */}
+        <meta
+          name="impact-site-verification"
+          {...{ value: "6c44ae7a-96d9-432a-bad2-05701b1b8f64" }}
+        />
+      </head>
       <body className={`${geistSans.variable} antialiased`}>
         <SampleBanner />
         <SourcesBar />
