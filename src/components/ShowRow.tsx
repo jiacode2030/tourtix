@@ -1,6 +1,6 @@
 import { fmtDate, fmtDateTime, zonedTimeToUtc } from "@/lib/format";
 import { upcomingSaleStarts } from "@/lib/sales";
-import { otherSiteSearches } from "@/lib/search-links";
+import { otherSiteSearches, type SearchLink } from "@/lib/search-links";
 import type { SellerLink, Show } from "@/lib/types";
 import { AddToCalendar, type CalendarEvent } from "./AddToCalendar";
 import { Countdown } from "./Countdown";
@@ -76,6 +76,48 @@ function SellerOptions({ links }: { links: SellerLink[] }) {
         );
       })}
     </ul>
+  );
+}
+
+function SiteLinks({ label, links }: { label: string; links: SearchLink[] }) {
+  if (!links.length) return null;
+  return (
+    <div>
+      <span className="text-zinc-500">{label}: </span>
+      {links.map((l, i) => (
+        <span key={l.name}>
+          {i > 0 && " · "}
+          <a
+            href={l.url}
+            target="_blank"
+            rel="nofollow noopener noreferrer"
+            title={l.viaGoogle ? `Google search of ${l.name}` : `Search ${l.name}`}
+            className="font-medium text-violet-600 hover:underline"
+          >
+            {l.name}
+          </a>
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function OtherSites({ artistName, show }: { artistName: string; show: Show }) {
+  const { resale, official } = otherSiteSearches(artistName, show.city, show.links.map((l) => l.seller));
+  return (
+    <details className="text-sm">
+      <summary className="cursor-pointer font-medium text-violet-600">
+        Search other ticket sites ({resale.length + official.length})
+      </summary>
+      <div className="mt-2 space-y-1.5">
+        <SiteLinks label="Resale" links={resale} />
+        <SiteLinks label="Other official sellers" links={official} />
+        <p className="text-xs text-zinc-500">
+          Not checked by TourTix. These sites may not have this show. Some links open a Google
+          search of that site.
+        </p>
+      </div>
+    </details>
   );
 }
 
@@ -224,27 +266,7 @@ export function ShowRow({
 
       {canBuy && show.links.length > 0 && <SellerOptions links={show.links} />}
 
-      {canBuy && (
-        <p className="text-sm text-zinc-500">
-          Also search:{" "}
-          {otherSiteSearches(artistName, show.city, show.links.map((l) => l.seller)).map((s, i) => (
-            <span key={s.name}>
-              {i > 0 && " · "}
-              <a
-                href={s.url}
-                target="_blank"
-                rel="nofollow noopener noreferrer"
-                className="font-medium text-violet-600 hover:underline"
-              >
-                {s.name}
-              </a>
-            </span>
-          ))}
-          <span className="block text-xs">
-            Not checked by TourTix. These sites may not have this show.
-          </span>
-        </p>
-      )}
+      {canBuy && <OtherSites artistName={artistName} show={show} />}
 
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
         {nextSale && (
