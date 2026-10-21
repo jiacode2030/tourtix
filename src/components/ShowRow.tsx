@@ -96,7 +96,14 @@ function SellerOptions({ links }: { links: SellerLink[] }) {
   );
 }
 
-export function ShowRow({ show }: { show: Show }) {
+export function ShowRow({
+  show,
+  homeRegion = null,
+}: {
+  show: Show;
+  homeRegion?: string | null;
+}) {
+  const nearYou = homeRegion != null && show.country === "US" && show.region === homeRegion;
   const place = [show.city, show.region ?? show.country].filter(Boolean).join(", ");
   const note = saleNote(show);
   const buyable = show.status === "onsale" || show.status === "presale";
@@ -106,7 +113,14 @@ export function ShowRow({ show }: { show: Show }) {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="w-32 shrink-0 text-sm font-semibold text-violet-600">{fmtDate(show.date)}</div>
         <div className="min-w-0 flex-1">
-          <div className="font-medium">{place || "Location TBA"}</div>
+          <div className="font-medium">
+            {place || "Location TBA"}
+            {nearYou && (
+              <span className="ml-2 rounded-full bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-800 dark:bg-violet-950 dark:text-violet-300">
+                Near you
+              </span>
+            )}
+          </div>
           <div className="truncate text-sm text-zinc-500">{show.venue}</div>
           {note && <div className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{note}</div>}
         </div>

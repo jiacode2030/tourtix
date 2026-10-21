@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import Link from "next/link";
+import { ClerkProvider } from "@clerk/nextjs";
+import { Header } from "@/components/Header";
 import { SampleBanner } from "@/components/SampleBanner";
 import { SourcesBar } from "@/components/SourcesBar";
 import { Footer } from "@/components/Footer";
@@ -32,17 +33,13 @@ export default function RootLayout({
         />
       </head>
       <body className={`${geistSans.variable} antialiased`}>
-        <SampleBanner />
-        <SourcesBar />
-        <header className="border-b border-zinc-200 dark:border-zinc-800">
-          <nav className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-            <Link href="/" className="text-xl font-bold tracking-tight">
-              Tour<span className="text-violet-600">Tix</span>
-            </Link>
-          </nav>
-        </header>
-        <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
-        <Footer />
+        <ClerkProvider>
+          <SampleBanner />
+          <SourcesBar />
+          <Header />
+          <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
+          <Footer />
+        </ClerkProvider>
       </body>
     </html>
   );

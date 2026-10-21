@@ -1,7 +1,11 @@
+import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { FavoriteButton } from "@/components/FavoriteButton";
 import { ShowRow } from "@/components/ShowRow";
+import { SignInPrompt } from "@/components/SignInPrompt";
 import { getArtist, getShows } from "@/lib/data";
+import { getProfile, isFavorite } from "@/lib/user-data";
 
 export default async function ArtistPage({
   params,
@@ -11,7 +15,12 @@ export default async function ArtistPage({
   const { id } = await params;
   const artist = await getArtist(id);
   if (!artist) notFound();
-  const shows = await getShows(artist);
+  const { userId } = await auth();
+  const [shows, following, profile] = await Promise.all([
+    getShows(artist),
+    userId ? isFavorite(userId, id) : false,
+    userId ? getProfile(userId) : null,
+  ]);
 
   return (
     <div className="space-y-6">
@@ -27,10 +36,17 @@ export default async function ArtistPage({
             artist.name.charAt(0)
           )}
         </div>
-        <div>
+        <div className="min-w-0 flex-1">
           <h1 className="text-3xl font-bold">{artist.name}</h1>
           <p className="text-zinc-500">{artist.genre ?? "Music"}</p>
         </div>
+      </div>
+      <div>
+        {userId ? (
+          <FavoriteButton artistId={artist.id} isFavorite={following} />
+        ) : (
+          <SignInPrompt label="☆ Sign in to follow" />
+        )}
       </div>
 
       <section className="space-y-3">
@@ -46,7 +62,7 @@ export default async function ArtistPage({
         {shows.length ? (
           <ul className="space-y-3">
             {shows.map((s) => (
-              <ShowRow key={s.id} show={s} />
+              <ShowRow key={s.id} show={s} homeRegion={profile?.region ?? null} />
             ))}
           </ul>
         ) : (
