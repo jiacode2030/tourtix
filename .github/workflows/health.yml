@@ -82,7 +82,7 @@ jobs:
           # Metallica has listings from Ticketmaster and from partner sites.
           node -e '
             (async () => {
-              const html = await (await fetch(process.env.SITE + "/artists/K8vZ9171G9V")).text();
+              const html = (await (await fetch(process.env.SITE + "/artists/K8vZ9171G9V")).text()).replace(/<!-- -->/g, "");
               let checked = 0, bad = [];
               for (const m of html.matchAll(/<a [^>]*href="(https?:[^"]+)"[^>]*>(?:<[^>]+>)*\s*Get tickets on ([^<]+)</g)) {
                 const host = new URL(m[1].replace(/&amp;/g, "&")).hostname;
