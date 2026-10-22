@@ -205,13 +205,12 @@ const isMusic = (a: any) =>
 // endpoint, which matches partial words ("calv"), unlike keyword search;
 // falls back to keyword search if autocomplete returns nothing.
 export async function tmSuggestArtists(query: string): Promise<Artist[]> {
-  const data = await tm("/suggest.json", {
-    keyword: query,
-    resource: "attractions",
-    segmentId: MUSIC_SEGMENT,
-    size: "8",
-  });
-  const suggested: Artist[] = (data._embedded?.attractions ?? []).filter(isMusic).map(toArtist);
-  if (suggested.length) return suggested.slice(0, 6);
+  try {
+    const data = await tm("/suggest.json", { keyword: query, resource: "attractions", size: "10" });
+    const suggested: Artist[] = (data._embedded?.attractions ?? []).filter(isMusic).map(toArtist);
+    if (suggested.length) return suggested.slice(0, 6);
+  } catch (err) {
+    console.error("suggest failed, falling back to keyword search", err);
+  }
   return (await tmSearchArtists(query)).slice(0, 6);
 }
