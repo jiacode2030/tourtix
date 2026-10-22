@@ -1,4 +1,5 @@
 import { apiFetch } from "./http";
+import { presaleDisplayName } from "./presale-names";
 import { computeStatus } from "./status";
 import type { Artist, Presale, Show, ShowExtras } from "./types";
 
@@ -44,7 +45,7 @@ function realTime(iso: unknown): string | null {
 function toShow(e: any): Show {
   const venue = e._embedded?.venues?.[0];
   const presales: Presale[] = (e.sales?.presales ?? []).map((p: any) => ({
-    name: p.name ?? "Presale",
+    name: presaleDisplayName(p.name ?? "Presale"),
     start: realTime(p.startDateTime),
     end: realTime(p.endDateTime),
     url: p.url ?? null,

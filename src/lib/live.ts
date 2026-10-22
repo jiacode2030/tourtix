@@ -1,3 +1,4 @@
+import { presaleKey } from "./presale-names";
 import { realPresales } from "./sales";
 import type { Show } from "./types";
 
@@ -22,10 +23,11 @@ export function livePresales(shows: Show[], now = Date.now()): LiveSale[] {
       if (!p.start || Date.parse(p.start) > now) continue;
       const end = p.end ? Date.parse(p.end) : publicStart;
       if (end != null && end <= now) continue;
-      const g = groups.get(p.name) ?? { label: p.name, shows: [], endsAt: null };
+      const key = presaleKey(p.name);
+      const g = groups.get(key) ?? { label: p.name, shows: [], endsAt: null };
       if (!g.shows.includes(show)) g.shows.push(show);
       if (p.end && (!g.endsAt || p.end < g.endsAt)) g.endsAt = p.end;
-      groups.set(p.name, g);
+      groups.set(key, g);
     }
   }
   return [...groups.values()].sort((a, b) => b.shows.length - a.shows.length);

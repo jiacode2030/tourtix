@@ -1,4 +1,5 @@
 import { isNear, type UserLocation } from "./geo";
+import { presaleKey } from "./presale-names";
 import { realPresales, upcomingSaleStarts } from "./sales";
 import type { Show } from "./types";
 
@@ -44,7 +45,7 @@ export function nextDrop(shows: Show[], loc: UserLocation | null, now = Date.now
   if (!starts.length) return null;
   starts.sort((a, b) => a.start.localeCompare(b.start));
   const first = starts[0];
-  const group = starts.filter((s) => s.label === first.label && s.local === first.local);
+  const group = starts.filter((s) => presaleKey(s.label) === presaleKey(first.label) && s.local === first.local);
   const seen = new Set<string>();
   const dropShows = group
     .filter((s) => !seen.has(s.show.id) && seen.add(s.show.id))
@@ -58,24 +59,26 @@ export type SaleStage = { label: string; state: "ended" | "live" | "upcoming"; s
 // Each sale type across the tour (presales, then general sale) and whether it
 // has ended, is live, or is coming up, judged across all of the artist's shows.
 export function saleTimeline(shows: Show[], now = Date.now()): SaleStage[] {
-  const stages = new Map<string, { starts: number[]; live: boolean; ended: boolean }>();
+  const stages = new Map<string, { label: string; starts: number[]; live: boolean; ended: boolean }>();
   const note = (label: string, start: string | null, end: string | null) => {
     if (!start) return;
     const s = Date.parse(start);
     const e = end ? Date.parse(end) : null;
-    const entry = stages.get(label) ?? { starts: [], live: false, ended: false };
+    const key = presaleKey(label);
+    const entry = stages.get(key) ?? { label, starts: [], live: false, ended: false };
     entry.starts.push(s);
     if (s <= now && (e == null || e > now)) entry.live = true;
     if (e != null && e <= now) entry.ended = true;
-    stages.set(label, entry);
+    stages.set(key, entry);
   };
   for (const show of shows) {
     if (show.status === "cancelled" || show.status === "postponed") continue;
     for (const p of realPresales(show)) note(p.name, p.start, p.end);
     note("General sale", show.publicSaleStart, null);
   }
-  return [...stages.entries()]
-    .map(([label, e]) => {
+  return [...stages.values()]
+    .map((e) => {
+      const label = e.label;
       const future = e.starts.filter((s) => s > now);
       const state: SaleStage["state"] = e.live ? "live" : future.length ? "upcoming" : "ended";
       const start = future.length ? new Date(Math.min(...future)).toISOString() : null;
