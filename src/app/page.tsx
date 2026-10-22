@@ -1,5 +1,6 @@
 import { currentUserId } from "@/auth";
 import { Bell, CircleCheck, Clock, Ticket, UserPlus } from "lucide-react";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { ArtistCard } from "@/components/ArtistCard";
 import { AutoRefresh } from "@/components/AutoRefresh";
@@ -15,6 +16,7 @@ import { GENRES, isGenre } from "@/lib/genres";
 import { groupDrops, type TicketDrop } from "@/lib/sales";
 import { chip, chipOff, chipOn, linkAccent } from "@/lib/ui";
 import { hasLocation, isNear } from "@/lib/geo";
+import { SEARCH_LIMIT, allow, clientIp } from "@/lib/rate-limit";
 import type { Show } from "@/lib/types";
 import { getProfile, listFavorites, locationOf } from "@/lib/user-data";
 
@@ -128,13 +130,14 @@ export default async function Home({
   const followState = (id: string) => (followedIds ? followedIds.has(id) : undefined);
 
   if (q) {
-    const results = await searchArtists(q);
+    const limited = !allow(`search:${clientIp(await headers())}`, SEARCH_LIMIT.limit, SEARCH_LIMIT.windowMs);
+    const results = limited ? [] : await searchArtists(q);
     return (
       <div className="space-y-8">
         {renderHero(false)}
         <section className="reveal space-y-4">
           <h2 className="text-xl font-bold tracking-tight">
-            {results.length ? `Results for “${q}”` : `No artists found for “${q}”`}
+            {limited ? "Too many searches. Please wait a minute and try again." : results.length ? `Results for “${q}”` : `No artists found for “${q}”`}
           </h2>
           <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-x-4 lg:grid-cols-4">
             {results.map((a) => (
