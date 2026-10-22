@@ -7,6 +7,7 @@ import { AutoRefresh } from "@/components/AutoRefresh";
 import { GetStarted } from "@/components/GetStarted";
 import { InstallButton } from "@/components/InstallButton";
 import { SignInPrompt } from "@/components/SignInPrompt";
+import { SuggestedArtists } from "@/components/SuggestedArtists";
 import { getShows } from "@/lib/data";
 import { hasLocation, isNear } from "@/lib/geo";
 import { chipOff, chipOn, linkAccent } from "@/lib/ui";
@@ -20,7 +21,7 @@ const SHOWS_PER_ARTIST = 5;
 export default async function MyArtistsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ near?: string }>;
+  searchParams: Promise<{ near?: string; genre?: string }>;
 }) {
   const userId = await currentUserId();
   if (!userId) {
@@ -37,7 +38,8 @@ export default async function MyArtistsPage({
     );
   }
 
-  const nearOnly = (await searchParams).near === "1";
+  const params = await searchParams;
+  const nearOnly = params.near === "1";
   const [favs, profile, notifying, stamped] = await Promise.all([
     listFavorites(userId),
     getProfile(userId),
@@ -101,15 +103,7 @@ export default async function MyArtistsPage({
       <GetStarted following={favs.length > 0} located={located} notifying={notifying} stamped={stamped} />
       <InstallButton />
 
-      {favs.length === 0 && (
-        <p className="rounded-3xl bg-surface p-8 text-center text-muted">
-          You&apos;re not following anyone yet.{" "}
-          <Link href="/" className={linkAccent}>
-            Search for an artist
-          </Link>{" "}
-          and tap &ldquo;Follow&rdquo;.
-        </p>
-      )}
+      {favs.length === 0 && <SuggestedArtists genreParam={params.genre} />}
 
       {sections.map(({ fav, shows, total, failed, shared }) => (
         <section key={fav.artistId} className="space-y-2">
@@ -151,6 +145,10 @@ export default async function MyArtistsPage({
           )}
         </section>
       ))}
+
+      {favs.length > 0 && favs.length < 3 && (
+        <SuggestedArtists genreParam={params.genre} followedIds={favs.map((f) => f.artistId)} />
+      )}
     </div>
   );
 }
