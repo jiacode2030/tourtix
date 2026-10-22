@@ -20,7 +20,7 @@ export function nameScore(query: string, name: string): number {
   const q = fold(query);
   const n = fold(name);
   if (!q || !n) return 0;
-  if (n === q) return 100;
+  if (n === q) return 92;
   if (n.startsWith(q + " ") || n.startsWith(q)) return 85; // "calvin" -> "calvin harris", "calv" -> "calvin harris"
   // Punctuation and spacing don't matter: "acdc" -> "AC/DC", "blink182" -> "blink-182".
   if (n.replace(/ /g, "").startsWith(q.replace(/ /g, ""))) return 80;
@@ -42,9 +42,39 @@ export function rankArtists(query: string, artists: Artist[]): Artist[] {
       let score = nameScore(query, a.name);
       if (!wantsImitation && IMITATION.test(fold(a.name))) score -= 60;
       // Popularity breaks ties between similar matches, but can't beat a better name match.
-      score += Math.min(12, Math.log2(1 + (a.upcomingShows ?? 0)) * 2.5);
+      score += Math.min(15, Math.log2(1 + (a.upcomingShows ?? 0)) * 3);
       return { a, score, i };
     })
     .sort((x, y) => y.score - x.score || x.i - y.i) // ties keep Ticketmaster's order
     .map((x) => x.a);
+}
+
+// Several Ticketmaster entries can share one name ("Noah" appears four times).
+// Keep the best known of each so the list isn't full of lookalikes.
+export function dedupeByName(artists: Artist[]): Artist[] {
+  const best = new Map<string, Artist>();
+  for (const a of artists) {
+    const key = fold(a.name);
+    const have = best.get(key);
+    if (!have || (a.upcomingShows ?? 0) > (have.upcomingShows ?? 0)) best.set(key, a);
+  }
+  return artists.filter((a) => best.get(fold(a.name)) === a);
+}
+
+// Merge lists, keeping one entry per Ticketmaster id with the highest show count.
+export function mergeArtists(...lists: Artist[][]): Artist[] {
+  const byId = new Map<string, Artist>();
+  for (const a of lists.flat()) {
+    const have = byId.get(a.id);
+    if (!have) byId.set(a.id, a);
+    else if ((a.upcomingShows ?? 0) > (have.upcomingShows ?? 0)) byId.set(a.id, { ...have, ...a, imageUrl: a.imageUrl ?? have.imageUrl });
+    else if (!have.imageUrl && a.imageUrl) byId.set(a.id, { ...have, imageUrl: a.imageUrl });
+  }
+  return [...byId.values()];
+}
+
+// Artists from a lookup list whose names start with what was typed, for
+// partial words Ticketmaster's own search can't match ("taylor sw", "calv").
+export function matchTyped(query: string, pool: Artist[]): Artist[] {
+  return pool.filter((a) => nameScore(query, a.name) >= 70);
 }

@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   try {
     const artists = await suggestArtists(q, debug);
     const list = artists.map((a) => ({ id: a.id, name: a.name, imageUrl: a.imageUrl }));
-    return Response.json(debug ? { results: list.map((a) => a.name), steps: debug } : list);
+    return Response.json(debug ? { results: artists.map((a) => `${a.name} (${a.upcomingShows})`), steps: debug } : list);
   } catch (err) {
     console.error(err);
     return Response.json([]);

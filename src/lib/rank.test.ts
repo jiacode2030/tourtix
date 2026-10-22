@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { nameScore, rankArtists } from "./rank";
+import { dedupeByName, matchTyped, mergeArtists, nameScore, rankArtists } from "./rank";
 import type { Artist } from "./types";
 
 const a = (name: string, upcomingShows = 0, id = name): Artist => ({ id, name, imageUrl: null, genre: null, upcomingShows });
@@ -30,9 +30,9 @@ describe("rankArtists", () => {
   });
 
   it("ignores case, accents and punctuation", () => {
-    expect(nameScore("beyonce", "Beyoncé")).toBe(100);
+    expect(nameScore("beyonce", "Beyoncé")).toBe(92);
     expect(nameScore("fred again", "Fred again..")).toBeGreaterThanOrEqual(85);
-    expect(nameScore("tyler the creator", "Tyler, The Creator")).toBe(100);
+    expect(nameScore("tyler the creator", "Tyler, The Creator")).toBe(92);
     expect(nameScore("acdc", "AC/DC")).toBeGreaterThanOrEqual(80);
     expect(nameScore("blink182", "blink-182")).toBeGreaterThanOrEqual(80);
   });
@@ -50,5 +50,41 @@ describe("rankArtists", () => {
 
   it("returns every artist (ranking never drops results)", () => {
     expect(rankArtists("calvin", [a("A"), a("B"), a("Calvin Harris")])).toHaveLength(3);
+  });
+});
+
+describe("popularity vs exact names", () => {
+  it("lets a famous artist beat an obscure artist who has exactly the typed name", () => {
+    const ranked = names(rankArtists("olivia", [a("Olivia", 1), a("Olivia Rodrigo", 60)]));
+    expect(ranked[0]).toBe("Olivia Rodrigo");
+  });
+});
+
+describe("dedupeByName", () => {
+  it("keeps the best known of several entries with the same name", () => {
+    const out = dedupeByName([a("Noah", 0, "n1"), a("NOAH", 5, "n2"), a("Noah", 1, "n3"), a("Noah Kahan", 30)]);
+    expect(out.map((x) => x.id)).toEqual(["n2", "Noah Kahan"]);
+  });
+});
+
+describe("mergeArtists", () => {
+  it("keeps one entry per id, with the highest show count and any photo found", () => {
+    const merged = mergeArtists([{ ...a("Calvin Harris", 9, "x"), imageUrl: null }], [{ ...a("Calvin Harris", 0, "x"), imageUrl: "https://img" }]);
+    expect(merged).toHaveLength(1);
+    expect(merged[0]).toMatchObject({ upcomingShows: 9, imageUrl: "https://img" });
+  });
+});
+
+describe("matchTyped (partial names from the lookup list)", () => {
+  const pool = [a("Taylor Swift", 50), a("Taylor Acorn", 1), a("Ed Sheeran", 40), a("Bad Bunny", 60), a("Post Malone", 35), a("Calvin Harris", 40)];
+  it("finds artists from unfinished words Ticketmaster's search can't match", () => {
+    expect(names(matchTyped("taylor sw", pool))).toEqual(["Taylor Swift"]);
+    expect(names(matchTyped("ed sh", pool))).toEqual(["Ed Sheeran"]);
+    expect(names(matchTyped("bad bun", pool))).toEqual(["Bad Bunny"]);
+    expect(names(matchTyped("post m", pool))).toEqual(["Post Malone"]);
+    expect(names(matchTyped("calv", pool))).toEqual(["Calvin Harris"]);
+  });
+  it("returns nothing for text that matches no one", () => {
+    expect(matchTyped("zzzz", pool)).toEqual([]);
   });
 });

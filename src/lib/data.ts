@@ -12,7 +12,7 @@ import {
   tmGetShows,
   tmPopularArtists,
   tmSearchArtists,
-  tmSuggestArtists,
+  tmFindArtists,
   type SuggestDebug,
 } from "./ticketmaster";
 import type { Artist, Show } from "./types";
@@ -91,7 +91,7 @@ export async function concerts(where: ConcertSearch, days = 30) {
 
 export async function suggestArtists(query: string, debug?: SuggestDebug): Promise<Artist[]> {
   if (usingSampleData) return (await searchArtists(query)).slice(0, 6);
-  return tmSuggestArtists(query, debug);
+  return tmFindArtists(query, 6, debug);
 }
 
 export type LiveArtist = {

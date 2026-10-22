@@ -1,6 +1,6 @@
 import { apiFetch } from "./http";
 import { cleanUrl, sellerName } from "./links";
-import { rankArtists } from "./rank";
+import { dedupeByName, matchTyped, mergeArtists, rankArtists } from "./rank";
 import { presaleDisplayName } from "./presale-names";
 import { computeStatus } from "./status";
 import type { Artist, Presale, Show, ShowExtras } from "./types";
@@ -12,11 +12,11 @@ const MUSIC_SEGMENT = "KZFzniwnSyZfZ7v7nJ";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-async function tm(path: string, params: Record<string, string>) {
+async function tm(path: string, params: Record<string, string>, revalidate = 300) {
   const key = process.env.TICKETMASTER_API_KEY;
   if (!key) throw new Error("TICKETMASTER_API_KEY is not set");
   const qs = new URLSearchParams({ ...params, apikey: key });
-  return apiFetch(`${BASE}${path}?${qs}`, 300, `Ticketmaster ${path}`);
+  return apiFetch(`${BASE}${path}?${qs}`, revalidate, `Ticketmaster ${path}`);
 }
 
 function pickImage(images: any[] | undefined): string | null {
@@ -110,14 +110,7 @@ function tmExtras(e: any, venue: any): ShowExtras {
 export const _test = { toShow };
 
 export async function tmSearchArtists(query: string): Promise<Artist[]> {
-  const data = await tm("/attractions.json", {
-    keyword: query,
-    classificationName: "music",
-    size: "50",
-  });
-  // A wide net, then our own ranking: Ticketmaster's order can bury the artist
-  // people mean ("calvin" -> Calvin Harris) under tributes and other matches.
-  return rankArtists(query, (data._embedded?.attractions ?? []).map(toArtist)).slice(0, 24);
+  return tmFindArtists(query, 24);
 }
 
 export async function tmGetArtist(id: string): Promise<Artist | null> {
@@ -220,34 +213,79 @@ const isMusic = (a: any) =>
 
 export type SuggestDebug = { source: string; count: number; error?: string }[];
 
-// Artist suggestions for the search box. Tries Ticketmaster's autocomplete
-// endpoint (matches partial words like "calv") and keyword search (whole
-// words), then merges them, autocomplete first. `debug` collects what each
-// step returned, for /api/suggest?debug=1.
-export async function tmSuggestArtists(query: string, debug?: SuggestDebug): Promise<Artist[]> {
-  const found: Artist[] = [];
-  const add = (artists: Artist[]) => {
-    for (const a of artists) if (!found.some((f) => f.id === a.id)) found.push(a);
-  };
-  for (const path of ["/suggest", "/suggest.json"]) {
-    try {
-      const data = await tm(path, { keyword: query, resource: "attractions", size: "10" });
-      const all: any[] = data._embedded?.attractions ?? [];
-      debug?.push({ source: `${path} (all)`, count: all.length });
-      const music = all.filter(isMusic);
-      debug?.push({ source: `${path} (music)`, count: music.length });
-      add(music.map(toArtist));
-      break;
-    } catch (err) {
-      debug?.push({ source: path, count: 0, error: String(err) });
+// The most in-demand US touring artists, as a lookup list for partial names.
+// Ticketmaster's keyword search only matches whole words, so "calv" or
+// "taylor sw" find nothing there. Loaded rarely (hourly) to keep API use low.
+// An artist's show count here is how many of the top events are theirs, a
+// good-enough popularity signal for ranking.
+export async function tmArtistPool(): Promise<Artist[]> {
+  const pages = await Promise.all(
+    [0, 1, 2].map((page) =>
+      tm(
+        "/events.json",
+        { classificationName: "music", countryCode: "US", sort: "relevance,desc", size: "200", page: String(page) },
+        3600,
+      ).catch(() => null),
+    ),
+  );
+  const counts = new Map<string, Artist>();
+  for (const data of pages) {
+    for (const { artist } of withArtists(data ?? {})) {
+      const have = counts.get(artist.id);
+      counts.set(artist.id, have ? { ...have, upcomingShows: have.upcomingShows + 1 } : { ...artist, upcomingShows: 1 });
     }
   }
+  return [...counts.values()];
+}
+
+// Artist lookup for the search box and results page. Combines Ticketmaster's
+// autocomplete and keyword search with the lookup list above, then ranks by
+// how well the name matches and how well known the artist is. `debug`
+// collects what each step returned, for /api/suggest?debug=1.
+export async function tmFindArtists(query: string, limit: number, debug?: SuggestDebug): Promise<Artist[]> {
+  const words = query.trim().split(/\s+/);
+  // "taylor sw": search the finished words too; Ticketmaster can't match "sw".
+  const finished = words.length > 1 ? words.slice(0, -1).join(" ") : null;
+
+  const [suggest, keyword, keywordFinished, pool] = await Promise.all([
+    (async () => {
+      for (const path of ["/suggest", "/suggest.json"]) {
+        try {
+          const data = await tm(path, { keyword: query, resource: "attractions", size: "10" });
+          const all: any[] = data._embedded?.attractions ?? [];
+          debug?.push({ source: `${path} (all)`, count: all.length });
+          const music = all.filter(isMusic);
+          debug?.push({ source: `${path} (music)`, count: music.length });
+          return music.map(toArtist);
+        } catch (err) {
+          debug?.push({ source: path, count: 0, error: String(err) });
+        }
+      }
+      return [] as Artist[];
+    })(),
+    tmKeyword(query, debug, "keyword search"),
+    finished ? tmKeyword(finished, debug, `keyword search "${finished}"`) : Promise.resolve([] as Artist[]),
+    tmArtistPool().catch((err) => {
+      debug?.push({ source: "artist lookup list", count: 0, error: String(err) });
+      return [] as Artist[];
+    }),
+  ]);
+  const matches = matchTyped(query, pool);
+  debug?.push({ source: "lookup list matches", count: matches.length });
+  // Pool entries carry the show-count popularity signal, so list them first
+  // and let mergeArtists keep the highest count per artist.
+  const merged = mergeArtists(matches, suggest, keyword, keywordFinished);
+  return rankArtists(query, dedupeByName(merged)).slice(0, limit);
+}
+
+async function tmKeyword(keyword: string, debug: SuggestDebug | undefined, label: string): Promise<Artist[]> {
   try {
-    const keyword = await tmSearchArtists(query);
-    debug?.push({ source: "keyword search", count: keyword.length });
-    add(keyword);
+    const data = await tm("/attractions.json", { keyword, classificationName: "music", size: "50" });
+    const artists = (data._embedded?.attractions ?? []).map(toArtist);
+    debug?.push({ source: label, count: artists.length });
+    return artists;
   } catch (err) {
-    debug?.push({ source: "keyword search", count: 0, error: String(err) });
+    debug?.push({ source: label, count: 0, error: String(err) });
+    return [];
   }
-  return rankArtists(query, found).slice(0, 6);
 }
