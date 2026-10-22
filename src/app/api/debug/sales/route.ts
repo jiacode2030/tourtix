@@ -8,7 +8,10 @@ import { upcomingSaleStarts } from "@/lib/sales";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
-  const id = new URL(req.url).searchParams.get("id") ?? "";
+  const params = new URL(req.url).searchParams;
+  const id = params.get("id") ?? "";
+  const from = params.get("from");
+  const limit = Math.min(Number(params.get("limit")) || 12, 60);
   try {
     const artist = await getArtist(id);
     if (!artist) return Response.json({ error: "artist not found" }, { status: 404 });
@@ -18,7 +21,12 @@ export async function GET(req: Request) {
       now: new Date(now).toISOString(),
       artist: artist.name,
       nextDrop: nextDrop(shows, null, now)?.label ?? null,
-      shows: shows.slice(0, 8).map((s) => ({
+      totalShows: shows.length,
+      // ?from=YYYY-MM-DD skips earlier shows; ?limit=N caps the list (default 12).
+      shows: shows
+        .filter((s) => !from || (s.date ?? "") >= from)
+        .slice(0, limit)
+        .map((s) => ({
         date: s.date,
         city: s.city,
         status: s.status,
