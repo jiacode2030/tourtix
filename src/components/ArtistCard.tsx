@@ -1,7 +1,14 @@
 import Link from "next/link";
 import type { Artist } from "@/lib/types";
+import { Countdown } from "./Countdown";
 
-export function ArtistCard({ artist }: { artist: Artist }) {
+export function ArtistCard({
+  artist,
+  nextSale = null,
+}: {
+  artist: Artist;
+  nextSale?: { label: string; start: string } | null;
+}) {
   return (
     <Link
       href={`/artists/${artist.id}`}
@@ -24,6 +31,11 @@ export function ArtistCard({ artist }: { artist: Artist }) {
           {artist.upcomingShows > 0 &&
             ` · ${artist.upcomingShows} upcoming ${artist.upcomingShows === 1 ? "show" : "shows"}`}
         </p>
+        {nextSale && (
+          <p className="mt-1 text-sm">
+            <Countdown to={nextSale.start} label={nextSale.label} />
+          </p>
+        )}
       </div>
     </Link>
   );

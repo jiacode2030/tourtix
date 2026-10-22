@@ -4,11 +4,16 @@ import { ArtistCard } from "@/components/ArtistCard";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { DropList } from "@/components/DropList";
 import { SearchBar } from "@/components/SearchBar";
+import { Countdown } from "@/components/Countdown";
+import { justAnnounced } from "@/lib/announced";
 import { getShows, popularArtists, searchArtists, upcomingDrops } from "@/lib/data";
-import { groupDrops } from "@/lib/sales";
+import { fmtDateTime } from "@/lib/format";
+import { GENRES, isGenre } from "@/lib/genres";
+import { groupDrops, type TicketDrop } from "@/lib/sales";
 import { listFavorites } from "@/lib/user-data";
 
-const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
+const WEEK_MS = 7 * DAY_MS;
 const TWO_WEEKS_MS = 2 * WEEK_MS;
 // Followed artists checked for the "your drops" section, to bound API calls.
 const MAX_FOLLOWED_CHECKED = 10;
@@ -38,6 +43,11 @@ async function followedDrops(userId: string) {
   return { followsAnyone: favs.length > 0, drops: groupDrops(items.flat(), TWO_WEEKS_MS) };
 }
 
+function startingWithin(drops: TicketDrop[], ms: number) {
+  const now = Date.now();
+  return drops.filter((d) => Date.parse(d.sale.start) - now <= ms);
+}
+
 function SectionHeading({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div>
@@ -50,9 +60,11 @@ function SectionHeading({ title, subtitle }: { title: string; subtitle?: string 
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; genre?: string }>;
 }) {
-  const q = (await searchParams).q?.trim() ?? "";
+  const params = await searchParams;
+  const q = params.q?.trim() ?? "";
+  const genre = isGenre(params.genre) ? params.genre : undefined;
 
   const hero = (
     <section className="space-y-4 text-center">
@@ -90,16 +102,61 @@ export default async function Home({
   }
 
   const userId = await currentUserId();
-  const [mine, drops, popular] = await Promise.all([
+  const [mine, drops, popular, announced] = await Promise.all([
     userId ? followedDrops(userId) : null,
-    upcomingDrops(WEEK_MS),
-    popularArtists(8),
+    upcomingDrops(WEEK_MS, 8, genre),
+    popularArtists(8, genre),
+    genre ? Promise.resolve([]) : justAnnounced(),
   ]);
+  // Biggest drops starting within a day, for the banner at the top.
+  const soon = startingWithin(drops, DAY_MS).slice(0, 3);
+  const genreLink = (g?: string) => (g ? `/?genre=${encodeURIComponent(g)}` : "/");
 
   return (
     <div className="space-y-12">
       <AutoRefresh />
       {hero}
+
+      {soon.length > 0 && (
+        <section className="space-y-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/40">
+          <h2 className="font-semibold">⏰ Dropping in the next 24 hours</h2>
+          <ul className="space-y-2">
+            {soon.map((d) => (
+              <li key={d.artistId}>
+                <Link
+                  href={`/artists/${d.artistId}`}
+                  className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 rounded-lg bg-white px-3 py-2 hover:bg-amber-100/50 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+                >
+                  <span className="font-semibold">{d.artistName}</span>
+                  <span className="text-sm">
+                    <Countdown to={d.sale.start} label={d.sale.label} />
+                    <span className="block text-right text-xs text-zinc-500">
+                      {fmtDateTime(d.sale.start, d.show.timezone)}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <nav className="flex flex-wrap justify-center gap-2" aria-label="Filter by genre">
+        {[undefined, ...GENRES].map((g) => (
+          <Link
+            key={g ?? "all"}
+            href={genreLink(g)}
+            scroll={false}
+            className={`rounded-full border px-3 py-1 text-sm ${
+              g === genre
+                ? "border-violet-600 bg-violet-600 text-white"
+                : "border-zinc-300 hover:border-violet-500 dark:border-zinc-700"
+            }`}
+          >
+            {g ?? "All music"}
+          </Link>
+        ))}
+      </nav>
 
       {mine && (
         <section className="space-y-4">
@@ -123,19 +180,47 @@ export default async function Home({
 
       {drops.length > 0 && (
         <section className="space-y-4">
-          <SectionHeading title="Tickets dropping this week" subtitle="Upcoming presales and on-sales for US concerts" />
+          <SectionHeading
+            title={genre ? `${genre} tickets dropping this week` : "Tickets dropping this week"}
+            subtitle="Upcoming presales and on-sales for US concerts"
+          />
           <DropList drops={drops} />
         </section>
       )}
 
       {popular.length > 0 && (
         <section className="space-y-4">
-          <SectionHeading title="Popular artists on tour" />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <SectionHeading title={genre ? `Popular ${genre} artists on tour` : "Popular artists on tour"} />
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             {popular.map((a) => (
-              <ArtistCard key={a.id} artist={a} />
+              <ArtistCard key={a.id} artist={a} nextSale={a.nextSale} />
             ))}
           </div>
+        </section>
+      )}
+
+      {genre && drops.length === 0 && popular.length === 0 && (
+        <p className="text-center text-zinc-500">No {genre} tours found right now. Try another genre.</p>
+      )}
+
+      {announced.length > 0 && (
+        <section className="space-y-4">
+          <SectionHeading title="Just announced" subtitle="New shows added in the last week by artists fans follow on TourTix" />
+          <ul className="flex flex-wrap gap-2">
+            {announced.map((a) => (
+              <li key={a.artistId}>
+                <Link
+                  href={`/artists/${a.artistId}`}
+                  className="inline-block rounded-full border border-zinc-300 px-4 py-2 text-sm hover:border-violet-500 dark:border-zinc-700"
+                >
+                  <span className="font-semibold">{a.artistName}</span>{" "}
+                  <span className="text-zinc-500">
+                    +{a.newShows} {a.newShows === 1 ? "show" : "shows"}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 

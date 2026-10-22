@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { sampleArtists, sampleShows } from "./sample-data";
 import { mergeShows, sgGetShows } from "./seatgeek";
-import { groupDrops, type TicketDrop } from "./sales";
+import { groupDrops, type TicketDrop, upcomingSaleStarts } from "./sales";
 import {
   type ConcertSearch,
   tmConcerts,
@@ -38,22 +38,33 @@ export async function getShows(artist: Artist): Promise<Show[]> {
   return mergeShows(tm, sg);
 }
 
+export type PopularArtist = Artist & { nextSale: { label: string; start: string } | null };
+
+const MONTH_MS = 30 * 24 * 60 * 60 * 1000;
+
 // Homepage sections are extras: if Ticketmaster fails they're just hidden.
-export async function popularArtists(limit = 8): Promise<Artist[]> {
-  if (usingSampleData) return sampleArtists.slice(0, limit);
+export async function popularArtists(limit = 8, genre?: string): Promise<PopularArtist[]> {
   try {
-    return await tmPopularArtists(limit);
+    const groups = usingSampleData
+      ? sampleArtists.slice(0, limit).map((artist) => ({ artist, shows: sampleShows(artist.id) }))
+      : await tmPopularArtists(limit, genre);
+    return groups.map(({ artist, shows }) => {
+      const sale = shows
+        .flatMap((s) => upcomingSaleStarts(s, MONTH_MS))
+        .sort((x, y) => x.start.localeCompare(y.start))[0];
+      return { ...artist, nextSale: sale ? { label: sale.label, start: sale.start } : null };
+    });
   } catch (err) {
     console.error(err);
     return [];
   }
 }
 
-export async function upcomingDrops(windowMs: number, limit = 8): Promise<TicketDrop[]> {
+export async function upcomingDrops(windowMs: number, limit = 8, genre?: string): Promise<TicketDrop[]> {
   try {
     const items = usingSampleData
       ? sampleArtists.flatMap((a) => sampleShows(a.id).map((show) => ({ artist: a, show })))
-      : await tmEventsGoingOnSale(windowMs);
+      : await tmEventsGoingOnSale(windowMs, genre);
     return groupDrops(
       items.map(({ artist, show }) => ({
         artistId: artist.id,

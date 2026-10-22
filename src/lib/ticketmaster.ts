@@ -4,6 +4,9 @@ import type { Artist, Presale, Show, ShowExtras } from "./types";
 
 const BASE = "https://app.ticketmaster.com/discovery/v2";
 
+// Ticketmaster's segment ID for Music.
+const MUSIC_SEGMENT = "KZFzniwnSyZfZ7v7nJ";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 async function tm(path: string, params: Record<string, string>) {
@@ -141,26 +144,37 @@ function withArtists(data: any): EventWithArtist[] {
   });
 }
 
-// Most relevant upcoming US music events, reduced to unique artists.
-export async function tmPopularArtists(limit: number): Promise<Artist[]> {
+// Music filter for event searches: all music, or one genre within music.
+function musicFilter(genre?: string): Record<string, string> {
+  return genre ? { segmentId: MUSIC_SEGMENT, classificationName: genre } : { classificationName: "music" };
+}
+
+export type ArtistWithShows = { artist: Artist; shows: Show[] };
+
+// Most relevant upcoming US music events, grouped into unique artists with
+// the shows from that same response (so callers can find each artist's next
+// sale without extra API calls).
+export async function tmPopularArtists(limit: number, genre?: string): Promise<ArtistWithShows[]> {
   const data = await tm("/events.json", {
-    classificationName: "music",
+    ...musicFilter(genre),
     countryCode: "US",
     sort: "relevance,desc",
     size: "100",
   });
-  const seen = new Map<string, Artist>();
-  for (const { artist } of withArtists(data)) {
-    if (!seen.has(artist.id)) seen.set(artist.id, artist);
+  const byArtist = new Map<string, ArtistWithShows>();
+  for (const { artist, show } of withArtists(data)) {
+    const entry = byArtist.get(artist.id) ?? { artist, shows: [] };
+    entry.shows.push(show);
+    byArtist.set(artist.id, entry);
   }
-  return [...seen.values()].slice(0, limit);
+  return [...byArtist.values()].slice(0, limit);
 }
 
 // US music events whose public sale starts within the window.
-export async function tmEventsGoingOnSale(windowMs: number): Promise<EventWithArtist[]> {
+export async function tmEventsGoingOnSale(windowMs: number, genre?: string): Promise<EventWithArtist[]> {
   const now = Date.now();
   const data = await tm("/events.json", {
-    classificationName: "music",
+    ...musicFilter(genre),
     countryCode: "US",
     onsaleStartDateTime: tmTime(now),
     onsaleEndDateTime: tmTime(now + windowMs),
@@ -194,9 +208,6 @@ export async function tmConcerts(where: ConcertSearch, days: number): Promise<Ev
   }
   return withArtists(await tm("/events.json", params));
 }
-
-// Ticketmaster's segment ID for Music.
-const MUSIC_SEGMENT = "KZFzniwnSyZfZ7v7nJ";
 
 const isMusic = (a: any) =>
   !a.classifications?.length || a.classifications.some((c: any) => c.segment?.id === MUSIC_SEGMENT);
