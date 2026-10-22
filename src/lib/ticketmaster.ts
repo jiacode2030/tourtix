@@ -195,12 +195,23 @@ export async function tmConcerts(where: ConcertSearch, days: number): Promise<Ev
   return withArtists(await tm("/events.json", params));
 }
 
-// Lightweight artist suggestions for the search box.
+// Ticketmaster's segment ID for Music.
+const MUSIC_SEGMENT = "KZFzniwnSyZfZ7v7nJ";
+
+const isMusic = (a: any) =>
+  !a.classifications?.length || a.classifications.some((c: any) => c.segment?.id === MUSIC_SEGMENT);
+
+// Artist suggestions for the search box. Uses Ticketmaster's autocomplete
+// endpoint, which matches partial words ("calv"), unlike keyword search;
+// falls back to keyword search if autocomplete returns nothing.
 export async function tmSuggestArtists(query: string): Promise<Artist[]> {
-  const data = await tm("/attractions.json", {
+  const data = await tm("/suggest.json", {
     keyword: query,
-    classificationName: "music",
-    size: "6",
+    resource: "attractions",
+    segmentId: MUSIC_SEGMENT,
+    size: "8",
   });
-  return (data._embedded?.attractions ?? []).map(toArtist);
+  const suggested: Artist[] = (data._embedded?.attractions ?? []).filter(isMusic).map(toArtist);
+  if (suggested.length) return suggested.slice(0, 6);
+  return (await tmSearchArtists(query)).slice(0, 6);
 }
