@@ -34,6 +34,10 @@ export function nameScore(query: string, name: string): number {
   return hits ? 20 + 10 * (hits / qWords.length) : 0;
 }
 
+// Touring a lot and being well known both count, so a famous artist between
+// tours still beats a small act with a similar name.
+export const fame = (a: Artist) => Math.min(15, Math.log2(1 + (a.upcomingShows ?? 0)) * 3) + Math.min(18, (a.notability ?? 0) * 1.5);
+
 export function rankArtists(query: string, artists: Artist[]): Artist[] {
   const q = fold(query);
   const wantsImitation = IMITATION.test(q);
@@ -42,7 +46,7 @@ export function rankArtists(query: string, artists: Artist[]): Artist[] {
       let score = nameScore(query, a.name);
       if (!wantsImitation && IMITATION.test(fold(a.name))) score -= 60;
       // Popularity breaks ties between similar matches, but can't beat a better name match.
-      score += Math.min(15, Math.log2(1 + (a.upcomingShows ?? 0)) * 3);
+      score += fame(a);
       return { a, score, i };
     })
     .sort((x, y) => y.score - x.score || x.i - y.i) // ties keep Ticketmaster's order
@@ -56,19 +60,26 @@ export function dedupeByName(artists: Artist[]): Artist[] {
   for (const a of artists) {
     const key = fold(a.name);
     const have = best.get(key);
-    if (!have || (a.upcomingShows ?? 0) > (have.upcomingShows ?? 0)) best.set(key, a);
+    if (!have || fame(a) > fame(have)) best.set(key, a);
   }
   return artists.filter((a) => best.get(fold(a.name)) === a);
 }
 
-// Merge lists, keeping one entry per Ticketmaster id with the highest show count.
+// Merge lists, keeping one entry per Ticketmaster id with the best of each field.
 export function mergeArtists(...lists: Artist[][]): Artist[] {
   const byId = new Map<string, Artist>();
   for (const a of lists.flat()) {
     const have = byId.get(a.id);
     if (!have) byId.set(a.id, a);
-    else if ((a.upcomingShows ?? 0) > (have.upcomingShows ?? 0)) byId.set(a.id, { ...have, ...a, imageUrl: a.imageUrl ?? have.imageUrl });
-    else if (!have.imageUrl && a.imageUrl) byId.set(a.id, { ...have, imageUrl: a.imageUrl });
+    else {
+      byId.set(a.id, {
+        ...have,
+        upcomingShows: Math.max(have.upcomingShows ?? 0, a.upcomingShows ?? 0),
+        notability: Math.max(have.notability ?? 0, a.notability ?? 0),
+        imageUrl: have.imageUrl ?? a.imageUrl,
+        genre: have.genre ?? a.genre,
+      });
+    }
   }
   return [...byId.values()];
 }

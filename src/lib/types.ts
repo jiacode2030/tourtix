@@ -4,6 +4,9 @@ export type Artist = {
   imageUrl: string | null;
   genre: string | null;
   upcomingShows: number;
+  // 0-12, from the profile links Ticketmaster has for the artist (Wikipedia,
+  // Spotify, ...). A rough sign of how well known they are. Used only for ranking.
+  notability?: number;
 };
 
 export type Presale = {

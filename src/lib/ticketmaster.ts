@@ -1,6 +1,6 @@
 import { apiFetch } from "./http";
 import { cleanUrl, sellerName } from "./links";
-import { dedupeByName, matchTyped, mergeArtists, rankArtists } from "./rank";
+import { dedupeByName, matchTyped, mergeArtists, nameScore, rankArtists } from "./rank";
 import { presaleDisplayName } from "./presale-names";
 import { computeStatus } from "./status";
 import type { Artist, Presale, Show, ShowExtras } from "./types";
@@ -27,6 +27,17 @@ function pickImage(images: any[] | undefined): string | null {
   return (wide[0] ?? images[0]).url ?? null;
 }
 
+// Well-known artists have a Wikipedia page and links on several platforms;
+// tribute acts and local bands usually don't.
+function notability(links: unknown): number {
+  if (!links || typeof links !== "object") return 0;
+  const have = Object.entries(links as Record<string, unknown>).filter(([, v]) => Array.isArray(v) && v.length > 0).map(([k]) => k);
+  const wiki = have.includes("wiki") ? 6 : 0;
+  const spotify = have.includes("spotify") ? 2 : 0;
+  const others = Math.min(4, have.filter((k) => k !== "wiki" && k !== "spotify").length);
+  return wiki + spotify + others;
+}
+
 function toArtist(a: any): Artist {
   return {
     id: a.id,
@@ -34,6 +45,7 @@ function toArtist(a: any): Artist {
     imageUrl: pickImage(a.images),
     genre: a.classifications?.[0]?.genre?.name ?? null,
     upcomingShows: a.upcomingEvents?._total ?? 0,
+    notability: notability(a.externalLinks),
   };
 }
 
@@ -208,9 +220,6 @@ export async function tmConcerts(where: ConcertSearch, days: number): Promise<Ev
   return withArtists(await tm("/events.json", params));
 }
 
-const isMusic = (a: any) =>
-  !a.classifications?.length || a.classifications.some((c: any) => c.segment?.id === MUSIC_SEGMENT);
-
 export type SuggestDebug = { source: string; count: number; error?: string }[];
 
 // The most in-demand US touring artists, as a lookup list for partial names.
@@ -218,13 +227,27 @@ export type SuggestDebug = { source: string; count: number; error?: string }[];
 // "taylor sw" find nothing there. Loaded rarely (hourly) to keep API use low.
 // An artist's show count here is how many of the top events are theirs, a
 // good-enough popularity signal for ranking.
+const POOL_TTL_MS = 60 * 60 * 1000;
+let poolCache: { at: number; artists: Artist[] } | null = null;
+let poolInflight: Promise<Artist[]> | null = null;
+
+// Responses this size are too big for Next's data cache, so the list is kept
+// in memory instead: one load per server instance per hour.
 export async function tmArtistPool(): Promise<Artist[]> {
+  if (poolCache && Date.now() - poolCache.at < POOL_TTL_MS) return poolCache.artists;
+  poolInflight ??= loadPool().finally(() => {
+    poolInflight = null;
+  });
+  return poolInflight;
+}
+
+async function loadPool(): Promise<Artist[]> {
   const pages = await Promise.all(
     [0, 1, 2].map((page) =>
       tm(
         "/events.json",
         { classificationName: "music", countryCode: "US", sort: "relevance,desc", size: "200", page: String(page) },
-        3600,
+        0,
       ).catch(() => null),
     ),
   );
@@ -235,7 +258,10 @@ export async function tmArtistPool(): Promise<Artist[]> {
       counts.set(artist.id, have ? { ...have, upcomingShows: have.upcomingShows + 1 } : { ...artist, upcomingShows: 1 });
     }
   }
-  return [...counts.values()];
+  const artists = [...counts.values()];
+  // If every page failed, try again soon instead of caching an empty list for an hour.
+  poolCache = { at: artists.length ? Date.now() : Date.now() - POOL_TTL_MS + 60_000, artists };
+  return artists;
 }
 
 // Artist lookup for the search box and results page. Combines Ticketmaster's
@@ -247,22 +273,7 @@ export async function tmFindArtists(query: string, limit: number, debug?: Sugges
   // "taylor sw": search the finished words too; Ticketmaster can't match "sw".
   const finished = words.length > 1 ? words.slice(0, -1).join(" ") : null;
 
-  const [suggest, keyword, keywordFinished, pool] = await Promise.all([
-    (async () => {
-      for (const path of ["/suggest", "/suggest.json"]) {
-        try {
-          const data = await tm(path, { keyword: query, resource: "attractions", size: "10" });
-          const all: any[] = data._embedded?.attractions ?? [];
-          debug?.push({ source: `${path} (all)`, count: all.length });
-          const music = all.filter(isMusic);
-          debug?.push({ source: `${path} (music)`, count: music.length });
-          return music.map(toArtist);
-        } catch (err) {
-          debug?.push({ source: path, count: 0, error: String(err) });
-        }
-      }
-      return [] as Artist[];
-    })(),
+  const [keyword, keywordFinished, pool] = await Promise.all([
     tmKeyword(query, debug, "keyword search"),
     finished ? tmKeyword(finished, debug, `keyword search "${finished}"`) : Promise.resolve([] as Artist[]),
     tmArtistPool().catch((err) => {
@@ -272,9 +283,13 @@ export async function tmFindArtists(query: string, limit: number, debug?: Sugges
   ]);
   const matches = matchTyped(query, pool);
   debug?.push({ source: "lookup list matches", count: matches.length });
-  // Pool entries carry the show-count popularity signal, so list them first
-  // and let mergeArtists keep the highest count per artist.
-  const merged = mergeArtists(matches, suggest, keyword, keywordFinished);
+  let merged = mergeArtists(matches, keyword, keywordFinished);
+
+  // Nothing matched the typed (possibly unfinished) text: try a wildcard search.
+  if (!merged.some((a) => nameScore(query, a.name) >= 70) && query.trim().length >= 3) {
+    const wild = await tmKeyword(`${query.trim()}*`, debug, "wildcard search");
+    merged = mergeArtists(merged, wild);
+  }
   return rankArtists(query, dedupeByName(merged)).slice(0, limit);
 }
 

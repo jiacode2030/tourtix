@@ -88,3 +88,19 @@ describe("matchTyped (partial names from the lookup list)", () => {
     expect(matchTyped("zzzz", pool)).toEqual([]);
   });
 });
+
+describe("notability", () => {
+  const withN = (name: string, upcomingShows: number, notability: number): Artist => ({ ...a(name, upcomingShows), notability });
+  it("ranks a famous artist between tours above a lesser-known act with a similar name", () => {
+    const ranked = names(rankArtists("sabrina", [withN("Sabrina Claudio", 8, 3), withN("Sabrina Carpenter", 0, 12)]));
+    expect(ranked[0]).toBe("Sabrina Carpenter");
+  });
+  it("never lets fame beat a clearly better name match", () => {
+    const ranked = names(rankArtists("calvin harris", [withN("Harris Brothers", 20, 12), withN("Calvin Harris", 0, 0)]));
+    expect(ranked[0]).toBe("Calvin Harris");
+  });
+  it("keeps the best of each field when merging", () => {
+    const merged = mergeArtists([withN("X", 3, 2)], [withN("X", 1, 9)]);
+    expect(merged[0]).toMatchObject({ upcomingShows: 3, notability: 9 });
+  });
+});
