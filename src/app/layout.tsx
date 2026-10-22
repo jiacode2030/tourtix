@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { Header } from "@/components/Header";
 import { SampleBanner } from "@/components/SampleBanner";
-import { SourcesBar } from "@/components/SourcesBar";
 import { Footer } from "@/components/Footer";
 import { Analytics } from "@vercel/analytics/next";
 import { siteUrl } from "@/lib/site";
@@ -39,7 +38,6 @@ export default function RootLayout({
       </head>
       <body className={`${geistSans.variable} antialiased`}>
         <SampleBanner />
-        <SourcesBar />
         <Header />
         <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
         <Footer />

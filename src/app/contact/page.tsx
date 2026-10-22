@@ -22,7 +22,7 @@ export default async function ContactPage({
     return (
       <div className="mx-auto max-w-xl space-y-3 py-12 text-center">
         <h1 className="text-2xl font-bold">Thanks, message sent!</h1>
-        <p className="text-zinc-500">If you left an email address, we&apos;ll reply there.</p>
+        <p className="text-zinc-600 dark:text-zinc-400">If you left an email address, we&apos;ll reply there.</p>
       </div>
     );
   }
@@ -30,7 +30,7 @@ export default async function ContactPage({
     <div className="mx-auto max-w-xl space-y-6">
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">Contact TourTix</h1>
-        <p className="text-zinc-500">
+        <p className="text-zinc-600 dark:text-zinc-400">
           Questions, feedback, privacy requests, or a request to remove content (for example, from
           an event organizer). Removal requests are handled within 24 hours.
         </p>

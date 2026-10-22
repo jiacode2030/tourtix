@@ -58,7 +58,7 @@ export default async function SettingsPage({
       <section id="location" className="scroll-mt-6 space-y-4">
         <div>
           <h2 className="text-lg font-semibold">Your location</h2>
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
             Used to find shows near you. Enter your ZIP code or share your current location (rounded
             to about 1 km).
           </p>
@@ -76,7 +76,7 @@ export default async function SettingsPage({
       <section id="notifications" className="scroll-mt-6 space-y-4 border-t border-zinc-200 pt-8 dark:border-zinc-800">
         <div>
           <h2 className="text-lg font-semibold">Notifications</h2>
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
             Get a pop-up alert on this device about artists you follow. Turn it on for each device
             you want alerts on.
           </p>
@@ -112,7 +112,7 @@ export default async function SettingsPage({
 
       <section className="space-y-3 border-t border-zinc-200 pt-8 dark:border-zinc-800">
         <h2 className="text-lg font-semibold">Delete account</h2>
-        <p className="text-sm text-zinc-500">
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">
           Permanently deletes your followed artists, location, and notification settings, and signs you out. This can&apos;t be undone.
         </p>
         <DeleteAccountButton />

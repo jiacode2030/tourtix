@@ -23,7 +23,7 @@ export function DropList({ drops }: { drops: TicketDrop[] }) {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="truncate font-semibold">{d.artistName}</div>
-                <div className="truncate text-sm text-zinc-500">
+                <div className="truncate text-sm text-zinc-600 dark:text-zinc-400">
                   {place || "Location TBA"} · {fmtDate(d.show.date)}
                   {d.moreShows > 0 && ` · +${d.moreShows} more`}
                 </div>

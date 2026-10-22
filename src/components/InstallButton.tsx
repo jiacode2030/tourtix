@@ -50,7 +50,7 @@ export function InstallButton() {
   }
   if (ios) {
     return (
-      <p className="text-sm text-zinc-500">
+      <p className="text-sm text-zinc-600 dark:text-zinc-400">
         📲 Add TourTix to your Home Screen: tap Share, then &ldquo;Add to Home Screen&rdquo;.{" "}
         <Link href="/help/notifications#iphone" className="text-violet-600 hover:underline">
           Help

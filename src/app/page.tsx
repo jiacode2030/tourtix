@@ -53,7 +53,7 @@ function SectionHeading({ title, subtitle }: { title: string; subtitle?: string 
   return (
     <div>
       <h2 className="text-xl font-semibold">{title}</h2>
-      {subtitle && <p className="text-sm text-zinc-500">{subtitle}</p>}
+      {subtitle && <p className="text-sm text-zinc-600 dark:text-zinc-400">{subtitle}</p>}
     </div>
   );
 }
@@ -68,18 +68,37 @@ export default async function Home({
   const genre = isGenre(params.genre) ? params.genre : undefined;
 
   const hero = (
-    <section className="space-y-4 text-center">
-      <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Never miss a ticket drop</h1>
-      <p className="text-zinc-600 dark:text-zinc-400">
-        Follow artists, track their tours, and get alerts when tickets go on sale.
-      </p>
-      <p className="text-sm text-zinc-500">
-        TourTix doesn&apos;t sell tickets. We gather shows from ticket sites and link you to them, so
-        you buy directly from the seller.
-      </p>
+    <section className="space-y-5 text-center">
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Never miss a ticket drop</h1>
+        <p className="text-lg text-zinc-700 dark:text-zinc-300">
+          Every tour date, presale, and on-sale time for your artists, in one place. Free.
+        </p>
+      </div>
       <div className="mx-auto max-w-xl">
         <SearchBar defaultValue={q} />
       </div>
+      {!q && (
+        <ol className="mx-auto grid max-w-3xl gap-3 text-left sm:grid-cols-3">
+          {[
+            ["⭐", "Follow artists", "Search any artist and tap Follow."],
+            ["🔔", "Get alerts", "We remind you before presales and general sales start."],
+            ["🎟️", "Buy from the seller", "We link you to Ticketmaster and other sites. TourTix doesn't sell tickets."],
+          ].map(([icon, title, text], i) => (
+            <li key={title} className="flex gap-3 rounded-2xl bg-violet-50 p-4 dark:bg-violet-950/40">
+              <span className="text-2xl" aria-hidden="true">
+                {icon}
+              </span>
+              <span>
+                <span className="block font-semibold">
+                  {i + 1}. {title}
+                </span>
+                <span className="block text-sm text-zinc-700 dark:text-zinc-300">{text}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+      )}
     </section>
   );
 
@@ -135,7 +154,7 @@ export default async function Home({
                   <span className="font-semibold">{d.artistName}</span>
                   <span className="text-sm">
                     <Countdown to={d.sale.start} label={d.sale.label} />
-                    <span className="block text-right text-xs text-zinc-500">
+                    <span className="block text-right text-xs text-zinc-600 dark:text-zinc-400">
                       {fmtDateTime(d.sale.start, d.show.timezone)}
                     </span>
                   </span>
@@ -146,13 +165,16 @@ export default async function Home({
         </section>
       )}
 
-      <nav className="flex flex-wrap justify-center gap-2" aria-label="Filter by genre">
+      <nav
+        className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0"
+        aria-label="Filter by genre"
+      >
         {[undefined, ...GENRES].map((g) => (
           <Link
             key={g ?? "all"}
             href={genreLink(g)}
             scroll={false}
-            className={`rounded-full border px-3 py-1 text-sm ${
+            className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-sm ${
               g === genre
                 ? "border-violet-600 bg-violet-600 text-white"
                 : "border-zinc-300 hover:border-violet-500 dark:border-zinc-700"
@@ -172,7 +194,7 @@ export default async function Home({
           {mine.drops.length ? (
             <DropList drops={mine.drops} />
           ) : (
-            <p className="rounded-xl border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700">
+            <p className="rounded-xl border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-600 dark:text-zinc-400 dark:border-zinc-700">
               {mine.followsAnyone ? (
                 "No ticket sales coming up for your artists in the next 2 weeks."
               ) : (
@@ -222,7 +244,7 @@ export default async function Home({
       )}
 
       {genre && drops.length === 0 && popular.length === 0 && (
-        <p className="text-center text-zinc-500">No {genre} tours found right now. Try another genre.</p>
+        <p className="text-center text-zinc-600 dark:text-zinc-400">No {genre} tours found right now. Try another genre.</p>
       )}
 
       {announced.length > 0 && (
@@ -236,7 +258,7 @@ export default async function Home({
                   className="inline-block rounded-full border border-zinc-300 px-4 py-2 text-sm hover:border-violet-500 dark:border-zinc-700"
                 >
                   <span className="font-semibold">{a.artistName}</span>{" "}
-                  <span className="text-zinc-500">
+                  <span className="text-zinc-600 dark:text-zinc-400">
                     +{a.newShows} {a.newShows === 1 ? "show" : "shows"}
                   </span>
                 </Link>
@@ -247,7 +269,7 @@ export default async function Home({
       )}
 
       {!userId && (
-        <p className="text-center text-sm text-zinc-500">
+        <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
           <Link href="/my-artists" className="text-violet-600 hover:underline">
             Sign in
           </Link>{" "}

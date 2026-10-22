@@ -106,7 +106,7 @@ export default function NotificationHelpPage() {
           </Link>
           , turn notifications off and on again, and send another test.
         </p>
-        <p className="text-sm text-zinc-500">
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">
           Also check your notification center: the alert may already be there.
         </p>
       </div>

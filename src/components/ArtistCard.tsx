@@ -31,7 +31,7 @@ export function ArtistCard({
       </div>
       <div className="p-4">
         <h3 className="font-semibold group-hover:text-violet-600">{artist.name}</h3>
-        <p className="text-sm text-zinc-500">
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">
           {artist.genre ?? "Music"}
           {artist.upcomingShows > 0 &&
             ` · ${artist.upcomingShows} upcoming ${artist.upcomingShows === 1 ? "show" : "shows"}`}

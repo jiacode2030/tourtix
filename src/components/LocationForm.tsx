@@ -93,7 +93,7 @@ export function LocationForm({
           <button type="submit" onClick={() => (mode.current!.value = "zip")} className={primary}>
             Save
           </button>
-          <span className="self-center text-sm text-zinc-500">or</span>
+          <span className="self-center text-sm text-zinc-600 dark:text-zinc-400">or</span>
           <button type="button" onClick={useHere} className={secondary}>
             📍 Use my current location
           </button>
@@ -119,9 +119,9 @@ export function LocationForm({
       <div className="flex flex-wrap items-center gap-3 text-sm">
         {saved && !status && <span className="text-emerald-600">Saved!</span>}
         {error && errors[error] && <span className="text-rose-600">{errors[error]}</span>}
-        {status && <span className="text-zinc-500">{status}</span>}
+        {status && <span className="text-zinc-600 dark:text-zinc-400">{status}</span>}
         {hasLocation && (
-          <button type="button" onClick={() => submitAs("clear")} className="text-zinc-500 underline hover:text-rose-600">
+          <button type="button" onClick={() => submitAs("clear")} className="text-zinc-600 dark:text-zinc-400 underline hover:text-rose-600">
             Remove my location
           </button>
         )}

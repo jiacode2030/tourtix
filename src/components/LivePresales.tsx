@@ -45,7 +45,7 @@ export function LivePresales({ sales }: { sales: LiveSale[] }) {
           );
         })}
       </ul>
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-zinc-600 dark:text-zinc-400">
         General guidance only; rules differ by tour. Always check the seller&apos;s presale details.
       </p>
     </section>

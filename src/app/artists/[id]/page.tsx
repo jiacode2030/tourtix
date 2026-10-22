@@ -89,7 +89,7 @@ export default async function ArtistPage({
   return (
     <div className="space-y-6">
       <AutoRefresh />
-      <Link href="/" className="inline-block text-sm text-zinc-500 hover:text-violet-600">
+      <Link href="/" className="inline-block text-sm text-zinc-600 dark:text-zinc-400 hover:text-violet-600">
         ← Back to search
       </Link>
       <div className="flex items-center gap-4">
@@ -103,7 +103,7 @@ export default async function ArtistPage({
         </div>
         <div className="min-w-0 flex-1">
           <h1 className="text-3xl font-bold">{artist.name}</h1>
-          <p className="text-zinc-500">
+          <p className="text-zinc-600 dark:text-zinc-400">
             {artist.genre ?? "Music"}
             {nextShow && ` · Next show ${fmtDate(nextShow.date)}`}
           </p>
@@ -115,8 +115,8 @@ export default async function ArtistPage({
               {located && ` · ${summary.near} near you`}
             </p>
           )}
-          <p className="text-xs text-zinc-400">
-            Unofficial fan tool. Not affiliated with {artist.name} or their team.
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Unofficial fan tool, not affiliated with {artist.name}.
           </p>
         </div>
       </div>
@@ -167,11 +167,12 @@ export default async function ArtistPage({
           </nav>
         )}
         {shows.length > 0 && (
-          <p className="text-sm text-zinc-500">
-            Ticket info updates automatically and can be up to 5 minutes old.{" "}
-            <LastChecked at={checkedAt} />{" "}
-            Always check the date, seats, and final price (including fees) on the seller&apos;s site
-            before you buy.
+          <p className="rounded-xl bg-zinc-50 px-3 py-2 text-sm text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
+            🛒 You buy on the seller&apos;s website. TourTix doesn&apos;t sell tickets.
+            <span className="block text-xs text-zinc-600 dark:text-zinc-400">
+              Updates automatically (up to 5 min old). <LastChecked at={checkedAt} /> Check the date,
+              seats, and total price on the seller&apos;s site before buying.
+            </span>
           </p>
         )}
         {visible.length ? (
@@ -188,7 +189,7 @@ export default async function ArtistPage({
             ))}
           </ul>
         ) : (
-          <p className="rounded-xl border border-dashed border-zinc-300 p-6 text-center text-zinc-500 dark:border-zinc-700">
+          <p className="rounded-xl border border-dashed border-zinc-300 p-6 text-center text-zinc-600 dark:text-zinc-400 dark:border-zinc-700">
             {shows.length ? "No shows match this filter." : "No upcoming shows right now."}
           </p>
         )}

@@ -5,7 +5,7 @@ export function Footer() {
   const sources = activeSources();
   return (
     <footer className="mt-16 border-t border-zinc-200 dark:border-zinc-800">
-      <div className="mx-auto max-w-5xl space-y-3 px-4 py-8 text-sm text-zinc-500">
+      <div className="mx-auto max-w-5xl space-y-3 px-4 py-8 text-sm text-zinc-600 dark:text-zinc-400">
         {sources.length > 0 && <p>Event data provided by {sources.join(", ")}.</p>}
         <p>
           TourTix is an independent site. We don&apos;t sell tickets; purchases happen on the

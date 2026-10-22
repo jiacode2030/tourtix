@@ -49,7 +49,7 @@ export default async function ConcertsPage({
     <div className="space-y-8">
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">Find concerts</h1>
-        <p className="text-zinc-500">Browse shows in a city over the next 30 days.</p>
+        <p className="text-zinc-600 dark:text-zinc-400">Browse shows in a city over the next 30 days.</p>
       </div>
 
       <form action="/concerts" className="flex flex-wrap gap-2">
@@ -72,7 +72,7 @@ export default async function ConcertsPage({
             📍 Show concerts near me
           </Link>
         ) : (
-          <span className="text-zinc-500">
+          <span className="text-zinc-600 dark:text-zinc-400">
             Want concerts near you?{" "}
             <Link href="/settings" className="text-violet-600 hover:underline">
               Share your location in Settings
@@ -100,7 +100,7 @@ export default async function ConcertsPage({
                     <div className="w-28 shrink-0 text-sm font-semibold text-violet-600">{fmtDate(show.date)}</div>
                     <div className="min-w-0 flex-1">
                       <div className="truncate font-semibold">{artist.name}</div>
-                      <div className="truncate text-sm text-zinc-500">
+                      <div className="truncate text-sm text-zinc-600 dark:text-zinc-400">
                         {[show.venue, show.city].filter(Boolean).join(" · ")}
                       </div>
                     </div>
@@ -110,7 +110,7 @@ export default async function ConcertsPage({
               ))}
             </ul>
           ) : (
-            <p className="text-zinc-500">No concerts found. Check the spelling or try a nearby bigger city.</p>
+            <p className="text-zinc-600 dark:text-zinc-400">No concerts found. Check the spelling or try a nearby bigger city.</p>
           )}
         </section>
       )}

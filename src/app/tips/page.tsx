@@ -104,7 +104,7 @@ export default function TipsPage() {
           </li>
         ))}
       </ol>
-      <p className="text-sm text-zinc-500">
+      <p className="text-sm text-zinc-600 dark:text-zinc-400">
         Think you were scammed? Contact your bank or card issuer right away, and report it to the{" "}
         <a
           href="https://reportfraud.ftc.gov"

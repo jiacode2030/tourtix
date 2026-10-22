@@ -85,7 +85,7 @@ export async function Header() {
                 <form action={signOutAction} className="border-t border-zinc-200 dark:border-zinc-700">
                   <button type="submit" className={`${menuLink} w-full text-left`}>
                     Sign out
-                    <span className="block truncate text-xs text-zinc-500">{user.email}</span>
+                    <span className="block truncate text-xs text-zinc-600 dark:text-zinc-400">{user.email}</span>
                   </button>
                 </form>
               </>

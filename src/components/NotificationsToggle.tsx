@@ -97,7 +97,7 @@ export function NotificationsToggle({ publicKey }: { publicKey: string }) {
 
   return (
     <div className="space-y-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
-      {state === "loading" && <p className="text-sm text-zinc-500">Checking this device…</p>}
+      {state === "loading" && <p className="text-sm text-zinc-600 dark:text-zinc-400">Checking this device…</p>}
 
       {state === "unsupported" && (
         <p className="text-sm text-zinc-600 dark:text-zinc-400">

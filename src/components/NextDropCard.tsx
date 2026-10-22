@@ -126,7 +126,7 @@ export function NextDropCard({
           ))}
         </ul>
       )}
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-zinc-600 dark:text-zinc-400">
         You buy on the seller&apos;s site. Times come from Ticketmaster and can change.
       </p>
     </section>

@@ -34,7 +34,7 @@ export function GetStarted({
       </p>
       <div className="flex items-baseline justify-between gap-2">
         <h2 className="font-semibold">Get started</h2>
-        <span className="text-sm text-zinc-500">
+        <span className="text-sm text-zinc-600 dark:text-zinc-400">
           {steps.length - remaining} of {steps.length} done
         </span>
       </div>

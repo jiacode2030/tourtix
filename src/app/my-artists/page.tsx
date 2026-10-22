@@ -24,9 +24,9 @@ export default async function MyArtistsPage({
     return (
       <div className="space-y-4 py-12 text-center">
         <h1 className="text-2xl font-bold">Follow your favorite artists</h1>
-        <p className="text-zinc-500">Sign in to see all your artists&apos; upcoming shows in one place.</p>
+        <p className="text-zinc-600 dark:text-zinc-400">Sign in to see all your artists&apos; upcoming shows in one place.</p>
         <SignInPrompt label="Sign in with Google" redirectTo="/my-artists" />
-        <p className="mx-auto max-w-md text-sm text-zinc-500">
+        <p className="mx-auto max-w-md text-sm text-zinc-600 dark:text-zinc-400">
           TourTix is free and doesn&apos;t sell tickets. We collect shows from ticket sites and link
           you to the seller to buy.
         </p>
@@ -67,7 +67,7 @@ export default async function MyArtistsPage({
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">My Artists</h1>
-          <p className="text-zinc-500">
+          <p className="text-zinc-600 dark:text-zinc-400">
             {favs.length} {favs.length === 1 ? "artist" : "artists"} followed
           </p>
         </div>
@@ -98,7 +98,7 @@ export default async function MyArtistsPage({
       <InstallButton />
 
       {favs.length === 0 && (
-        <p className="rounded-xl border border-dashed border-zinc-300 p-8 text-center text-zinc-500 dark:border-zinc-700">
+        <p className="rounded-xl border border-dashed border-zinc-300 p-8 text-center text-zinc-600 dark:text-zinc-400 dark:border-zinc-700">
           You&apos;re not following anyone yet.{" "}
           <Link href="/" className="text-violet-600 hover:underline">
             Search for an artist
@@ -134,7 +134,7 @@ export default async function MyArtistsPage({
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-zinc-500">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
               {failed
                 ? "Couldn't load shows right now. Try again in a minute."
                 : nearOnly
