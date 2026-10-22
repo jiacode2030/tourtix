@@ -88,16 +88,16 @@ export default async function Home({
   const hero = (
     <section className="hero-glow space-y-6 pt-4 text-center sm:pt-10">
       <div className="space-y-3">
-        <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-5xl">Never miss a ticket drop</h1>
-        <p className="mx-auto max-w-xl text-lg text-muted">
+        <h1 className="enter text-balance text-4xl font-bold tracking-tight sm:text-5xl">Never miss a ticket drop</h1>
+        <p className="enter mx-auto max-w-xl text-lg text-muted [--delay:80ms]">
           Every tour date, presale, and on-sale time for your artists, in one place. Free.
         </p>
       </div>
-      <div className="mx-auto max-w-xl">
+      <div className="enter relative z-10 mx-auto max-w-xl [--delay:160ms]">
         <SearchBar defaultValue={q} />
       </div>
       {!q && (
-        <ol className="mx-auto grid max-w-3xl gap-6 pt-4 text-left sm:grid-cols-3">
+        <ol className="enter mx-auto grid max-w-3xl [--delay:240ms] gap-6 pt-4 text-left sm:grid-cols-3">
           {STEPS.map(({ icon: Icon, title, text }, i) => (
             <li key={title} className="flex gap-3 sm:flex-col">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent">
@@ -125,7 +125,7 @@ export default async function Home({
     return (
       <div className="space-y-8">
         {hero}
-        <section className="space-y-4">
+        <section className="reveal space-y-4">
           <h2 className="text-xl font-bold tracking-tight">
             {results.length ? `Results for “${q}”` : `No artists found for “${q}”`}
           </h2>
@@ -198,7 +198,7 @@ export default async function Home({
       </nav>
 
       {mine && (
-        <section className="space-y-4">
+        <section className="reveal space-y-4">
           <SectionHeading
             title="Your upcoming ticket drops"
             subtitle="Presales and on-sales in the next 2 weeks for artists you follow"
@@ -218,7 +218,7 @@ export default async function Home({
       )}
 
       {live.presales.length > 0 && (
-        <section className="space-y-4">
+        <section className="reveal space-y-4">
           <SectionHeading
             icon={LIVE_DOT}
             title="Presales happening now"
@@ -229,7 +229,7 @@ export default async function Home({
       )}
 
       {live.justOnSale.length > 0 && (
-        <section className="space-y-4">
+        <section className="reveal space-y-4">
           <SectionHeading
             icon={<CircleCheck size={20} aria-hidden className="text-live" />}
             title="Just went on sale"
@@ -239,7 +239,7 @@ export default async function Home({
       )}
 
       {drops.length > 0 && (
-        <section className="space-y-4">
+        <section className="reveal space-y-4">
           <SectionHeading
             title={genre ? `${genre} tickets dropping this week` : "Tickets dropping this week"}
             subtitle="Upcoming presales and on-sales for US concerts"
@@ -249,7 +249,7 @@ export default async function Home({
       )}
 
       {popular.length > 0 && (
-        <section className="space-y-4">
+        <section className="reveal space-y-4">
           <SectionHeading title={genre ? `Popular ${genre} artists on tour` : "Popular artists on tour"} />
           <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-x-4 lg:grid-cols-4">
             {popular.map((a) => (
@@ -264,7 +264,7 @@ export default async function Home({
       )}
 
       {announced.length > 0 && (
-        <section className="space-y-4">
+        <section className="reveal space-y-4">
           <SectionHeading title="Just announced" subtitle="New shows added in the last week by artists fans follow on TourTix" />
           <ul className="flex flex-wrap gap-2">
             {announced.map((a) => (

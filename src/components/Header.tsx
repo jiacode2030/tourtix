@@ -73,7 +73,7 @@ export async function Header() {
             >
               {user ? <Avatar name={user.name} image={user.image} /> : <Menu size={22} aria-hidden />}
             </summary>
-            <div className="absolute right-0 z-40 mt-2 w-64 overflow-hidden rounded-2xl border border-line bg-bg py-1 shadow-xl">
+            <div className="reveal-panel absolute right-0 z-40 mt-2 w-64 overflow-hidden rounded-2xl border border-line bg-bg py-1 shadow-xl">
               <Link href="/concerts" className={menuLink}>
                 Concerts near you
               </Link>

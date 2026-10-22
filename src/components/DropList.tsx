@@ -9,7 +9,7 @@ export function DropList({ drops }: { drops: TicketDrop[] }) {
       {drops.map((d) => {
         const place = [d.show.city, d.show.region ?? d.show.country].filter(Boolean).join(", ");
         return (
-          <li key={d.artistId}>
+          <li key={d.artistId} className="reveal">
             <Link href={`/artists/${d.artistId}`} className="flex items-center gap-4 py-3 transition hover:opacity-80">
               <ArtistThumb name={d.artistName} imageUrl={d.imageUrl} />
               <div className="min-w-0 flex-1">

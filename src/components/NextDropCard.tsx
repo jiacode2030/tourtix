@@ -52,7 +52,7 @@ export function NextDropCard({
   const signup = focus.show.presales.find((p) => p.name === drop.label && p.url);
 
   return (
-    <section className="space-y-4 rounded-3xl bg-surface p-5 sm:p-6">
+    <section className="reveal space-y-4 rounded-3xl bg-surface p-5 sm:p-6">
       <div>
         <p className="text-sm font-medium text-muted">Next ticket drop · {drop.label}</p>
         <p className="mt-1 text-5xl font-bold tracking-tight">

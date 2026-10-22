@@ -15,7 +15,7 @@ export function ArtistCard({
   following?: boolean;
 }) {
   return (
-    <div className="relative">
+    <div className="reveal relative">
       <Link href={`/artists/${artist.id}`} className="group block h-full">
         <div
           className="aspect-[4/3] overflow-hidden rounded-2xl bg-surface"

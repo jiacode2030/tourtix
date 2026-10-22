@@ -7,7 +7,7 @@ export function LiveList({ items }: { items: LiveArtist[] }) {
   return (
     <ul className="grid gap-2 sm:grid-cols-2">
       {items.map((a) => (
-        <li key={a.artistId} className="min-w-0">
+        <li key={a.artistId} className="reveal min-w-0">
           <Link
             href={`/artists/${a.artistId}`}
             className="flex items-center gap-3 rounded-2xl bg-surface p-3 transition hover:bg-surface-2"

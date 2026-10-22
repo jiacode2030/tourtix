@@ -157,7 +157,7 @@ export default async function ArtistPage({
       {liveNow.length > 0 && <LivePresales sales={liveNow} memberships={memberships} />}
       {drop && <NextDropCard artistName={artist.name} drop={drop} timeline={saleTimeline(drop.shows.map((d) => d.show))} />}
 
-      <section className="space-y-3">
+      <section className="reveal space-y-3">
         <h2 className="text-xl font-semibold">Upcoming shows</h2>
         {shows.length > 0 && (
           <nav className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0" aria-label="Filter shows">

@@ -216,7 +216,7 @@ export function ShowRow({
 
   return (
     <li id={`show-${show.id}`} className="scroll-mt-20">
-      <details className="group">
+      <details className="group smooth">
         <summary className="flex min-h-[72px] cursor-pointer list-none items-center gap-4 py-3">
           <div className="w-12 shrink-0 text-center">
             {d ? (
@@ -255,7 +255,7 @@ export function ShowRow({
           <ChevronDown size={20} aria-hidden className="shrink-0 text-muted transition group-open:rotate-180" />
         </summary>
 
-        <div className="space-y-4 pb-5 pl-16 text-sm">
+        <div className="reveal-panel space-y-4 pb-5 pl-16 text-sm">
           <p className="text-muted">
             {d && part({ weekday: "long", month: "long", day: "numeric", year: "numeric" })}
             {nextSale && (

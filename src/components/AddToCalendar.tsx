@@ -65,7 +65,7 @@ export function AddToCalendar({ event, label }: { event: CalendarEvent; label: s
       <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-medium text-accent hover:underline">
         <CalendarPlus size={18} aria-hidden /> {label}
       </summary>
-      <div className="absolute left-0 z-20 mt-1 w-56 overflow-hidden rounded-xl border border-line bg-bg text-sm shadow-xl">
+      <div className="reveal-panel absolute left-0 z-20 mt-1 w-56 overflow-hidden rounded-xl border border-line bg-bg text-sm shadow-xl">
         <a
           href={googleUrl(event)}
           target="_blank"

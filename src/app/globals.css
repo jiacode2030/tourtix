@@ -106,3 +106,65 @@ body {
     radial-gradient(ellipse at 68% 45%, var(--glow-2), transparent 60%);
   filter: blur(24px);
 }
+
+/* ── Motion: small, quick, and off for people who prefer reduced motion. ── */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-down {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Page-load entrance, staggered with --delay. */
+  .enter {
+    animation: fade-up 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: var(--delay, 0ms);
+  }
+
+  /* A tapped-open show (or menu) slides its contents in. */
+  details[open] > .reveal-panel {
+    animation: fade-down 0.22s ease-out;
+  }
+
+  /* Smooth height change where the browser supports it. */
+  details.smooth {
+    interpolate-size: allow-keywords;
+  }
+  details.smooth::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition:
+      block-size 0.25s ease,
+      content-visibility 0.25s allow-discrete;
+  }
+  details.smooth[open]::details-content {
+    block-size: auto;
+  }
+
+  /* Fade sections and cards in as they scroll into view. Browsers without
+     scroll-driven animations just show them normally. */
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: fade-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0px entry 120px;
+    }
+  }
+}
