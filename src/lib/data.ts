@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { sampleArtists, sampleShows } from "./sample-data";
 import { mergeShows, sgGetShows } from "./seatgeek";
+import { justWentOnSale, livePresales } from "./live";
 import { groupDrops, type TicketDrop, upcomingSaleStarts } from "./sales";
 import {
   type ConcertSearch,
@@ -90,4 +91,51 @@ export async function concerts(where: ConcertSearch, days = 30) {
 export async function suggestArtists(query: string, debug?: SuggestDebug): Promise<Artist[]> {
   if (usingSampleData) return (await searchArtists(query)).slice(0, 6);
   return tmSuggestArtists(query, debug);
+}
+
+export type LiveArtist = {
+  artistId: string;
+  artistName: string;
+  imageUrl: string | null;
+  detail: string;
+  endsAt: string | null;
+  timezone: string | null;
+};
+
+// Presales open right now and general sales that just started, across the
+// most relevant US music events (the same cached Ticketmaster response as
+// the popular artists list, so no extra API calls).
+export async function liveSales(genre?: string): Promise<{ presales: LiveArtist[]; justOnSale: LiveArtist[] }> {
+  try {
+    const groups = usingSampleData
+      ? sampleArtists.map((artist) => ({ artist, shows: sampleShows(artist.id) }))
+      : await tmPopularArtists(100, genre);
+    const presales: LiveArtist[] = [];
+    const justOnSale: LiveArtist[] = [];
+    for (const { artist, shows } of groups) {
+      const base = { artistId: artist.id, artistName: artist.name, imageUrl: artist.imageUrl };
+      const [sale] = livePresales(shows);
+      if (sale) {
+        presales.push({
+          ...base,
+          detail: `${sale.label} · ${sale.shows.length} ${sale.shows.length === 1 ? "show" : "shows"}`,
+          endsAt: sale.endsAt,
+          timezone: sale.shows[0].timezone,
+        });
+      }
+      const fresh = justWentOnSale(shows, 2 * 24 * 60 * 60 * 1000);
+      if (fresh.length) {
+        justOnSale.push({
+          ...base,
+          detail: `General sale · ${fresh.length} ${fresh.length === 1 ? "show" : "shows"}`,
+          endsAt: null,
+          timezone: fresh[0].timezone,
+        });
+      }
+    }
+    return { presales: presales.slice(0, 8), justOnSale: justOnSale.slice(0, 8) };
+  } catch (err) {
+    console.error(err);
+    return { presales: [], justOnSale: [] };
+  }
 }

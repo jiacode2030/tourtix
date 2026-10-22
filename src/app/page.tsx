@@ -6,7 +6,8 @@ import { DropList } from "@/components/DropList";
 import { SearchBar } from "@/components/SearchBar";
 import { Countdown } from "@/components/Countdown";
 import { justAnnounced } from "@/lib/announced";
-import { getShows, popularArtists, searchArtists, upcomingDrops } from "@/lib/data";
+import { LiveList } from "@/components/LiveList";
+import { getShows, liveSales, popularArtists, searchArtists, upcomingDrops } from "@/lib/data";
 import { fmtDateTime } from "@/lib/format";
 import { GENRES, isGenre } from "@/lib/genres";
 import { groupDrops, type TicketDrop } from "@/lib/sales";
@@ -102,11 +103,12 @@ export default async function Home({
   }
 
   const userId = await currentUserId();
-  const [mine, drops, popular, announced] = await Promise.all([
+  const [mine, drops, popular, announced, live] = await Promise.all([
     userId ? followedDrops(userId) : null,
     upcomingDrops(WEEK_MS, 8, genre),
     popularArtists(8, genre),
     genre ? Promise.resolve([]) : justAnnounced(),
+    liveSales(genre),
   ]);
   // Biggest drops starting within a day, for the banner at the top.
   const soon = startingWithin(drops, DAY_MS).slice(0, 3);
@@ -175,6 +177,23 @@ export default async function Home({
               )}
             </p>
           )}
+        </section>
+      )}
+
+      {live.presales.length > 0 && (
+        <section className="space-y-4">
+          <SectionHeading
+            title="🔥 Presales happening now"
+            subtitle="Open right now. Most need a code, sign-up, or membership."
+          />
+          <LiveList items={live.presales} />
+        </section>
+      )}
+
+      {live.justOnSale.length > 0 && (
+        <section className="space-y-4">
+          <SectionHeading title="✅ Just went on sale" subtitle="General sales that opened in the last 2 days" />
+          <LiveList items={live.justOnSale} />
         </section>
       )}
 

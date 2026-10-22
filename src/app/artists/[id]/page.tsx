@@ -5,12 +5,14 @@ import { notFound } from "next/navigation";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { LastChecked } from "@/components/LastChecked";
+import { LivePresales } from "@/components/LivePresales";
 import { NextDropCard } from "@/components/NextDropCard";
 import { ShowRow } from "@/components/ShowRow";
 import { SignInPrompt } from "@/components/SignInPrompt";
 import { getArtist, getShows } from "@/lib/data";
 import { nextDrop, saleTimeline, tourSummary } from "@/lib/drops";
 import { fmtDate } from "@/lib/format";
+import { livePresales } from "@/lib/live";
 import { hasLocation, isNear } from "@/lib/geo";
 import { upcomingSaleStarts } from "@/lib/sales";
 import type { Show } from "@/lib/types";
@@ -76,6 +78,7 @@ export default async function ArtistPage({
   const visible = shows.filter(matches[filter]);
   const checkedAt = new Date().toISOString();
   const drop = nextDrop(shows, loc);
+  const liveNow = livePresales(shows);
   const covered = new Set(drop?.shows.map((d) => d.show.id));
   const summary = tourSummary(shows, loc);
   const sameYear = summary.firstDate?.slice(0, 4) === summary.lastDate?.slice(0, 4);
@@ -138,6 +141,7 @@ export default async function ArtistPage({
         )}
       </div>
 
+      {liveNow.length > 0 && <LivePresales sales={liveNow} />}
       {drop && <NextDropCard artistName={artist.name} drop={drop} timeline={saleTimeline(drop.shows.map((d) => d.show))} />}
 
       <section className="space-y-3">
