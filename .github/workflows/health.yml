@@ -61,3 +61,11 @@ jobs:
 
       - name: Google verification file still present
         run: curl -fs --max-time 30 "$SITE/google81cfae6c0886ad1e.html" | grep -q google-site-verification
+
+      - name: Share preview images load
+        run: |
+          for path in $(curl -s --max-time 30 "$SITE/" "$SITE/artists/K8vZ9175TJ0" | grep -oE 'og:image" content="[^"]*' | sed 's/.*content="//'); do
+            type=$(curl -s -o /dev/null -w '%{http_code} %{content_type}' --max-time 60 "$path")
+            echo "$type  $path"
+            [ "$type" = "200 image/png" ] || { echo "::error::share image broken: $path"; exit 1; }
+          done
