@@ -86,7 +86,7 @@ export default async function Home({
   const genre = isGenre(params.genre) ? params.genre : undefined;
 
   const hero = (
-    <section className="space-y-6 pt-4 text-center sm:pt-10">
+    <section className="hero-glow space-y-6 pt-4 text-center sm:pt-10">
       <div className="space-y-3">
         <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-5xl">Never miss a ticket drop</h1>
         <p className="mx-auto max-w-xl text-lg text-muted">

@@ -13,12 +13,14 @@
   --fg: #111114;
   --muted: #5f5f6b;
   --line: #e6e6ea;
-  --accent: #4f46e5;
-  --accent-soft: #eef0ff;
+  --accent: #b93a0e;
+  --accent-soft: #fff1ea;
   --live: #047857;
   --live-soft: #e7f8ef;
-  --cta: #111114;
+  --cta: #d23d12;
   --on-cta: #ffffff;
+  --glow: rgba(255, 110, 60, 0.22);
+  --glow-2: rgba(255, 190, 70, 0.2);
 }
 
 .dark {
@@ -28,12 +30,14 @@
   --fg: #f4f4f6;
   --muted: #a1a1ad;
   --line: #26262d;
-  --accent: #a5b4fc;
-  --accent-soft: #1e1f38;
+  --accent: #ff9a76;
+  --accent-soft: #3a1c12;
   --live: #4ade80;
   --live-soft: #12301f;
-  --cta: #ffffff;
-  --on-cta: #0e0e11;
+  --cta: #ff7a4d;
+  --on-cta: #160b06;
+  --glow: rgba(255, 106, 61, 0.2);
+  --glow-2: rgba(255, 170, 60, 0.12);
 }
 
 @theme inline {
@@ -80,4 +84,25 @@ body {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Soft sunset glow behind the homepage headline. */
+.hero-glow {
+  position: relative;
+  isolation: isolate;
+}
+.hero-glow::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -3rem;
+  z-index: -1;
+  width: min(56rem, 100vw);
+  height: 26rem;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 35% 35%, var(--glow), transparent 60%),
+    radial-gradient(ellipse at 68% 45%, var(--glow-2), transparent 60%);
+  filter: blur(24px);
 }

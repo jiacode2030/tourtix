@@ -31,7 +31,7 @@ export async function Header() {
     <header className="sticky top-0 z-30 border-b border-line bg-bg/85 backdrop-blur">
       <nav className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-4">
         <Link href="/" className="text-xl font-bold tracking-tight">
-          TourTix
+          Tour<span className="text-accent">Tix</span>
         </Link>
 
         {/* Computers and tablets */}
