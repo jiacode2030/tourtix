@@ -1,0 +1,63 @@
+# Hourly check that the live site works with real data. A failed run means
+# something on tourtix.vercel.app is broken; GitHub emails the repo owner.
+name: Live site health
+
+on:
+  schedule:
+    - cron: "41 * * * *"
+  workflow_dispatch:
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SITE: https://tourtix.vercel.app
+    steps:
+      - name: Pages load
+        run: |
+          for path in / /concerts /tips /contact /privacy /terms /help/notifications \
+                      /sitemap.xml /robots.txt /manifest.webmanifest /api/auth/providers; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "$SITE$path")
+            echo "$path -> $code"
+            [ "$code" = "200" ] || { echo "::error::$path returned $code"; exit 1; }
+          done
+
+      - name: Pages respond quickly
+        run: |
+          t=$(curl -s -o /dev/null -w '%{time_total}' --max-time 30 "$SITE/")
+          echo "homepage took ${t}s"
+          awk "BEGIN { exit !($t < 15) }" || { echo "::error::homepage took ${t}s"; exit 1; }
+
+      - name: Real Ticketmaster data (not sample data)
+        run: |
+          html=$(curl -s --max-time 30 "$SITE/")
+          echo "$html" | grep -q "sample data" && { echo "::error::site is showing sample data; check TICKETMASTER_API_KEY in Vercel"; exit 1; }
+          echo "$html" | grep -q "Ticketmaster" || { echo "::error::Ticketmaster attribution missing from homepage"; exit 1; }
+
+      - name: Search suggestions return artists
+        run: |
+          body=$(curl -s --max-time 30 "$SITE/api/suggest?q=calvin")
+          echo "$body" | head -c 300; echo
+          echo "$body" | grep -q '"name"' || { echo "::error::search suggestions returned no artists"; exit 1; }
+
+      - name: Artist page shows real shows
+        run: |
+          html=$(curl -s --max-time 30 "$SITE/artists/K8vZ9175TJ0")
+          echo "$html" | grep -q "Calvin Harris" || { echo "::error::artist page missing artist name"; exit 1; }
+          echo "$html" | grep -q "Upcoming shows" || { echo "::error::artist page missing shows section"; exit 1; }
+          echo "$html" | grep -q "Something went wrong" && { echo "::error::artist page shows an error"; exit 1; } || true
+
+      - name: Legal and trust notices present
+        run: |
+          home=$(curl -s --max-time 30 "$SITE/")
+          for text in "doesn&#x27;t sell tickets" "Privacy Policy" "Terms of Use" "not affiliated"; do
+            echo "$home" | grep -q "$text" || { echo "::error::homepage missing: $text"; exit 1; }
+          done
+          curl -s --max-time 30 "$SITE/privacy" | grep -q "Ticketmaster" || { echo "::error::privacy policy missing data source"; exit 1; }
+          curl -s --max-time 30 "$SITE/terms" | grep -q "within 24 hours" || { echo "::error::terms missing removal policy"; exit 1; }
+          # Only look inside links: the footer's "not affiliated" text is fine.
+          echo "$home" | grep -qiE 'href="[^"]*(aff=|affiliate_id|irclickid|clickid=)' && { echo "::error::affiliate links found; Ticketmaster's terms forbid earning from its data"; exit 1; } || true
+
+      - name: Google verification file still present
+        run: curl -fs --max-time 30 "$SITE/google81cfae6c0886ad1e.html" | grep -q google-site-verification
