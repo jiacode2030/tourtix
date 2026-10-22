@@ -39,7 +39,16 @@ function subscribe(listener: () => void) {
 
 // Live countdown to an ISO time. Renders nothing on the server so the
 // server and browser clocks can't disagree.
-export function Countdown({ to, label }: { to: string; label: string }) {
+export function Countdown({
+  to,
+  label,
+  bare = false,
+}: {
+  to: string;
+  label: string;
+  // Just the time left ("18h 42m 9s"), for big headline countdowns.
+  bare?: boolean;
+}) {
   const current = useSyncExternalStore(
     subscribe,
     () => now,
@@ -57,6 +66,9 @@ export function Countdown({ to, label }: { to: string; label: string }) {
 
   if (current == null) return null;
   const left = new Date(to).getTime() - current;
+  if (bare) {
+    return left <= 0 ? <span className="text-emerald-600">Live now</span> : <span className="tabular-nums">{format(left)}</span>;
+  }
   if (left <= 0) return <span className="font-medium text-emerald-600">{label} is live now</span>;
   return (
     <span className="font-medium text-amber-700 dark:text-amber-400">

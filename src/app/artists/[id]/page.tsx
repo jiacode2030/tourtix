@@ -5,9 +5,11 @@ import { notFound } from "next/navigation";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { LastChecked } from "@/components/LastChecked";
+import { NextDropCard } from "@/components/NextDropCard";
 import { ShowRow } from "@/components/ShowRow";
 import { SignInPrompt } from "@/components/SignInPrompt";
 import { getArtist, getShows } from "@/lib/data";
+import { nextDrop, saleTimeline, tourSummary } from "@/lib/drops";
 import { fmtDate } from "@/lib/format";
 import { hasLocation, isNear } from "@/lib/geo";
 import { upcomingSaleStarts } from "@/lib/sales";
@@ -73,6 +75,12 @@ export default async function ArtistPage({
   };
   const visible = shows.filter(matches[filter]);
   const checkedAt = new Date().toISOString();
+  const drop = nextDrop(shows, loc);
+  const covered = new Set(drop?.shows.map((d) => d.show.id));
+  const summary = tourSummary(shows, loc);
+  const sameYear = summary.firstDate?.slice(0, 4) === summary.lastDate?.slice(0, 4);
+  const range = (d: string | null) =>
+    d ? new Date(`${d}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "";
   const nextShow = shows.find((s) => s.status !== "cancelled");
 
   return (
@@ -96,6 +104,14 @@ export default async function ArtistPage({
             {artist.genre ?? "Music"}
             {nextShow && ` · Next show ${fmtDate(nextShow.date)}`}
           </p>
+          {summary.count > 1 && summary.firstDate && (
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              {summary.count} shows · {sameYear ? range(summary.firstDate).replace(/, \d{4}$/, "") : range(summary.firstDate)}
+              {" – "}
+              {range(summary.lastDate)}
+              {located && ` · ${summary.near} near you`}
+            </p>
+          )}
           <p className="text-xs text-zinc-400">
             Unofficial fan tool. Not affiliated with {artist.name} or their team.
           </p>
@@ -121,6 +137,8 @@ export default async function ArtistPage({
           </div>
         )}
       </div>
+
+      {drop && <NextDropCard artistName={artist.name} drop={drop} timeline={saleTimeline(drop.shows.map((d) => d.show))} />}
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">
@@ -161,6 +179,7 @@ export default async function ArtistPage({
                 artistId={artist.id}
                 artistName={artist.name}
                 nearYou={isNear(s, loc)}
+                coveredByDrop={covered.has(s.id)}
               />
             ))}
           </ul>

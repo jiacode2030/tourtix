@@ -225,14 +225,18 @@ export function ShowRow({
   artistId,
   artistName,
   nearYou = false,
+  coveredByDrop = false,
 }: {
   show: Show;
   artistId: string;
   artistName: string;
   nearYou?: boolean;
+  // The page's "Next ticket drop" card already shows this show's next sale.
+  coveredByDrop?: boolean;
 }) {
   const place = placeOf(show);
   const nextSale = upcomingSaleStarts(show, FOREVER)[0];
+  const showSale = nextSale && !coveredByDrop;
   const canBuy = show.status !== "cancelled" && show.status !== "offsale" && show.status !== "postponed";
   const concert = showEvent(show, artistName);
 
@@ -250,7 +254,12 @@ export function ShowRow({
             )}
           </div>
           <div className="truncate text-sm text-zinc-500">{show.venue}</div>
-          {nextSale && (
+          {nextSale && coveredByDrop && (
+            <div className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+              {nextSale.label}: {fmtDateTime(nextSale.start, show.timezone)}
+            </div>
+          )}
+          {showSale && (
             <div className="mt-1 space-y-0.5 text-sm">
               <div className="text-zinc-600 dark:text-zinc-400">
                 {nextSale.label} starts {fmtDateTime(nextSale.start, show.timezone)}
@@ -276,7 +285,7 @@ export function ShowRow({
       {canBuy && <OtherSites artistName={artistName} show={show} />}
 
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-        {nextSale && (
+        {showSale && (
           <AddToCalendar
             label={`Remind me: ${nextSale.label.toLowerCase()}`}
             event={{
