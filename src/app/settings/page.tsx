@@ -91,7 +91,8 @@ export default async function SettingsPage({
           </label>
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" name="sales" defaultChecked={profile?.alertSales ?? true} />
-            A presale or general sale starts within 24 hours
+            A presale or general sale is coming up (a day before and about an hour before), or a
+            new presale is added
           </label>
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" name="nearOnly" defaultChecked={profile?.alertNearOnly ?? false} />

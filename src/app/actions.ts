@@ -35,6 +35,7 @@ export async function toggleFavorite(artistId: string, currentlyFavorite: boolea
   }
   revalidatePath(`/artists/${artistId}`);
   revalidatePath("/my-artists");
+  revalidatePath("/");
 }
 
 // Saves the user's location from a ZIP code, the browser's location, or

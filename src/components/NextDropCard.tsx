@@ -1,5 +1,6 @@
 import type { NextDrop, SaleStage } from "@/lib/drops";
 import { fmtDate, fmtDateTime } from "@/lib/format";
+import { presaleHelp } from "@/lib/presale-help";
 import { AddToCalendar } from "./AddToCalendar";
 import { Countdown } from "./Countdown";
 
@@ -76,6 +77,12 @@ export function NextDropCard({
           </p>
         )}
       </div>
+
+      {drop.label !== "General sale" && (
+        <p className="rounded-lg bg-white/70 p-3 text-sm dark:bg-zinc-900/60">
+          <span className="font-medium">How to get in:</span> {presaleHelp(drop.label)}
+        </p>
+      )}
 
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
         {seller && (

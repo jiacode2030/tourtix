@@ -74,4 +74,12 @@ await sql`
     user_id text,
     created_at timestamptz NOT NULL DEFAULT now()
   )`;
+await sql`ALTER TABLE tracked_artists ADD COLUMN IF NOT EXISTS presales_seeded boolean NOT NULL DEFAULT false`;
+await sql`
+  CREATE TABLE IF NOT EXISTS known_presales (
+    artist_id text NOT NULL,
+    presale_key text NOT NULL,
+    first_seen timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (artist_id, presale_key)
+  )`;
 console.log("migrate: tables ready");

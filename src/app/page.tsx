@@ -83,6 +83,10 @@ export default async function Home({
     </section>
   );
 
+  const userId = await currentUserId();
+  const followedIds = userId ? new Set((await listFavorites(userId)).map((f) => f.artistId)) : null;
+  const followState = (id: string) => (followedIds ? followedIds.has(id) : undefined);
+
   if (q) {
     const results = await searchArtists(q);
     return (
@@ -94,7 +98,7 @@ export default async function Home({
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {results.map((a) => (
-              <ArtistCard key={a.id} artist={a} />
+              <ArtistCard key={a.id} artist={a} following={followState(a.id)} />
             ))}
           </div>
         </section>
@@ -102,7 +106,6 @@ export default async function Home({
     );
   }
 
-  const userId = await currentUserId();
   const [mine, drops, popular, announced, live] = await Promise.all([
     userId ? followedDrops(userId) : null,
     upcomingDrops(WEEK_MS, 8, genre),
@@ -212,7 +215,7 @@ export default async function Home({
           <SectionHeading title={genre ? `Popular ${genre} artists on tour` : "Popular artists on tour"} />
           <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             {popular.map((a) => (
-              <ArtistCard key={a.id} artist={a} nextSale={a.nextSale} />
+              <ArtistCard key={a.id} artist={a} nextSale={a.nextSale} following={followState(a.id)} />
             ))}
           </div>
         </section>

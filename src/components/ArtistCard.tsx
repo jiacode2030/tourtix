@@ -1,18 +1,23 @@
 import Link from "next/link";
 import type { Artist } from "@/lib/types";
 import { Countdown } from "./Countdown";
+import { FollowStar } from "./FollowStar";
 
 export function ArtistCard({
   artist,
   nextSale = null,
+  following,
 }: {
   artist: Artist;
   nextSale?: { label: string; start: string } | null;
+  // Whether the signed-in user follows this artist; undefined when signed out.
+  following?: boolean;
 }) {
   return (
-    <Link
+    <div className="relative">
+      <Link
       href={`/artists/${artist.id}`}
-      className="group overflow-hidden rounded-xl border border-zinc-200 bg-white transition hover:border-violet-400 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+      className="group block h-full overflow-hidden rounded-xl border border-zinc-200 bg-white transition hover:border-violet-400 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
     >
       <div className="aspect-video bg-gradient-to-br from-violet-500 to-fuchsia-500">
         {artist.imageUrl ? (
@@ -37,6 +42,12 @@ export function ArtistCard({
           </p>
         )}
       </div>
-    </Link>
+      </Link>
+      {following !== undefined && (
+        <div className="absolute right-2 top-2">
+          <FollowStar artistId={artist.id} artistName={artist.name} isFavorite={following} />
+        </div>
+      )}
+    </div>
   );
 }

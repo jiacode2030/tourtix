@@ -6,7 +6,7 @@ import type { Show } from "./types";
 const FOREVER = Number.MAX_SAFE_INTEGER;
 
 // Wall-clock time in the venue's zone, e.g. "Thu, Oct 22, 12:00 PM".
-function localKey(iso: string, timeZone: string | null) {
+export function localKey(iso: string, timeZone: string | null) {
   return new Date(iso).toLocaleString("en-US", {
     timeZone: timeZone ?? "UTC",
     weekday: "short",

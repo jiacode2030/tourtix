@@ -63,7 +63,21 @@ export const knownShows = pgTable(
 export const trackedArtists = pgTable("tracked_artists", {
   artistId: text("artist_id").primaryKey(),
   seededAt: timestamp("seeded_at", { withTimezone: true }).notNull().defaultNow(),
+  // Same idea for presales: the first presale check records them silently.
+  presalesSeeded: boolean("presales_seeded").notNull().default(false),
 });
+
+// Presales we've already seen per show, so newly added ones trigger alerts.
+export const knownPresales = pgTable(
+  "known_presales",
+  {
+    artistId: text("artist_id").notNull(),
+    // showKey|presaleKey
+    presaleKey: text("presale_key").notNull(),
+    firstSeen: timestamp("first_seen", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.artistId, t.presaleKey] })],
+);
 
 // Every alert sent, so each one goes out once per user.
 export const sentAlerts = pgTable(

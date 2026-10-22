@@ -1,5 +1,6 @@
 import { fmtDateTime } from "@/lib/format";
 import type { LiveSale } from "@/lib/live";
+import { presaleHelp } from "@/lib/presale-help";
 
 // "Presale happening now" on an artist page.
 export function LivePresales({ sales }: { sales: LiveSale[] }) {
@@ -20,6 +21,9 @@ export function LivePresales({ sales }: { sales: LiveSale[] }) {
                   {sale.endsAt && <> · ends {fmtDateTime(sale.endsAt, first.timezone)}</>}
                 </span>
               </div>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                <span className="font-medium">How to get in:</span> {presaleHelp(sale.label)}
+              </p>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
                 {seller && (
                   <a
@@ -42,7 +46,7 @@ export function LivePresales({ sales }: { sales: LiveSale[] }) {
         })}
       </ul>
       <p className="text-xs text-zinc-500">
-        Presales usually need a code, a sign-up, or a membership. Check the seller&apos;s presale details.
+        General guidance only; rules differ by tour. Always check the seller&apos;s presale details.
       </p>
     </section>
   );
