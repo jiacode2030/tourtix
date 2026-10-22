@@ -133,6 +133,7 @@ export default async function MyArtistsPage({
                   artistId={fav.artistId}
                   artistName={fav.artistName}
                   nearYou={isNear(s, loc)}
+                  memberships={profile?.memberships ?? []}
                 />
               ))}
             </ul>

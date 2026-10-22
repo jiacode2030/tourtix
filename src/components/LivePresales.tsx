@@ -2,9 +2,10 @@ import { fmtDateTime } from "@/lib/format";
 import type { LiveSale } from "@/lib/live";
 import { presaleHelp } from "@/lib/presale-help";
 import { btnPrimary } from "@/lib/ui";
+import { PresaleBadge } from "./PresaleBadge";
 
 // "Presale happening now" on an artist page.
-export function LivePresales({ sales }: { sales: LiveSale[] }) {
+export function LivePresales({ sales, memberships }: { sales: LiveSale[]; memberships?: readonly string[] }) {
   return (
     <section className="space-y-3">
       <h2 className="flex items-center gap-2 text-xl font-semibold">
@@ -22,7 +23,10 @@ export function LivePresales({ sales }: { sales: LiveSale[] }) {
           return (
             <li key={sale.label} className="space-y-3 rounded-3xl bg-surface p-5">
               <div>
-                <p className="text-lg font-semibold">{sale.label}</p>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <p className="text-lg font-semibold">{sale.label}</p>
+                  <PresaleBadge name={sale.label} memberships={memberships} />
+                </div>
                 <p className="text-sm text-muted">
                   {sale.shows.length} {sale.shows.length === 1 ? "show" : "shows"}
                   {sale.endsAt && <> · ends {fmtDateTime(sale.endsAt, first.timezone)}</>}

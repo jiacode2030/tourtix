@@ -68,6 +68,8 @@ export default async function ArtistPage({
   ]);
   const loc = locationOf(profile);
   const located = hasLocation(loc);
+  // Signed-in users without a profile row yet get an empty list, which shows the Settings prompt.
+  const memberships = userId ? (profile?.memberships ?? []) : undefined;
   const filter: FilterKey =
     FILTERS.some((f) => f.key === requested) && (requested !== "near" || located)
       ? (requested as FilterKey)
@@ -152,7 +154,7 @@ export default async function ArtistPage({
         <p className="text-xs text-muted">Unofficial fan tool, not affiliated with {artist.name}.</p>
       </div>
 
-      {liveNow.length > 0 && <LivePresales sales={liveNow} />}
+      {liveNow.length > 0 && <LivePresales sales={liveNow} memberships={memberships} />}
       {drop && <NextDropCard artistName={artist.name} drop={drop} timeline={saleTimeline(drop.shows.map((d) => d.show))} />}
 
       <section className="space-y-3">
@@ -183,6 +185,7 @@ export default async function ArtistPage({
                 artistName={artist.name}
                 nearYou={isNear(s, loc)}
                 coveredByDrop={covered.has(s.id)}
+                memberships={memberships}
               />
             ))}
           </ul>

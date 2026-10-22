@@ -22,6 +22,8 @@ export const profiles = pgTable("profiles", {
   alertNewShows: boolean("alert_new_shows").notNull().default(true),
   alertSales: boolean("alert_sales").notNull().default(true),
   alertNearOnly: boolean("alert_near_only").notNull().default(false),
+  // Accounts and cards ticked under "Presales I can get into" (keys from lib/presale-access).
+  memberships: text("memberships").array().notNull().default([]),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

@@ -1,11 +1,14 @@
-import { ChevronDown, MapPin } from "lucide-react";
+import { ChevronDown, MapPin, Ticket } from "lucide-react";
+import Link from "next/link";
 import { fmtDate, fmtDateTime, zonedTimeToUtc } from "@/lib/format";
+import { earliestForYou } from "@/lib/presale-access";
 import { upcomingSaleStarts } from "@/lib/sales";
 import { otherSiteSearches, type SearchLink } from "@/lib/search-links";
 import type { SellerLink, Show } from "@/lib/types";
 import { btnPrimary } from "@/lib/ui";
 import { AddToCalendar, type CalendarEvent } from "./AddToCalendar";
 import { Countdown } from "./Countdown";
+import { PresaleBadge } from "./PresaleBadge";
 import { ShareButton } from "./ShareButton";
 import { statusLabel } from "@/lib/status";
 
@@ -97,9 +100,11 @@ function showEvent(show: Show, artistName: string): CalendarEvent | null {
   return { ...common, start: start.toISOString(), end: end.toISOString() };
 }
 
-function Details({ show }: { show: Show }) {
+function Details({ show, memberships }: { show: Show; memberships?: readonly string[] }) {
   const { extras } = show;
-  const presales = show.presales.filter((p) => p.start || p.url || p.description);
+  const presales = show.presales
+    .filter((p) => p.start || p.url || p.description)
+    .sort((a, b) => (a.start ?? "~").localeCompare(b.start ?? "~"));
   const facts: [string, string | undefined][] = [
     ["Ticket limit", extras.ticketLimit],
     ["Age", extras.ageRestriction],
@@ -118,7 +123,10 @@ function Details({ show }: { show: Show }) {
           <ul className="divide-y divide-line">
             {presales.map((p, i) => (
               <li key={i} className="py-2">
-                <div className="font-medium">{p.name}</div>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <span className="font-medium">{p.name}</span>
+                  <PresaleBadge name={p.name} memberships={memberships} />
+                </div>
                 {p.start && (
                   <div className="text-muted">
                     {fmtDateTime(p.start, show.timezone)}
@@ -186,6 +194,7 @@ export function ShowRow({
   artistName,
   nearYou = false,
   coveredByDrop = false,
+  memberships,
 }: {
   show: Show;
   artistId: string;
@@ -193,11 +202,15 @@ export function ShowRow({
   nearYou?: boolean;
   // The page's "Next ticket drop" card already counts down to this show's sale.
   coveredByDrop?: boolean;
+  // Accounts and cards ticked in Settings; undefined when signed out.
+  memberships?: readonly string[];
 }) {
   const place = placeOf(show);
   const nextSale = upcomingSaleStarts(show, FOREVER)[0];
   const canBuy = show.status !== "cancelled" && show.status !== "offsale" && show.status !== "postponed";
   const concert = showEvent(show, artistName);
+  const yours = memberships ? earliestForYou(show, memberships) : null;
+  const hasPresales = show.presales.length > 0 && canBuy;
   const d = show.date ? new Date(`${show.date}T12:00:00Z`) : null;
   const part = (opts: Intl.DateTimeFormatOptions) => d!.toLocaleDateString("en-US", { ...opts, timeZone: "UTC" });
 
@@ -228,6 +241,11 @@ export function ShowRow({
                 )}
               </span>
             </p>
+            {yours && (
+              <p className="mt-0.5 flex items-center gap-1 text-xs font-medium text-live">
+                <Ticket size={12} aria-hidden /> Your presale: {yours.name}
+              </p>
+            )}
             {nearYou && (
               <p className="mt-0.5 flex items-center gap-1 text-xs font-medium text-accent">
                 <MapPin size={12} aria-hidden /> Near you
@@ -247,6 +265,20 @@ export function ShowRow({
               </>
             )}
           </p>
+          {yours && (
+            <p className="rounded-2xl bg-live-soft px-4 py-3 text-fg">
+              <span className="font-semibold">Your earliest presale:</span> {yours.name},{" "}
+              {fmtDateTime(yours.start, show.timezone)}
+            </p>
+          )}
+          {!yours && memberships?.length === 0 && hasPresales && (
+            <p className="text-muted">
+              <Link href="/settings#presales" className="font-medium text-accent hover:underline">
+                Tell us which presales you can get into
+              </Link>{" "}
+              to see the earliest one for you.
+            </p>
+          )}
           {canBuy && show.links.length > 0 && <SellerOptions links={show.links} />}
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             {nextSale ? (
@@ -269,7 +301,7 @@ export function ShowRow({
             <ShareButton title={`${artistName} – ${place}, ${fmtDate(show.date)}`} path={`/artists/${artistId}#show-${show.id}`} />
           </div>
           {canBuy && <OtherSites artistName={artistName} show={show} />}
-          <Details show={show} />
+          <Details show={show} memberships={memberships} />
         </div>
       </details>
     </li>

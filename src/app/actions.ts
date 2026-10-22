@@ -11,6 +11,7 @@ import { DEFAULT_RADIUS, RADIUS_OPTIONS } from "@/lib/geo";
 import { sendToUser } from "@/lib/push";
 import { isUsState } from "@/lib/regions";
 import { isZip, lookupZip } from "@/lib/zip";
+import { cleanMemberships } from "@/lib/presale-access";
 
 async function requireUser() {
   const userId = await currentUserId();
@@ -110,6 +111,17 @@ export async function saveAlertPrefs(formData: FormData) {
     .onConflictDoUpdate({ target: profiles.userId, set: { ...prefs, updatedAt: new Date() } });
   revalidatePath("/settings");
   redirect("/settings?saved=alerts");
+}
+
+export async function saveMemberships(formData: FormData) {
+  const userId = await requireUser();
+  const memberships = cleanMemberships(formData.getAll("membership"));
+  await db()
+    .insert(profiles)
+    .values({ userId, memberships })
+    .onConflictDoUpdate({ target: profiles.userId, set: { memberships, updatedAt: new Date() } });
+  revalidatePath("/", "layout");
+  redirect("/settings?saved=presales#presales");
 }
 
 type BrowserSubscription = { endpoint?: string; keys?: { p256dh?: string; auth?: string } };

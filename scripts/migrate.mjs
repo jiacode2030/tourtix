@@ -33,6 +33,7 @@ await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS zip text`;
 await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS lat double precision`;
 await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS lng double precision`;
 await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS radius_miles integer NOT NULL DEFAULT 100`;
+await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS memberships text[] NOT NULL DEFAULT '{}'`;
 await sql`
   CREATE TABLE IF NOT EXISTS push_subscriptions (
     endpoint text PRIMARY KEY,

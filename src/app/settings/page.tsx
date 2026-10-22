@@ -1,13 +1,14 @@
 import { currentUserId } from "@/auth";
 import { ChevronRight, Inbox } from "lucide-react";
 import type { Metadata } from "next";
-import { saveAlertPrefs } from "@/app/actions";
+import { saveAlertPrefs, saveMemberships } from "@/app/actions";
 import { DeleteAccountButton } from "@/components/DeleteAccountButton";
 import { InstallButton } from "@/components/InstallButton";
 import { LocationForm } from "@/components/LocationForm";
 import { NotificationsToggle } from "@/components/NotificationsToggle";
 import { SignInPrompt } from "@/components/SignInPrompt";
 import { DEFAULT_RADIUS } from "@/lib/geo";
+import { MEMBERSHIPS } from "@/lib/presale-access";
 import { currentAdminId } from "@/lib/admin";
 import { getVapidKeys } from "@/lib/push";
 import { btnPrimary } from "@/lib/ui";
@@ -106,6 +107,48 @@ export default async function SettingsPage({
               Save alert settings
             </button>
             {saved === "alerts" && <span className="text-sm font-medium text-live">Saved!</span>}
+          </div>
+        </form>
+      </section>
+
+      <section id="presales" className="scroll-mt-20 space-y-4 border-t border-line pt-8">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight">Presales I can get into</h2>
+          <p className="text-sm text-muted">
+            Tick what you have. Shows will highlight presales you likely qualify for and the earliest
+            one. Only used for that; we never ask for card numbers or codes.
+          </p>
+        </div>
+        <form action={saveMemberships} className="space-y-4">
+          <div className="grid gap-2 sm:grid-cols-2">
+            {MEMBERSHIPS.map((m) => (
+              <label
+                key={m.key}
+                className="flex min-h-12 cursor-pointer items-start gap-3 rounded-2xl bg-surface px-4 py-3 text-sm has-[:checked]:bg-accent-soft"
+              >
+                <input
+                  type="checkbox"
+                  name="membership"
+                  value={m.key}
+                  defaultChecked={profile?.memberships.includes(m.key) ?? false}
+                  className="mt-0.5 h-5 w-5 shrink-0 accent-accent"
+                />
+                <span>
+                  <span className="block font-medium">{m.label}</span>
+                  {"hint" in m && <span className="block text-xs text-muted">{m.hint}</span>}
+                </span>
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-muted">
+            Artist, fan club, venue, and Verified Fan presales need a separate sign-up for each tour,
+            so they&apos;re marked &ldquo;needs sign-up&rdquo; instead.
+          </p>
+          <div className="flex items-center gap-3">
+            <button type="submit" className={btnPrimary}>
+              Save
+            </button>
+            {saved === "presales" && <span className="text-sm font-medium text-live">Saved!</span>}
           </div>
         </form>
       </section>
