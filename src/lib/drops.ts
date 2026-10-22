@@ -1,5 +1,5 @@
 import { isNear, type UserLocation } from "./geo";
-import { upcomingSaleStarts } from "./sales";
+import { realPresales, upcomingSaleStarts } from "./sales";
 import type { Show } from "./types";
 
 const FOREVER = Number.MAX_SAFE_INTEGER;
@@ -71,7 +71,7 @@ export function saleTimeline(shows: Show[], now = Date.now()): SaleStage[] {
   };
   for (const show of shows) {
     if (show.status === "cancelled" || show.status === "postponed") continue;
-    for (const p of show.presales) note(p.name, p.start, p.end);
+    for (const p of realPresales(show)) note(p.name, p.start, p.end);
     note("General sale", show.publicSaleStart, null);
   }
   return [...stages.entries()]

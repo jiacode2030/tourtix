@@ -1,3 +1,4 @@
+import { realPresales } from "./sales";
 import type { Show } from "./types";
 
 const NOT_SELLING = new Set(["cancelled", "offsale", "postponed"]);
@@ -17,7 +18,7 @@ export function livePresales(shows: Show[], now = Date.now()): LiveSale[] {
   for (const show of shows) {
     if (NOT_SELLING.has(show.status)) continue;
     const publicStart = show.publicSaleStart ? Date.parse(show.publicSaleStart) : null;
-    for (const p of show.presales) {
+    for (const p of realPresales(show)) {
       if (!p.start || Date.parse(p.start) > now) continue;
       const end = p.end ? Date.parse(p.end) : publicStart;
       if (end != null && end <= now) continue;

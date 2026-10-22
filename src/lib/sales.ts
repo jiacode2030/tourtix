@@ -4,13 +4,20 @@ export type SaleStart = { label: string; start: string };
 
 // Presale and general-sale start times that fall within the next `windowMs`,
 // earliest first.
+// Ticketmaster lists add-ons like "VIP Package Onsale" as presales that start
+// with (or after) the general sale. They aren't pre-sales, so leave them out.
+export function realPresales(show: Show) {
+  const general = show.publicSaleStart ? Date.parse(show.publicSaleStart) : null;
+  return show.presales.filter((p) => !p.start || general == null || Date.parse(p.start) < general);
+}
+
 // Shows whose sale times no longer mean anything.
 const NOT_SELLING = new Set(["cancelled", "offsale", "postponed"]);
 
 export function upcomingSaleStarts(show: Show, windowMs: number, now = Date.now()): SaleStart[] {
   if (NOT_SELLING.has(show.status)) return [];
   const starts = [
-    ...show.presales.map((p) => ({ label: p.name, start: p.start })),
+    ...realPresales(show).map((p) => ({ label: p.name, start: p.start })),
     { label: "General sale", start: show.publicSaleStart },
   ];
   return starts
