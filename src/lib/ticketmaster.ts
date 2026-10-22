@@ -201,16 +201,36 @@ const MUSIC_SEGMENT = "KZFzniwnSyZfZ7v7nJ";
 const isMusic = (a: any) =>
   !a.classifications?.length || a.classifications.some((c: any) => c.segment?.id === MUSIC_SEGMENT);
 
-// Artist suggestions for the search box. Uses Ticketmaster's autocomplete
-// endpoint, which matches partial words ("calv"), unlike keyword search;
-// falls back to keyword search if autocomplete returns nothing.
-export async function tmSuggestArtists(query: string): Promise<Artist[]> {
-  try {
-    const data = await tm("/suggest.json", { keyword: query, resource: "attractions", size: "10" });
-    const suggested: Artist[] = (data._embedded?.attractions ?? []).filter(isMusic).map(toArtist);
-    if (suggested.length) return suggested.slice(0, 6);
-  } catch (err) {
-    console.error("suggest failed, falling back to keyword search", err);
+export type SuggestDebug = { source: string; count: number; error?: string }[];
+
+// Artist suggestions for the search box. Tries Ticketmaster's autocomplete
+// endpoint (matches partial words like "calv") and keyword search (whole
+// words), then merges them, autocomplete first. `debug` collects what each
+// step returned, for /api/suggest?debug=1.
+export async function tmSuggestArtists(query: string, debug?: SuggestDebug): Promise<Artist[]> {
+  const found: Artist[] = [];
+  const add = (artists: Artist[]) => {
+    for (const a of artists) if (!found.some((f) => f.id === a.id)) found.push(a);
+  };
+  for (const path of ["/suggest", "/suggest.json"]) {
+    try {
+      const data = await tm(path, { keyword: query, resource: "attractions", size: "10" });
+      const all: any[] = data._embedded?.attractions ?? [];
+      debug?.push({ source: `${path} (all)`, count: all.length });
+      const music = all.filter(isMusic);
+      debug?.push({ source: `${path} (music)`, count: music.length });
+      add(music.map(toArtist));
+      break;
+    } catch (err) {
+      debug?.push({ source: path, count: 0, error: String(err) });
+    }
   }
-  return (await tmSearchArtists(query)).slice(0, 6);
+  try {
+    const keyword = await tmSearchArtists(query);
+    debug?.push({ source: "keyword search", count: keyword.length });
+    add(keyword);
+  } catch (err) {
+    debug?.push({ source: "keyword search", count: 0, error: String(err) });
+  }
+  return found.slice(0, 6);
 }

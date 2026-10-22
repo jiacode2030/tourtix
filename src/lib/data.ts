@@ -11,6 +11,7 @@ import {
   tmPopularArtists,
   tmSearchArtists,
   tmSuggestArtists,
+  type SuggestDebug,
 } from "./ticketmaster";
 import type { Artist, Show } from "./types";
 
@@ -75,7 +76,7 @@ export async function concerts(where: ConcertSearch, days = 30) {
   return tmConcerts(where, days);
 }
 
-export async function suggestArtists(query: string): Promise<Artist[]> {
+export async function suggestArtists(query: string, debug?: SuggestDebug): Promise<Artist[]> {
   if (usingSampleData) return (await searchArtists(query)).slice(0, 6);
-  return tmSuggestArtists(query);
+  return tmSuggestArtists(query, debug);
 }

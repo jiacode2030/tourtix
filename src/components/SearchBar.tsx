@@ -44,6 +44,10 @@ export function SearchBar({ defaultValue = "" }: { defaultValue?: string }) {
         placeholder="Search an artist, e.g. Calvin Harris"
         aria-label="Search artists"
         autoComplete="off"
+        autoCapitalize="off"
+        autoCorrect="off"
+        spellCheck={false}
+        enterKeyHint="search"
         role="combobox"
         aria-expanded={visible.length > 0}
         aria-controls="artist-suggestions"
@@ -56,6 +60,10 @@ export function SearchBar({ defaultValue = "" }: { defaultValue?: string }) {
         <ul
           id="artist-suggestions"
           role="listbox"
+          // Keep focus in the input while tapping, so the list doesn't close
+          // before the tap registers (an issue on iPhone Safari).
+          onMouseDown={(e) => e.preventDefault()}
+          onTouchStart={() => setOpen(true)}
           className="absolute left-0 right-0 top-full z-20 mt-2 overflow-hidden rounded-lg border border-zinc-200 bg-white text-left shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
         >
           {visible.map((s) => (
