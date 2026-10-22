@@ -1,5 +1,6 @@
 import { apiFetch } from "./http";
 import { cleanUrl, sellerName } from "./links";
+import { isMusicGenre } from "./genres";
 import { KNOWN_ARTISTS } from "./known-artists";
 import { dedupeByName, matchTyped, mergeArtists, nameScore, rankArtists } from "./rank";
 import { presaleDisplayName } from "./presale-names";
@@ -152,7 +153,9 @@ type EventWithArtist = { artist: Artist; show: Show };
 function withArtists(data: any): EventWithArtist[] {
   return (data._embedded?.events ?? []).flatMap((e: any) => {
     const a = e._embedded?.attractions?.[0];
-    return a ? [{ artist: toArtist(a), show: toShow(e) }] : [];
+    if (!a) return [];
+    const artist = toArtist(a);
+    return isMusicGenre(artist.genre) ? [{ artist, show: toShow(e) }] : [];
   });
 }
 

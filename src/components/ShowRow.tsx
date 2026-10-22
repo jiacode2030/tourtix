@@ -234,7 +234,7 @@ export function ShowRow({
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-base font-semibold">{place || "Location TBA"}</p>
-            <p className="truncate text-sm text-muted">
+            <p className="line-clamp-2 text-sm text-muted">
               {show.venue}
               {show.venue && " · "}
               <span className={`font-medium ${statusTone[show.status] ?? "text-muted"}`}>

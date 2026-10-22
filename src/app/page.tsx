@@ -14,7 +14,9 @@ import { fmtDateTime } from "@/lib/format";
 import { GENRES, isGenre } from "@/lib/genres";
 import { groupDrops, type TicketDrop } from "@/lib/sales";
 import { chip, chipOff, chipOn, linkAccent } from "@/lib/ui";
-import { listFavorites } from "@/lib/user-data";
+import { hasLocation, isNear } from "@/lib/geo";
+import type { Show } from "@/lib/types";
+import { getProfile, listFavorites, locationOf } from "@/lib/user-data";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const WEEK_MS = 7 * DAY_MS;
@@ -23,7 +25,10 @@ const TWO_WEEKS_MS = 2 * WEEK_MS;
 const MAX_FOLLOWED_CHECKED = 10;
 
 async function followedDrops(userId: string) {
-  const favs = (await listFavorites(userId)).slice(0, MAX_FOLLOWED_CHECKED);
+  const [allFavs, profile] = await Promise.all([listFavorites(userId), getProfile(userId)]);
+  const favs = allFavs.slice(0, MAX_FOLLOWED_CHECKED);
+  const loc = locationOf(profile);
+  const near = hasLocation(loc) ? (show: Show) => isNear(show, loc) : undefined;
   const items = await Promise.all(
     favs.map(async (f) => {
       const shows = await getShows({
@@ -44,7 +49,7 @@ async function followedDrops(userId: string) {
       }));
     }),
   );
-  return { followsAnyone: favs.length > 0, drops: groupDrops(items.flat(), TWO_WEEKS_MS) };
+  return { followsAnyone: favs.length > 0, drops: groupDrops(items.flat(), TWO_WEEKS_MS, Date.now(), near) };
 }
 
 function startingWithin(drops: TicketDrop[], ms: number) {
@@ -86,7 +91,7 @@ export default async function Home({
   const q = params.q?.trim() ?? "";
   const genre = isGenre(params.genre) ? params.genre : undefined;
 
-  const hero = (
+  const renderHero = (showNudge: boolean) => (
     <section className="hero-glow space-y-6 pt-4 text-center sm:pt-10">
       <div className="space-y-3">
         <h1 className="enter text-balance text-4xl font-bold tracking-tight sm:text-5xl">Never miss a ticket drop</h1>
@@ -97,7 +102,7 @@ export default async function Home({
       <div className="enter relative z-10 mx-auto max-w-xl [--delay:160ms]">
         <SearchBar defaultValue={q} />
       </div>
-      {!q && <TourNudge />}
+      {showNudge && <TourNudge />}
       {!q && (
         <ol className="enter mx-auto grid max-w-3xl [--delay:240ms] gap-6 pt-4 text-left sm:grid-cols-3">
           {STEPS.map(({ icon: Icon, title, text }, i) => (
@@ -126,7 +131,7 @@ export default async function Home({
     const results = await searchArtists(q);
     return (
       <div className="space-y-8">
-        {hero}
+        {renderHero(false)}
         <section className="reveal space-y-4">
           <h2 className="text-xl font-bold tracking-tight">
             {results.length ? `Results for “${q}”` : `No artists found for “${q}”`}
@@ -155,7 +160,7 @@ export default async function Home({
   return (
     <div className="space-y-12">
       <AutoRefresh />
-      {hero}
+      {renderHero(!userId || !mine?.followsAnyone)}
 
       {soon.length > 0 && (
         <section className="space-y-3 rounded-3xl bg-surface p-5 sm:p-6">

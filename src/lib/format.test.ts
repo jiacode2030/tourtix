@@ -10,6 +10,13 @@ describe("zonedTimeToUtc", () => {
 
 describe("fmtDateTime", () => {
   it("shows times in the venue's time zone with its abbreviation", () => {
-    expect(fmtDateTime("2026-10-28T17:00:00Z", "America/Los_Angeles")).toBe("Oct 28, 10:00 AM PDT");
+    const now = Date.parse("2026-10-22T12:00:00Z");
+    expect(fmtDateTime("2026-10-28T17:00:00Z", "America/Los_Angeles", now)).toBe("Oct 28, 10:00 AM PDT");
+  });
+
+  it("adds the year when the date is months away, so it can't be mistaken for the past", () => {
+    const now = Date.parse("2026-10-22T12:00:00Z");
+    expect(fmtDateTime("2027-08-10T18:00:00Z", "America/Los_Angeles", now)).toBe("Aug 10, 2027, 11:00 AM PDT");
+    expect(fmtDateTime("2026-12-20T18:00:00Z", "America/Los_Angeles", now)).toBe("Dec 20, 10:00 AM PST");
   });
 });

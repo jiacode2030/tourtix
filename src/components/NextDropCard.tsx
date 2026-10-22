@@ -1,3 +1,4 @@
+import { ChevronDown } from "lucide-react";
 import type { NextDrop, SaleStage } from "@/lib/drops";
 import { fmtDate, fmtDateTime } from "@/lib/format";
 import { presaleHelp } from "@/lib/presale-help";
@@ -48,6 +49,8 @@ export function NextDropCard({
   const first = shows[0];
   const count = shows.length;
   const differentZones = new Set(shows.map((d) => d.start)).size > 1;
+  // Finished sales are tucked into one line so live and upcoming ones stand out.
+  const ended = timeline.filter((s) => s.state === "ended");
   const seller = focus.show.links[0];
   const signup = focus.show.presales.find((p) => p.name === drop.label && p.url);
 
@@ -113,11 +116,28 @@ export function NextDropCard({
       </div>
 
       {timeline.length > 1 && (
-        <ul className="flex flex-wrap gap-2" aria-label="Ticket sales for these shows">
-          {timeline.map((s) => (
-            <StageChip key={s.label} stage={s} timeZone={focus.show.timezone} />
-          ))}
-        </ul>
+        <div className="space-y-2">
+          <ul className="flex flex-wrap gap-2" aria-label="Ticket sales for these shows">
+            {timeline
+              .filter((s) => s.state !== "ended" || ended.length === 1)
+              .map((s) => (
+                <StageChip key={s.label} stage={s} timeZone={focus.show.timezone} />
+              ))}
+          </ul>
+          {ended.length > 1 && (
+            <details className="group text-xs text-muted">
+              <summary className="inline-flex min-h-9 cursor-pointer list-none items-center gap-1 font-medium hover:text-fg">
+                {ended.length} earlier sales ended
+                <ChevronDown size={14} aria-hidden className="transition-transform group-open:rotate-180" />
+              </summary>
+              <ul className="mt-1 flex flex-wrap gap-2">
+                {ended.map((s) => (
+                  <StageChip key={s.label} stage={s} timeZone={focus.show.timezone} />
+                ))}
+              </ul>
+            </details>
+          )}
+        </div>
       )}
     </section>
   );

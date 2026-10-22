@@ -44,6 +44,9 @@ export function groupDrops(
   items: { artistId: string; artistName: string; imageUrl: string | null; show: Show }[],
   windowMs: number,
   now = Date.now(),
+  // When several shows open at the same moment, show one this returns true for
+  // (e.g. a show near the user) instead of whichever came first.
+  prefer?: (show: Show) => boolean,
 ): TicketDrop[] {
   const byArtist = new Map<string, TicketDrop>();
   for (const item of items) {
@@ -53,6 +56,8 @@ export function groupDrops(
     if (!existing) {
       byArtist.set(item.artistId, { ...item, sale, moreShows: 0 });
     } else if (sale.start < existing.sale.start) {
+      byArtist.set(item.artistId, { ...item, sale, moreShows: existing.moreShows + 1 });
+    } else if (sale.start === existing.sale.start && prefer?.(item.show) && !prefer(existing.show)) {
       byArtist.set(item.artistId, { ...item, sale, moreShows: existing.moreShows + 1 });
     } else {
       existing.moreShows++;

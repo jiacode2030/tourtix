@@ -32,6 +32,9 @@ export function HelpCenter() {
   const pathname = usePathname();
   const [view, setView] = useState<HelpView>("menu");
   const [step, setStep] = useState(0);
+  // The ? button slides away while you scroll down (it would cover content) and
+  // comes back as soon as you scroll up, stop, or reach the top.
+  const [tucked, setTucked] = useState(false);
 
   const open = useCallback((v: HelpView) => {
     setView(v);
@@ -46,6 +49,25 @@ export function HelpCenter() {
     window.addEventListener(HELP_EVENT, onHelp);
     return () => window.removeEventListener(HELP_EVENT, onHelp);
   }, [open]);
+
+  useEffect(() => {
+    let last = window.scrollY;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const onScroll = () => {
+      const y = window.scrollY;
+      const delta = y - last;
+      last = y;
+      if (y < 120 || delta < -6) setTucked(false);
+      else if (delta > 8) setTucked(true);
+      clearTimeout(timer);
+      timer = setTimeout(() => setTucked(false), 900); // back once scrolling stops
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      clearTimeout(timer);
+    };
+  }, []);
 
   // Moving to another page (for example from a tour link) closes the sheet.
   useEffect(() => {
@@ -62,9 +84,10 @@ export function HelpCenter() {
       <button
         type="button"
         onClick={() => open("menu")}
+        onFocus={() => setTucked(false)}
         aria-label="Help"
         title="Help"
-        className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-cta text-on-cta shadow-lg transition hover:opacity-90 active:scale-95 print:hidden"
+        className={`fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-cta text-on-cta shadow-lg transition-all duration-200 hover:opacity-90 active:scale-95 print:hidden ${tucked ? "pointer-events-none translate-y-20 opacity-0" : ""}`}
       >
         <CircleHelp size={24} aria-hidden />
       </button>

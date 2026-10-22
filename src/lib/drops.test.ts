@@ -60,6 +60,29 @@ describe("saleTimeline", () => {
   });
 });
 
+describe("saleTimeline merges look-alike names", () => {
+  const mk = (names: [string, string][]) =>
+    ({
+      ...chicago,
+      publicSaleStart: "2026-12-01T17:00:00Z",
+      presales: names.map(([name, start]) => ({ name, start, end: start, url: null, description: null })),
+    }) as typeof chicago;
+  it("treats \"X\" and \"X Presale\" as one sale, showing the fuller name", () => {
+    const t = saleTimeline(
+      [mk([["Reserved by Spotify", "2026-11-01T17:00:00Z"], ["Reserved by Spotify Presale", "2026-11-01T18:00:00Z"]])],
+      Date.parse("2026-11-20T00:00:00Z"),
+    );
+    expect(t.filter((s) => /Spotify/.test(s.label))).toEqual([{ label: "Reserved by Spotify Presale", state: "ended", start: null }]);
+  });
+  it("keeps genuinely different sales apart (a VIP onsale is not a presale)", () => {
+    const t = saleTimeline(
+      [mk([["Artist VIP Package Onsale", "2026-11-01T17:00:00Z"], ["Artist VIP Packages Presale", "2026-11-02T17:00:00Z"]])],
+      Date.parse("2026-11-20T00:00:00Z"),
+    );
+    expect(t.filter((s) => /VIP/.test(s.label))).toHaveLength(2);
+  });
+});
+
 describe("tourSummary", () => {
   it("counts shows, date range, and nearby shows, ignoring cancelled ones", () => {
     const losAngeles = { region: "CA", lat: 34.05, lng: -118.24, radiusMiles: 100 };

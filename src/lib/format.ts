@@ -10,10 +10,14 @@ export function fmtDate(d: string | null) {
 
 // Sale times are shown in the venue's time zone with its abbreviation,
 // since the server's own time zone means nothing to visitors.
-export function fmtDateTime(iso: string, timeZone: string | null) {
+export function fmtDateTime(iso: string, timeZone: string | null, now = Date.now()) {
+  // A date months away (or long past) gets its year, so "ends Aug 10" can't be
+  // mistaken for last August.
+  const far = Math.abs(Date.parse(iso) - now) > 150 * 24 * 60 * 60 * 1000;
   return new Date(iso).toLocaleString("en-US", {
     month: "short",
     day: "numeric",
+    ...(far ? { year: "numeric" as const } : {}),
     hour: "numeric",
     minute: "2-digit",
     timeZone: timeZone ?? "UTC",

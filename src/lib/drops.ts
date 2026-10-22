@@ -58,14 +58,20 @@ export type SaleStage = { label: string; state: "ended" | "live" | "upcoming"; s
 
 // Each sale type across the tour (presales, then general sale) and whether it
 // has ended, is live, or is coming up, judged across all of the artist's shows.
+// Display only: "Reserved by Spotify" and "Reserved by Spotify Presale" are one
+// sale in the timeline. (Alerts keep using presaleKey, so their records don't change.)
+export const timelineKey = (label: string) => presaleKey(label).replace(/presale$/, "") || presaleKey(label);
+
 export function saleTimeline(shows: Show[], now = Date.now()): SaleStage[] {
   const stages = new Map<string, { label: string; starts: number[]; live: boolean; ended: boolean }>();
   const note = (label: string, start: string | null, end: string | null) => {
     if (!start) return;
     const s = Date.parse(start);
     const e = end ? Date.parse(end) : null;
-    const key = presaleKey(label);
+    const key = timelineKey(label);
     const entry = stages.get(key) ?? { label, starts: [], live: false, ended: false };
+    // Show the fuller of the two names ("... Presale" rather than the bare name).
+    if (label.length > entry.label.length) entry.label = label;
     entry.starts.push(s);
     if (s <= now && (e == null || e > now)) entry.live = true;
     if (e != null && e <= now) entry.ended = true;
