@@ -25,7 +25,7 @@ export function FollowStar({ artistId, artistName, isFavorite }: { artistId: str
         following ? "bg-cta text-on-cta" : "bg-bg/85 text-fg hover:bg-bg"
       }`}
     >
-      {following ? <Check size={18} aria-hidden /> : <Plus size={18} aria-hidden />}
+      {following ? <Check size={18} aria-hidden className="pop" /> : <Plus size={18} aria-hidden className="spin-in" />}
     </button>
   );
 }

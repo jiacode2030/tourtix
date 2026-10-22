@@ -181,7 +181,7 @@ export default async function ArtistPage({
           </nav>
         )}
         {visible.length ? (
-          <ul className="divide-y divide-line border-y border-line">
+          <ul className="stagger divide-y divide-line border-y border-line">
             {visible.map((s) => (
               <ShowRow
                 key={s.id}

@@ -16,7 +16,7 @@ export function ArtistCard({
 }) {
   return (
     <div className="reveal relative">
-      <Link href={`/artists/${artist.id}`} className="group block h-full">
+      <Link href={`/artists/${artist.id}`} className="group block h-full motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:-translate-y-1 motion-safe:active:scale-[0.98]">
         <div
           className="aspect-[4/3] overflow-hidden rounded-2xl bg-surface"
           style={artist.imageUrl ? undefined : { background: STAGE_LIGHTS }}

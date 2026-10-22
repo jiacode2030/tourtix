@@ -21,7 +21,7 @@ export function FavoriteButton({ artistId, isFavorite }: { artistId: string; isF
       }
       className={following ? btnSecondary : btnPrimary}
     >
-      {following ? <Check size={18} aria-hidden /> : <Plus size={18} aria-hidden />}
+      {following ? <Check size={18} aria-hidden className="pop" /> : <Plus size={18} aria-hidden className="spin-in" />}
       {following ? "Following" : "Follow"}
     </button>
   );

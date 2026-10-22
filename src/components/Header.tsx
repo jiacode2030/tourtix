@@ -28,7 +28,7 @@ export async function Header() {
   const session = await auth();
   const user = session?.user;
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-bg/85 backdrop-blur">
+    <header className="header-shadow sticky top-0 z-30 border-b border-line bg-bg/85 backdrop-blur">
       <nav className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-4">
         <Link href="/" className="text-xl font-bold tracking-tight">
           Tour<span className="text-accent">Tix</span>

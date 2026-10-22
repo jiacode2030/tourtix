@@ -182,7 +182,7 @@ export default async function Home({
       )}
 
       <nav
-        className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0"
+        className="stagger -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0"
         aria-label="Filter by genre"
       >
         {[undefined, ...GENRES].map((g) => (

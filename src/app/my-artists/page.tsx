@@ -126,7 +126,7 @@ export default async function MyArtistsPage({
             )}
           </div>
           {shows.length ? (
-            <ul className="divide-y divide-line border-y border-line">
+            <ul className="stagger divide-y divide-line border-y border-line">
               {shows.map((s) => (
                 <ShowRow
                   key={s.id}

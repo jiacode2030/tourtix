@@ -34,7 +34,7 @@ export function ThemeToggle({ withLabel = false }: { withLabel?: boolean }) {
       title={label}
       className="flex min-h-11 items-center gap-3 rounded-full px-2 text-fg hover:bg-surface"
     >
-      {dark ? <Sun size={20} aria-hidden /> : <Moon size={20} aria-hidden />}
+      {dark ? <Sun size={20} aria-hidden className="spin-in" /> : <Moon size={20} aria-hidden className="spin-in" />}
       {withLabel && <span className="text-sm font-medium">{dark ? "Light mode" : "Dark mode"}</span>}
     </button>
   );

@@ -1,4 +1,5 @@
 import { CalendarPlus, Smartphone } from "lucide-react";
+import Link from "next/link";
 
 // Plain-language ways to get dependable reminders, shown near notification settings.
 export function ReminderTips() {
@@ -19,6 +20,16 @@ export function ReminderTips() {
           <span className="font-medium text-fg">Tap &ldquo;Remind me&rdquo; on any sale</span> to put it
           on your calendar. Your calendar app will alert you even if phone notifications are off.
         </span>
+      </p>
+      <p className="text-muted">
+        More answers:{" "}
+        <Link href="/faq" className="font-medium text-accent hover:underline">
+          FAQ
+        </Link>{" "}
+        ·{" "}
+        <Link href="/help/notifications" className="font-medium text-accent hover:underline">
+          Notification help
+        </Link>
       </p>
     </div>
   );

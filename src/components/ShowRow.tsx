@@ -220,7 +220,7 @@ export function ShowRow({
   return (
     <li id={`show-${show.id}`} className="scroll-mt-20">
       <details className="group smooth">
-        <summary className="flex min-h-[72px] cursor-pointer list-none items-center gap-4 py-3">
+        <summary className="flex min-h-[72px] cursor-pointer list-none items-center gap-4 py-3 transition active:bg-surface">
           <div className="w-12 shrink-0 text-center">
             {d ? (
               <>

@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Pages load
         run: |
-          for path in / /concerts /tips /contact /privacy /terms /help/notifications \
+          for path in / /concerts /tips /faq /contact /privacy /terms /help/notifications \
                       /sitemap.xml /robots.txt /manifest.webmanifest /api/auth/providers; do
             code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "$SITE$path")
             echo "$path -> $code"

@@ -55,7 +55,7 @@ export function SearchBar({ defaultValue = "" }: { defaultValue?: string }) {
         role="combobox"
         aria-expanded={visible.length > 0}
         aria-controls="artist-suggestions"
-        className="min-h-13 min-w-0 flex-1 rounded-full border border-line bg-surface py-3 pl-12 pr-4 text-base text-fg outline-none placeholder:text-muted focus:border-accent focus:bg-bg"
+        className="min-h-13 min-w-0 flex-1 rounded-full border border-line bg-surface py-3 pl-12 pr-4 text-base text-fg outline-none transition placeholder:text-muted focus:border-accent focus:bg-bg focus:shadow-[0_0_0_4px_var(--accent-soft)]"
       />
       <button type="submit" className={`${btnPrimary} min-h-13`}>
         Search
