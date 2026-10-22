@@ -148,6 +148,9 @@ export default async function ArtistPage({
             <span className="flex-1">
               Get an alert when {artist.name} announces shows or tickets go on sale.
               <span className="block font-semibold text-accent">Turn on notifications</span>
+              <span className="mt-1 block text-xs text-muted">
+                Tip: add TourTix to your Home Screen (needed on iPhone), or tap &ldquo;Remind me&rdquo; on a sale to add it to your calendar.
+              </span>
             </span>
           </Link>
         )}

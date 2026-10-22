@@ -6,6 +6,7 @@ import { DeleteAccountButton } from "@/components/DeleteAccountButton";
 import { InstallButton } from "@/components/InstallButton";
 import { LocationForm } from "@/components/LocationForm";
 import { NotificationsToggle } from "@/components/NotificationsToggle";
+import { ReminderTips } from "@/components/ReminderTips";
 import { SignInPrompt } from "@/components/SignInPrompt";
 import { DEFAULT_RADIUS } from "@/lib/geo";
 import { MEMBERSHIPS } from "@/lib/presale-access";
@@ -87,6 +88,7 @@ export default async function SettingsPage({
         </div>
         <InstallButton />
         <NotificationsToggle publicKey={publicKey} />
+        <ReminderTips />
         <form action={saveAlertPrefs} className="space-y-3">
           <p className="text-sm font-semibold">Alert me when:</p>
           <label className="flex items-start gap-3 text-sm">

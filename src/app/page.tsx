@@ -72,7 +72,7 @@ const LIVE_DOT = (
 
 const STEPS = [
   { icon: UserPlus, title: "Follow artists", text: "Search any artist and tap Follow." },
-  { icon: Bell, title: "Get alerts", text: "We remind you before presales and general sales start." },
+  { icon: Bell, title: "Get alerts", text: "We remind you before presales and sales start. Add TourTix to your Home Screen, or use Remind me for your calendar." },
   { icon: Ticket, title: "Buy from the seller", text: "We link you to Ticketmaster and other sites. TourTix doesn't sell tickets." },
 ];
 
