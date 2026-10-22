@@ -29,6 +29,11 @@ export async function listStamps(userId: string): Promise<Stamp[]> {
     .orderBy(desc(stamps.eventDate), desc(stamps.id));
 }
 
+export async function hasStamps(userId: string): Promise<boolean> {
+  const rows = await db().select({ id: stamps.id }).from(stamps).where(eq(stamps.userId, userId)).limit(1);
+  return rows.length > 0;
+}
+
 export async function listFavorites(userId: string) {
   return db()
     .select()

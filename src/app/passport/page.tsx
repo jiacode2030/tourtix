@@ -2,6 +2,7 @@ import { currentUserId } from "@/auth";
 import { Lock } from "lucide-react";
 import type { Metadata } from "next";
 import { PassportForm } from "@/components/PassportForm";
+import { PassportHowItWorks } from "@/components/PassportHowItWorks";
 import { ShareCard } from "@/components/ShareCard";
 import { SignInPrompt } from "@/components/SignInPrompt";
 import { StampCard } from "@/components/StampCard";
@@ -88,9 +89,7 @@ export default async function PassportPage({ searchParams }: { searchParams: Pro
           <ShareCard />
         </>
       ) : (
-        <p className="rounded-3xl bg-surface p-8 text-center text-muted">
-          No stamps yet. Add the first concert you remember above.
-        </p>
+        <PassportHowItWorks />
       )}
     </div>
   );

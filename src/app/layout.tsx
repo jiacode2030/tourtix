@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 import { Header } from "@/components/Header";
 import { SampleBanner } from "@/components/SampleBanner";
 import { Footer } from "@/components/Footer";
+import { HelpCenter } from "@/components/HelpCenter";
 import { Analytics } from "@vercel/analytics/next";
 import { siteUrl } from "@/lib/site";
 import "./globals.css";
@@ -47,6 +48,7 @@ export default function RootLayout({
         <Header />
         <main className="mx-auto max-w-5xl px-4 pt-6 pb-12">{children}</main>
         <Footer />
+        <HelpCenter />
         <Analytics />
       </body>
     </html>

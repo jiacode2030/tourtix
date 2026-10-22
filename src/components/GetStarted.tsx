@@ -2,17 +2,20 @@ import { Check } from "lucide-react";
 import Link from "next/link";
 import { linkAccent } from "@/lib/ui";
 
-type Step = { done: boolean; label: string; href: string; action: string };
+type Step = { done: boolean; label: string; href: string; action: string; optional?: boolean };
 
 // First-run checklist; disappears once every step is done.
 export function GetStarted({
   following,
   located,
   notifying,
+  stamped = true,
 }: {
   following: boolean;
   located: boolean;
   notifying: boolean;
+  // Has added a concert to their passport. Optional: it never keeps this checklist on screen.
+  stamped?: boolean;
 }) {
   const steps: Step[] = [
     { done: following, label: "Follow an artist", href: "/", action: "Search artists" },
@@ -23,8 +26,10 @@ export function GetStarted({
       href: "/settings#notifications",
       action: "Turn on",
     },
+    { done: stamped, label: "Bonus: add a concert you've been to (private)", href: "/passport", action: "Open passport", optional: true },
   ];
-  const remaining = steps.filter((s) => !s.done).length;
+  const required = steps.filter((s) => !s.optional);
+  const remaining = required.filter((s) => !s.done).length;
   if (remaining === 0) return null;
 
   return (
@@ -37,7 +42,7 @@ export function GetStarted({
       <div className="flex items-baseline justify-between gap-2">
         <h2 className="text-lg font-bold tracking-tight">Get started</h2>
         <span className="text-sm text-muted">
-          {steps.length - remaining} of {steps.length} done
+          {required.length - remaining} of {required.length} done
         </span>
       </div>
       <ol className="space-y-3">

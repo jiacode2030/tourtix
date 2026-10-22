@@ -1,7 +1,9 @@
 import { ChevronDown } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { OpenHelpButton } from "@/components/OpenHelpButton";
 import { FAQ_GROUPS, faqJsonLd } from "@/lib/faq";
+import { btnSecondary } from "@/lib/ui";
 
 export const metadata: Metadata = {
   title: "FAQ",
@@ -22,6 +24,9 @@ export default function FaqPage() {
           </Link>
           .
         </p>
+        <OpenHelpButton view="tour" className={`${btnSecondary} mt-2`}>
+          Take the quick tour
+        </OpenHelpButton>
       </div>
 
       {FAQ_GROUPS.map((group) => (

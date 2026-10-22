@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { activeSources } from "@/lib/sources";
+import { OpenHelpButton } from "./OpenHelpButton";
 
 export function Footer() {
   const sources = activeSources();
   return (
     <footer className="mt-16 border-t border-line">
-      <div className="mx-auto max-w-5xl space-y-3 px-4 py-8 text-sm text-muted">
+      <div className="mx-auto max-w-5xl space-y-3 px-4 pb-24 pt-8 text-sm text-muted">
         {sources.length > 0 && <p>Event data provided by {sources.join(", ")}.</p>}
         <p>
           TourTix is an independent site. We don&apos;t sell tickets; purchases happen on the
@@ -26,6 +27,7 @@ export function Footer() {
         <nav className="flex flex-wrap gap-x-5 gap-y-2 pt-2">
           <Link href="/concerts" className="hover:text-fg">Find concerts</Link>
           <Link href="/passport" className="hover:text-fg">Concert passport</Link>
+          <OpenHelpButton view="tour" className="hover:text-fg">Quick tour</OpenHelpButton>
           <Link href="/faq" className="hover:text-fg">FAQ</Link>
           <Link href="/tips" className="hover:text-fg">Ticket buying tips</Link>
           <Link href="/help/notifications" className="hover:text-fg">Notification help</Link>

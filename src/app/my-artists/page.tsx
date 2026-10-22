@@ -11,7 +11,7 @@ import { getShows } from "@/lib/data";
 import { hasLocation, isNear } from "@/lib/geo";
 import { chipOff, chipOn, linkAccent } from "@/lib/ui";
 import { sharedSlotIds } from "@/lib/show-key";
-import { getProfile, hasNotifications, listFavorites, locationOf } from "@/lib/user-data";
+import { getProfile, hasNotifications, hasStamps, listFavorites, locationOf } from "@/lib/user-data";
 
 export const metadata: Metadata = { title: "My Artists" };
 
@@ -38,10 +38,11 @@ export default async function MyArtistsPage({
   }
 
   const nearOnly = (await searchParams).near === "1";
-  const [favs, profile, notifying] = await Promise.all([
+  const [favs, profile, notifying, stamped] = await Promise.all([
     listFavorites(userId),
     getProfile(userId),
     hasNotifications(userId),
+    hasStamps(userId),
   ]);
   const loc = locationOf(profile);
   const located = hasLocation(loc);
@@ -97,7 +98,7 @@ export default async function MyArtistsPage({
       </div>
 
       <AutoRefresh />
-      <GetStarted following={favs.length > 0} located={located} notifying={notifying} />
+      <GetStarted following={favs.length > 0} located={located} notifying={notifying} stamped={stamped} />
       <InstallButton />
 
       {favs.length === 0 && (

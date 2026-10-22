@@ -98,3 +98,8 @@ jobs:
           '
         env:
           SITE: https://tourtix.vercel.app
+
+      - name: Help button present
+        run: |
+          curl -s --max-time 30 "$SITE/" | grep -q 'aria-label="Help"' || { echo "::error::Help button missing from homepage"; exit 1; }
+          curl -s --max-time 30 "$SITE/faq" | grep -q "Take the quick tour" || { echo "::error::FAQ page missing the tour button"; exit 1; }

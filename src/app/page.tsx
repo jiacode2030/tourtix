@@ -5,6 +5,7 @@ import { ArtistCard } from "@/components/ArtistCard";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { DropList } from "@/components/DropList";
 import { SearchBar } from "@/components/SearchBar";
+import { TourNudge } from "@/components/TourNudge";
 import { Countdown } from "@/components/Countdown";
 import { justAnnounced } from "@/lib/announced";
 import { LiveList } from "@/components/LiveList";
@@ -96,6 +97,7 @@ export default async function Home({
       <div className="enter relative z-10 mx-auto max-w-xl [--delay:160ms]">
         <SearchBar defaultValue={q} />
       </div>
+      {!q && <TourNudge />}
       {!q && (
         <ol className="enter mx-auto grid max-w-3xl [--delay:240ms] gap-6 pt-4 text-left sm:grid-cols-3">
           {STEPS.map(({ icon: Icon, title, text }, i) => (
