@@ -1,6 +1,7 @@
 import { currentUserId } from "@/auth";
 import Link from "next/link";
 import { ArtistCard } from "@/components/ArtistCard";
+import { AutoRefresh } from "@/components/AutoRefresh";
 import { DropList } from "@/components/DropList";
 import { SearchBar } from "@/components/SearchBar";
 import { getShows, popularArtists, searchArtists, upcomingDrops } from "@/lib/data";
@@ -97,6 +98,7 @@ export default async function Home({
 
   return (
     <div className="space-y-12">
+      <AutoRefresh />
       {hero}
 
       {mine && (

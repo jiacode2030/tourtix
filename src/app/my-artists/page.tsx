@@ -2,6 +2,7 @@ import { currentUserId } from "@/auth";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ShowRow } from "@/components/ShowRow";
+import { AutoRefresh } from "@/components/AutoRefresh";
 import { GetStarted } from "@/components/GetStarted";
 import { InstallButton } from "@/components/InstallButton";
 import { SignInPrompt } from "@/components/SignInPrompt";
@@ -92,6 +93,7 @@ export default async function MyArtistsPage({
         )}
       </div>
 
+      <AutoRefresh />
       <GetStarted following={favs.length > 0} located={located} notifying={notifying} />
       <InstallButton />
 

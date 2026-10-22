@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { currentUserId } from "@/auth";
 import { notFound } from "next/navigation";
+import { AutoRefresh } from "@/components/AutoRefresh";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { LastChecked } from "@/components/LastChecked";
 import { ShowRow } from "@/components/ShowRow";
 import { SignInPrompt } from "@/components/SignInPrompt";
 import { getArtist, getShows } from "@/lib/data";
@@ -70,10 +72,12 @@ export default async function ArtistPage({
     near: (s) => isNear(s, loc),
   };
   const visible = shows.filter(matches[filter]);
+  const checkedAt = new Date().toISOString();
   const nextShow = shows.find((s) => s.status !== "cancelled");
 
   return (
     <div className="space-y-6">
+      <AutoRefresh />
       <Link href="/" className="inline-block text-sm text-zinc-500 hover:text-violet-600">
         ← Back to search
       </Link>
@@ -142,8 +146,10 @@ export default async function ArtistPage({
         )}
         {shows.length > 0 && (
           <p className="text-sm text-zinc-500">
-            Show info refreshes about every 5 minutes. Always check the date, seats, and final price
-            (including fees) on the seller&apos;s site before you buy.
+            Ticket info updates automatically and can be up to 5 minutes old.{" "}
+            <LastChecked at={checkedAt} />{" "}
+            Always check the date, seats, and final price (including fees) on the seller&apos;s site
+            before you buy.
           </p>
         )}
         {visible.length ? (
