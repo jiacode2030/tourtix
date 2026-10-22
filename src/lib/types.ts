@@ -53,8 +53,6 @@ export type Show = {
   lng: number | null;
   // Extra info for the details panel; all optional.
   extras: ShowExtras;
-  // Ticketmaster's sale fields as received (temporary, for diagnostics).
-  rawSales?: Record<string, unknown>;
 };
 
 export type ShowExtras = {

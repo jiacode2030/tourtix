@@ -81,13 +81,6 @@ function toShow(e: any): Show {
     lat: num(venue?.location?.latitude),
     lng: num(venue?.location?.longitude),
     extras: tmExtras(e, venue),
-    rawSales: {
-      statusCode: e.dates?.status?.code ?? null,
-      publicStart: e.sales?.public?.startDateTime ?? null,
-      publicEnd: e.sales?.public?.endDateTime ?? null,
-      publicStartTBD: e.sales?.public?.startTBD ?? null,
-      presaleCount: e.sales?.presales?.length ?? 0,
-    },
   };
 }
 
