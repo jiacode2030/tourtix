@@ -1,13 +1,32 @@
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { favorites, profiles, pushSubscriptions } from "@/db/schema";
+import { favorites, profiles, pushSubscriptions, stamps } from "@/db/schema";
 import { DEFAULT_RADIUS, type UserLocation } from "./geo";
+import type { Stamp } from "./passport";
 
 export type Profile = typeof profiles.$inferSelect;
 
 export async function getProfile(userId: string): Promise<Profile | null> {
   const rows = await db().select().from(profiles).where(eq(profiles.userId, userId));
   return rows[0] ?? null;
+}
+
+// A user's own passport stamps, newest concert first. Never call this with
+// anyone's id but the signed-in user's: stamps are private.
+export async function listStamps(userId: string): Promise<Stamp[]> {
+  return db()
+    .select({
+      id: stamps.id,
+      artistId: stamps.artistId,
+      artistName: stamps.artistName,
+      imageUrl: stamps.imageUrl,
+      venue: stamps.venue,
+      city: stamps.city,
+      eventDate: stamps.eventDate,
+    })
+    .from(stamps)
+    .where(eq(stamps.userId, userId))
+    .orderBy(desc(stamps.eventDate), desc(stamps.id));
 }
 
 export async function listFavorites(userId: string) {

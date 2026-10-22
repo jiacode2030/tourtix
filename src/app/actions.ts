@@ -5,13 +5,14 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
-import { contactMessages, favorites, profiles, pushSubscriptions, sentAlerts } from "@/db/schema";
+import { contactMessages, favorites, profiles, pushSubscriptions, sentAlerts, stamps } from "@/db/schema";
 import { getArtist } from "@/lib/data";
 import { DEFAULT_RADIUS, RADIUS_OPTIONS } from "@/lib/geo";
 import { sendToUser } from "@/lib/push";
 import { isUsState } from "@/lib/regions";
 import { isZip, lookupZip } from "@/lib/zip";
 import { cleanMemberships } from "@/lib/presale-access";
+import { MAX_STAMPS, parseStamp } from "@/lib/passport";
 
 async function requireUser() {
   const userId = await currentUserId();
@@ -91,11 +92,57 @@ export async function saveLocation(formData: FormData) {
 export async function deleteMyAccount() {
   const userId = await requireUser();
   await db().delete(favorites).where(eq(favorites.userId, userId));
+  await db().delete(stamps).where(eq(stamps.userId, userId));
   await db().delete(profiles).where(eq(profiles.userId, userId));
   await db().delete(pushSubscriptions).where(eq(pushSubscriptions.userId, userId));
   await db().delete(sentAlerts).where(eq(sentAlerts.userId, userId));
   await db().delete(contactMessages).where(eq(contactMessages.userId, userId));
   await signOut({ redirectTo: "/?deleted=1" });
+}
+
+// Concert passport. Stamps belong to one user and are never shown to anyone else.
+export async function addStamp(formData: FormData) {
+  const userId = await requireUser();
+  const parsed = parseStamp({
+    artistName: formData.get("artistName"),
+    artistId: formData.get("artistId"),
+    date: formData.get("date"),
+    city: formData.get("city"),
+    venue: formData.get("venue"),
+  });
+  if (!parsed.ok) redirect(`/passport?error=${parsed.error}#add`);
+  const input = parsed.value;
+
+  const existing = await db().select({ id: stamps.id }).from(stamps).where(eq(stamps.userId, userId)).limit(MAX_STAMPS);
+  if (existing.length >= MAX_STAMPS) redirect("/passport?error=full#add");
+
+  // The name and photo come from Ticketmaster's record, never from the form,
+  // so a stamp can't point at an arbitrary image.
+  let artistId: string | null = null;
+  let artistName = input.artistName;
+  let imageUrl: string | null = null;
+  if (input.artistId) {
+    const artist = await getArtist(input.artistId).catch(() => null);
+    if (artist) {
+      artistId = artist.id;
+      artistName = artist.name;
+      imageUrl = artist.imageUrl;
+    }
+  }
+  await db()
+    .insert(stamps)
+    .values({ userId, artistId, artistName, imageUrl, venue: input.venue, city: input.city, eventDate: input.eventDate })
+    .onConflictDoNothing();
+  revalidatePath("/passport");
+  redirect("/passport?added=1");
+}
+
+export async function deleteStamp(formData: FormData) {
+  const userId = await requireUser();
+  const id = Number(formData.get("id"));
+  if (!Number.isInteger(id) || id < 1) return;
+  await db().delete(stamps).where(and(eq(stamps.id, id), eq(stamps.userId, userId)));
+  revalidatePath("/passport");
 }
 
 export async function saveAlertPrefs(formData: FormData) {

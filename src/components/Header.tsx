@@ -44,6 +44,9 @@ export async function Header() {
               <Link href="/my-artists" className={navLink}>
                 My Artists
               </Link>
+              <Link href="/passport" className={navLink}>
+                Passport
+              </Link>
               <Link href="/settings" className={navLink}>
                 Settings
               </Link>
@@ -81,6 +84,9 @@ export async function Header() {
                 <>
                   <Link href="/my-artists" className={menuLink}>
                     My Artists
+                  </Link>
+                  <Link href="/passport" className={menuLink}>
+                    Concert passport
                   </Link>
                   <Link href="/settings" className={menuLink}>
                     Settings &amp; alerts

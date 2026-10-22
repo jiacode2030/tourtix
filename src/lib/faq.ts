@@ -120,6 +120,12 @@ export const FAQ_GROUPS: FaqGroup[] = [
     title: "Your data",
     items: [
       {
+        id: "passport",
+        q: "What is the concert passport?",
+        a: "A private collection of concerts you've been to. Add a concert and you get a stamp; the page shows your totals and can make a picture of your passport to share. Only you can see your stamps. The picture is made when you ask for it and shows only what you tick (dates, cities, a first name). It isn't saved, and there are no public profiles.",
+        link: { href: "/passport", label: "Open your passport" },
+      },
+      {
         id: "near-you",
         q: "How does \"near you\" work?",
         a: "If you enter a ZIP code or share your location in Settings, we mark shows within the distance you choose. Shared coordinates are rounded to about 1 km, and you can remove your location at any time.",
@@ -127,7 +133,7 @@ export const FAQ_GROUPS: FaqGroup[] = [
       {
         id: "delete",
         q: "How do I delete my data?",
-        a: "Go to Settings and choose Delete my account. It permanently removes your followed artists, location, presale choices, and notification settings.",
+        a: "Go to Settings and choose Delete my account. It permanently removes your followed artists, location, presale choices, passport stamps, and notification settings.",
         link: { href: "/privacy", label: "Privacy Policy" },
       },
       {

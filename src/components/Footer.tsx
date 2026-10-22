@@ -25,6 +25,7 @@ export function Footer() {
         </p>
         <nav className="flex flex-wrap gap-x-5 gap-y-2 pt-2">
           <Link href="/concerts" className="hover:text-fg">Find concerts</Link>
+          <Link href="/passport" className="hover:text-fg">Concert passport</Link>
           <Link href="/faq" className="hover:text-fg">FAQ</Link>
           <Link href="/tips" className="hover:text-fg">Ticket buying tips</Link>
           <Link href="/help/notifications" className="hover:text-fg">Notification help</Link>

@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Privacy Policy" };
 
 export default function PrivacyPage() {
   return (
-    <LegalPage title="Privacy Policy" updated="October 22, 2026">
+    <LegalPage title="Privacy Policy" updated="October 23, 2026">
       <p>
         This policy explains what information TourTix collects and how it is used. We will update
         this page whenever that changes, and the date above will change with it.
@@ -36,6 +36,14 @@ export default function PrivacyPage() {
           card&rdquo; or &ldquo;Live Nation account&rdquo;), only if you choose to, so we can
           highlight presales you likely qualify for. We never ask for card numbers, account
           logins, or presale codes, and we don&apos;t check with those programs.
+        </li>
+        <li>
+          <strong>Concert passport stamps</strong>, if you add any: the artist, the date, and the
+          city and venue if you choose to enter them. They are private: only you can see your
+          stamps, and we don&apos;t show them to anyone else or use them for anything else. If you
+          make a picture of your passport to share, it is created when you ask, includes only what
+          you tick (dates, cities, a first name), and isn&apos;t saved by us or given a public link.
+          What you do with the picture afterwards is up to you.
         </li>
         <li>
           <strong>Notification settings</strong>, if you turn on notifications: which alerts you
@@ -85,7 +93,7 @@ export default function PrivacyPage() {
       <p>We use these service providers, which process data on our behalf:</p>
       <ul>
         <li><strong>Google</strong>: sign-in</li>
-        <li><strong>Neon</strong>: database storing followed artists, location, presale programs, notification settings, and contact messages</li>
+        <li><strong>Neon</strong>: database storing followed artists, location, presale programs, passport stamps, notification settings, and contact messages</li>
         <li><strong>Vercel</strong>: website hosting and visitor statistics</li>
         <li>
           <strong>Your browser&apos;s push service</strong> (for example Google, Apple, Mozilla, or Microsoft):
@@ -104,7 +112,7 @@ export default function PrivacyPage() {
       <p>
         We keep your account data until you delete your account. You can delete it at any time
         from <strong>Settings → Delete my account</strong>, which permanently removes your
-        followed artists, location, presale programs, notification settings, and any contact messages you sent while
+        followed artists, location, presale programs, passport stamps, notification settings, and any contact messages you sent while
         signed in.
       </p>
 

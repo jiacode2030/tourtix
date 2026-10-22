@@ -84,3 +84,18 @@ await sql`
     PRIMARY KEY (artist_id, presale_key)
   )`;
 console.log("migrate: tables ready");
+await sql`
+  CREATE TABLE IF NOT EXISTS stamps (
+    id serial PRIMARY KEY,
+    user_id text NOT NULL,
+    artist_id text,
+    artist_name text NOT NULL,
+    image_url text,
+    venue text,
+    city text,
+    event_date date NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now()
+  )`;
+// One stamp per artist per day per person, however the name is capitalized.
+await sql`CREATE UNIQUE INDEX IF NOT EXISTS stamps_one_per_day ON stamps (user_id, lower(artist_name), event_date)`;
+await sql`CREATE INDEX IF NOT EXISTS stamps_by_user ON stamps (user_id, event_date DESC)`;

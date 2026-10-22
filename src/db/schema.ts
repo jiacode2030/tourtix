@@ -1,5 +1,6 @@
 import {
   boolean,
+  date,
   doublePrecision,
   integer,
   pgTable,
@@ -105,5 +106,19 @@ export const contactMessages = pgTable("contact_messages", {
   email: text("email"),
   message: text("message").notNull(),
   userId: text("user_id"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Private concert passport: concerts a user says they went to. Only ever read
+// back by their owner. event_date is the day of the concert (no time zone).
+export const stamps = pgTable("stamps", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  artistId: text("artist_id"),
+  artistName: text("artist_name").notNull(),
+  imageUrl: text("image_url"),
+  venue: text("venue"),
+  city: text("city"),
+  eventDate: date("event_date", { mode: "string" }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
