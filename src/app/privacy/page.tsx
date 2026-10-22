@@ -72,8 +72,12 @@ export default function PrivacyPage() {
         not use advertising cookies or tracking pixels, and we don&apos;t show ads.
       </p>
       <p>
+        If you pick light or dark mode, your choice is saved in your browser&apos;s local storage
+        on your device so we can remember it. It never leaves your device.
+      </p>
+      <p>
         Third parties may place or read their own cookies and collect information directly from
-        you: Google when you sign in, Ticketmaster when its artist photos and seat maps load, and
+        you: Google when you sign in (and when your Google profile picture loads), Ticketmaster when its artist photos and seat maps load, and
         any ticket site you click through to. Their own privacy policies apply to that.
       </p>
 

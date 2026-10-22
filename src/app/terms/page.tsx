@@ -5,7 +5,7 @@ export const metadata: Metadata = { title: "Terms of Use" };
 
 export default function TermsPage() {
   return (
-    <LegalPage title="Terms of Use" updated="October 21, 2026">
+    <LegalPage title="Terms of Use" updated="October 22, 2026">
       <p>By using TourTix, you agree to these terms.</p>
 
       <h2>What TourTix is</h2>
@@ -21,6 +21,12 @@ export default function TermsPage() {
         change at any time. We try to keep it current but cannot guarantee it is complete or
         accurate. Always confirm the final price, including fees, on the seller&apos;s site before
         you buy.
+      </p>
+      <p>
+        Labels like &ldquo;You likely qualify&rdquo; are our best guess from a presale&apos;s public
+        name and the programs you tick in Settings. The seller decides who can buy in a presale, and
+        many (such as Verified Fan or fan club presales) require a separate sign-up that may not
+        be approved. We don&apos;t check your eligibility with any seller or program.
       </p>
 
       <h2>Links to other sites</h2>

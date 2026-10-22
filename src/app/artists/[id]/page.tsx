@@ -18,6 +18,7 @@ import { hasLocation, isNear } from "@/lib/geo";
 import { upcomingSaleStarts } from "@/lib/sales";
 import type { Show } from "@/lib/types";
 import { btnSecondary, STAGE_LIGHTS } from "@/lib/ui";
+import { sharedSlotIds } from "@/lib/show-key";
 import { getProfile, hasNotifications, isFavorite, locationOf } from "@/lib/user-data";
 
 export async function generateMetadata({
@@ -68,6 +69,7 @@ export default async function ArtistPage({
   ]);
   const loc = locationOf(profile);
   const located = hasLocation(loc);
+  const shared = sharedSlotIds(shows);
   // Signed-in users without a profile row yet get an empty list, which shows the Settings prompt.
   const memberships = userId ? (profile?.memberships ?? []) : undefined;
   const filter: FilterKey =
@@ -189,6 +191,7 @@ export default async function ArtistPage({
                 nearYou={isNear(s, loc)}
                 coveredByDrop={covered.has(s.id)}
                 memberships={memberships}
+                listingName={shared.has(s.id) ? s.name : undefined}
               />
             ))}
           </ul>

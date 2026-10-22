@@ -69,3 +69,32 @@ jobs:
             echo "$type  $path"
             [ "$type" = "200 image/png" ] || { echo "::error::share image broken: $path"; exit 1; }
           done
+
+      - name: Security headers present
+        run: |
+          headers=$(curl -sI --max-time 30 "$SITE/")
+          for h in x-content-type-options x-frame-options referrer-policy permissions-policy strict-transport-security; do
+            echo "$headers" | grep -qi "^$h:" || { echo "::error::missing security header: $h"; exit 1; }
+          done
+
+      - name: Seller buttons go where they say
+        run: |
+          # Metallica has listings from Ticketmaster and from partner sites.
+          node -e '
+            (async () => {
+              const html = await (await fetch(process.env.SITE + "/artists/K8vZ9171G9V")).text();
+              let checked = 0, bad = [];
+              for (const m of html.matchAll(/<a [^>]*href="(https?:[^"]+)"[^>]*>(?:<[^>]+>)*\s*Get tickets on ([^<]+)</g)) {
+                const host = new URL(m[1].replace(/&amp;/g, "&")).hostname;
+                const name = m[2].trim();
+                checked++;
+                const isTm = /(^|\.)ticketmaster\.(?:[a-z]{2,3}|(?:co|com)\.[a-z]{2})$/.test(host);
+                if ((name === "Ticketmaster") !== isTm) bad.push(name + " -> " + host);
+              }
+              console.log("buttons checked:", checked);
+              if (!checked) { console.log("::error::no ticket buttons found"); process.exit(1); }
+              if (bad.length) { console.log("::error::mislabeled seller buttons: " + bad.join(", ")); process.exit(1); }
+            })();
+          '
+        env:
+          SITE: https://tourtix.vercel.app

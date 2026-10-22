@@ -10,6 +10,7 @@ import { SignInPrompt } from "@/components/SignInPrompt";
 import { getShows } from "@/lib/data";
 import { hasLocation, isNear } from "@/lib/geo";
 import { chipOff, chipOn, linkAccent } from "@/lib/ui";
+import { sharedSlotIds } from "@/lib/show-key";
 import { getProfile, hasNotifications, listFavorites, locationOf } from "@/lib/user-data";
 
 export const metadata: Metadata = { title: "My Artists" };
@@ -56,10 +57,10 @@ export default async function MyArtistsPage({
           upcomingShows: 0,
         });
         if (nearOnly && located) shows = shows.filter((s) => isNear(s, loc));
-        return { fav: f, shows: shows.slice(0, SHOWS_PER_ARTIST), total: shows.length, failed: false };
+        return { fav: f, shows: shows.slice(0, SHOWS_PER_ARTIST), total: shows.length, failed: false, shared: sharedSlotIds(shows) };
       } catch (err) {
         console.error(err);
-        return { fav: f, shows: [], total: 0, failed: true };
+        return { fav: f, shows: [], total: 0, failed: true, shared: new Set<string>() };
       }
     }),
   );
@@ -109,7 +110,7 @@ export default async function MyArtistsPage({
         </p>
       )}
 
-      {sections.map(({ fav, shows, total, failed }) => (
+      {sections.map(({ fav, shows, total, failed, shared }) => (
         <section key={fav.artistId} className="space-y-2">
           <div className="flex items-center justify-between gap-4">
             <h2 className="min-w-0 text-xl font-bold tracking-tight">
@@ -134,6 +135,7 @@ export default async function MyArtistsPage({
                   artistName={fav.artistName}
                   nearYou={isNear(s, loc)}
                   memberships={profile?.memberships ?? []}
+                  listingName={shared.has(s.id) ? s.name : undefined}
                 />
               ))}
             </ul>

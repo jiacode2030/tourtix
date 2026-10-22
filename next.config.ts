@@ -5,6 +5,21 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/artists/[id]/opengraph-image": ["./src/assets/**"],
   },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          // Nothing should show TourTix inside another site's frame.
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          // Location is only used when someone taps "Use my current location".
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(self)" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

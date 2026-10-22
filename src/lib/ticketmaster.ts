@@ -1,4 +1,5 @@
 import { apiFetch } from "./http";
+import { cleanUrl, sellerName } from "./links";
 import { presaleDisplayName } from "./presale-names";
 import { computeStatus } from "./status";
 import type { Artist, Presale, Show, ShowExtras } from "./types";
@@ -48,13 +49,14 @@ function toShow(e: any): Show {
     name: presaleDisplayName(p.name ?? "Presale"),
     start: realTime(p.startDateTime),
     end: realTime(p.endDateTime),
-    url: p.url ?? null,
+    url: cleanUrl(p.url),
     description: p.description ?? null,
   }));
   const publicSaleStart = e.sales?.public?.startTBD ? null : realTime(e.sales?.public?.startDateTime);
   // Discovery price ranges are usually face value before fees; only use one
   // that says it includes fees.
   const allIn = (e.priceRanges ?? []).find((r: any) => /fee/i.test(r.type ?? ""));
+  const link = cleanUrl(e.url);
   return {
     id: e.id,
     name: e.name,
@@ -65,11 +67,11 @@ function toShow(e: any): Show {
     city: venue?.city?.name ?? null,
     region: venue?.state?.stateCode ?? null,
     country: venue?.country?.countryCode ?? null,
-    links: e.url
+    links: link
       ? [
           {
-            seller: "Ticketmaster",
-            url: e.url,
+            seller: sellerName(link),
+            url: link,
             allInPrice: allIn?.min ?? null,
             currency: allIn?.currency ?? null,
           },

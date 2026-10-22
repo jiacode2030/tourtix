@@ -195,6 +195,7 @@ export function ShowRow({
   nearYou = false,
   coveredByDrop = false,
   memberships,
+  listingName,
 }: {
   show: Show;
   artistId: string;
@@ -204,6 +205,8 @@ export function ShowRow({
   coveredByDrop?: boolean;
   // Accounts and cards ticked in Settings; undefined when signed out.
   memberships?: readonly string[];
+  // Shown when several listings share this date and venue (passes, packages).
+  listingName?: string;
 }) {
   const place = placeOf(show);
   const nextSale = upcomingSaleStarts(show, FOREVER)[0];
@@ -241,6 +244,7 @@ export function ShowRow({
                 )}
               </span>
             </p>
+            {listingName && <p className="mt-0.5 truncate text-xs text-muted">{listingName}</p>}
             {yours && (
               <p className="mt-0.5 flex items-center gap-1 text-xs font-medium text-live">
                 <Ticket size={12} aria-hidden /> Your presale: {yours.name}
