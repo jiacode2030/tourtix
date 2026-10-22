@@ -20,14 +20,14 @@ export function nameScore(query: string, name: string): number {
   const q = fold(query);
   const n = fold(name);
   if (!q || !n) return 0;
-  if (n === q) return 92;
+  if (n === q) return 87;
   if (n.startsWith(q + " ") || n.startsWith(q)) return 85; // "calvin" -> "calvin harris", "calv" -> "calvin harris"
   // Punctuation and spacing don't matter: "acdc" -> "AC/DC", "blink182" -> "blink-182".
   if (n.replace(/ /g, "").startsWith(q.replace(/ /g, ""))) return 80;
   const words = n.split(" ");
   const qWords = q.split(" ");
   // Every typed word starts some word of the name, in any order ("harris calvin").
-  if (qWords.every((w) => words.some((nw) => nw.startsWith(w)))) return 70;
+  if (qWords.every((w) => words.some((nw) => nw.startsWith(w)))) return 78;
   if (n.includes(q)) return 50;
   // Some typed words match: better than nothing.
   const hits = qWords.filter((w) => words.some((nw) => nw.startsWith(w))).length;
@@ -36,7 +36,13 @@ export function nameScore(query: string, name: string): number {
 
 // Touring a lot and being well known both count, so a famous artist between
 // tours still beats a small act with a similar name.
-export const fame = (a: Artist) => Math.min(15, Math.log2(1 + (a.upcomingShows ?? 0)) * 3) + Math.min(18, (a.notability ?? 0) * 1.5);
+export function fame(a: Artist): number {
+  const touring = Math.min(24, Math.log2(1 + (a.upcomingShows ?? 0)) * 4.5);
+  const known = Math.min(18, (a.notability ?? 0) * 1.5);
+  // The stronger signal counts fully, the weaker a little: either one alone
+  // can make an artist stand out (touring a lot, or very well known).
+  return Math.max(touring, known) + 0.25 * Math.min(touring, known);
+}
 
 export function rankArtists(query: string, artists: Artist[]): Artist[] {
   const q = fold(query);

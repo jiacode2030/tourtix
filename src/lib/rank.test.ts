@@ -30,9 +30,9 @@ describe("rankArtists", () => {
   });
 
   it("ignores case, accents and punctuation", () => {
-    expect(nameScore("beyonce", "Beyoncé")).toBe(92);
+    expect(nameScore("beyonce", "Beyoncé")).toBe(87);
     expect(nameScore("fred again", "Fred again..")).toBeGreaterThanOrEqual(85);
-    expect(nameScore("tyler the creator", "Tyler, The Creator")).toBe(92);
+    expect(nameScore("tyler the creator", "Tyler, The Creator")).toBe(87);
     expect(nameScore("acdc", "AC/DC")).toBeGreaterThanOrEqual(80);
     expect(nameScore("blink182", "blink-182")).toBeGreaterThanOrEqual(80);
   });
@@ -102,5 +102,29 @@ describe("notability", () => {
   it("keeps the best of each field when merging", () => {
     const merged = mergeArtists([withN("X", 3, 2)], [withN("X", 1, 9)]);
     expect(merged[0]).toMatchObject({ upcomingShows: 3, notability: 9 });
+  });
+});
+
+describe("real-world orderings seen in live results", () => {
+  const withN = (name: string, upcomingShows: number, notability: number): Artist => ({ ...a(name, upcomingShows), notability });
+  it("Olivia Rodrigo (touring a lot) beats Olivia O'Brien", () => {
+    expect(names(rankArtists("olivia", [withN("Olivia O'Brien", 9, 12), withN("Olivia Rodrigo", 89, 1)]))[0]).toBe("Olivia Rodrigo");
+  });
+  it("Lady Gaga beats a small act literally named GaGa for \"gaga\"", () => {
+    expect(names(rankArtists("gaga", [withN("GaGa", 2, 0), withN("Lady Gaga", 0, 12)]))[0]).toBe("Lady Gaga");
+  });
+  it("Noah Kahan beats Noah Gundersen", () => {
+    expect(names(rankArtists("noah", [withN("Noah Gundersen", 10, 12), withN("Noah Kahan", 29, 6)]))[0]).toBe("Noah Kahan");
+  });
+});
+
+describe("known artist names", () => {
+  it("finds well-known names from a few typed letters", async () => {
+    const { KNOWN_ARTISTS } = await import("./known-artists");
+    const hit = (q: string) => KNOWN_ARTISTS.filter((n) => nameScore(q, n) >= 70).slice(0, 3);
+    expect(hit("kend")).toContain("Kendrick Lamar");
+    expect(hit("sz")).toContain("SZA");
+    expect(hit("beyon")).toContain("Beyoncé");
+    expect(hit("bad bu")).toContain("Bad Bunny");
   });
 });

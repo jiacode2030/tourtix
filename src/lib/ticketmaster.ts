@@ -1,5 +1,6 @@
 import { apiFetch } from "./http";
 import { cleanUrl, sellerName } from "./links";
+import { KNOWN_ARTISTS } from "./known-artists";
 import { dedupeByName, matchTyped, mergeArtists, nameScore, rankArtists } from "./rank";
 import { presaleDisplayName } from "./presale-names";
 import { computeStatus } from "./status";
@@ -285,10 +286,13 @@ export async function tmFindArtists(query: string, limit: number, debug?: Sugges
   debug?.push({ source: "lookup list matches", count: matches.length });
   let merged = mergeArtists(matches, keyword, keywordFinished);
 
-  // Nothing matched the typed (possibly unfinished) text: try a wildcard search.
-  if (!merged.some((a) => nameScore(query, a.name) >= 70) && query.trim().length >= 3) {
-    const wild = await tmKeyword(`${query.trim()}*`, debug, "wildcard search");
-    merged = mergeArtists(merged, wild);
+  // Nothing matched the typed (possibly unfinished) text, e.g. "kend": look
+  // up well-known artists whose names start with it, by their full names.
+  if (!merged.some((a) => nameScore(query, a.name) >= 70) && query.trim().length >= 2) {
+    const names = KNOWN_ARTISTS.filter((n) => nameScore(query, n) >= 70).slice(0, 3);
+    const found = await Promise.all(names.map((n) => tmKeyword(n, debug, `known artist "${n}"`)));
+    const exact = found.flatMap((list, i) => list.filter((a) => nameScore(names[i], a.name) === 87));
+    merged = mergeArtists(merged, exact);
   }
   return rankArtists(query, dedupeByName(merged)).slice(0, limit);
 }
