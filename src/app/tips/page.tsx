@@ -47,9 +47,9 @@ const tips: { title: string; body: React.ReactNode }[] = [
     title: "Register for presales early",
     body: (
       <>
-        Presales like Ticketmaster Verified Fan often require signing up days before the sale. Open
-        a show&apos;s &ldquo;Presales, seat map &amp; info&rdquo; section on TourTix to find sign-up
-        links, and add the sale time to your calendar.
+        Presales like Ticketmaster Verified Fan often require signing up days before the sale. Tap a
+        show on TourTix to see its presales and sign-up links, then tap &ldquo;Remind me&rdquo; to add
+        the sale time to your calendar.
       </>
     ),
   },
@@ -88,8 +88,8 @@ export default function TipsPage() {
   return (
     <article className="mx-auto max-w-2xl space-y-8">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Ticket buying tips</h1>
-        <p className="text-zinc-600 dark:text-zinc-400">
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Ticket buying tips</h1>
+        <p className="text-muted">
           How to get tickets without overpaying or getting scammed. General advice, not legal or
           financial advice.
         </p>
@@ -97,24 +97,24 @@ export default function TipsPage() {
       <ol className="space-y-6">
         {tips.map((t, i) => (
           <li key={t.title} className="space-y-1">
-            <h2 className="text-lg font-semibold">
+            <h2 className="text-lg font-bold tracking-tight">
               {i + 1}. {t.title}
             </h2>
-            <p className="leading-relaxed text-zinc-700 dark:text-zinc-300">{t.body}</p>
+            <p className="leading-relaxed text-fg/90">{t.body}</p>
           </li>
         ))}
       </ol>
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="text-sm text-muted">
         Think you were scammed? Contact your bank or card issuer right away, and report it to the{" "}
         <a
           href="https://reportfraud.ftc.gov"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-violet-600 hover:underline"
+          className="font-medium text-accent hover:underline"
         >
           FTC
         </a>
-        . <Link href="/" className="text-violet-600 hover:underline">Back to TourTix</Link>
+        . <Link href="/" className="font-medium text-accent hover:underline">Back to TourTix</Link>
       </p>
     </article>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { Check, Plus } from "lucide-react";
 import { useOptimistic, useTransition } from "react";
 import { toggleFavorite } from "@/app/actions";
 
@@ -20,11 +21,11 @@ export function FollowStar({ artistId, artistName, isFavorite }: { artistId: str
           await toggleFavorite(artistId, following);
         })
       }
-      className={`flex h-9 w-9 items-center justify-center rounded-full text-lg shadow-md transition ${
-        following ? "bg-violet-600 text-white" : "bg-white/90 text-violet-700 hover:bg-white dark:bg-zinc-900/90 dark:text-violet-300"
+      className={`flex h-10 w-10 items-center justify-center rounded-full shadow-md backdrop-blur transition ${
+        following ? "bg-cta text-on-cta" : "bg-bg/85 text-fg hover:bg-bg"
       }`}
     >
-      {following ? "★" : "☆"}
+      {following ? <Check size={18} aria-hidden /> : <Plus size={18} aria-hidden />}
     </button>
   );
 }

@@ -1,6 +1,8 @@
 "use client";
 
+import { Smartphone } from "lucide-react";
 import Link from "next/link";
+import { btnSecondary, linkAccent } from "@/lib/ui";
 import { useEffect, useState } from "react";
 
 type InstallEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
@@ -42,19 +44,22 @@ export function InstallButton() {
           await prompt.userChoice;
           setPrompt(null);
         }}
-        className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
+        className={btnSecondary}
       >
-        📲 Install TourTix as an app
+        <Smartphone size={18} aria-hidden /> Install TourTix as an app
       </button>
     );
   }
   if (ios) {
     return (
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">
-        📲 Add TourTix to your Home Screen: tap Share, then &ldquo;Add to Home Screen&rdquo;.{" "}
-        <Link href="/help/notifications#iphone" className="text-violet-600 hover:underline">
+      <p className="flex gap-2 text-sm text-muted">
+        <Smartphone size={18} aria-hidden className="mt-0.5 shrink-0" />
+        <span>
+        Add TourTix to your Home Screen: tap Share, then &ldquo;Add to Home Screen&rdquo;.{" "}
+        <Link href="/help/notifications#iphone" className={linkAccent}>
           Help
         </Link>
+        </span>
       </p>
     );
   }

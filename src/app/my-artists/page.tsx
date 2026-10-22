@@ -1,6 +1,7 @@
 import { currentUserId } from "@/auth";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArtistThumb } from "@/components/ArtistThumb";
 import { ShowRow } from "@/components/ShowRow";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { GetStarted } from "@/components/GetStarted";
@@ -8,6 +9,7 @@ import { InstallButton } from "@/components/InstallButton";
 import { SignInPrompt } from "@/components/SignInPrompt";
 import { getShows } from "@/lib/data";
 import { hasLocation, isNear } from "@/lib/geo";
+import { chipOff, chipOn, linkAccent } from "@/lib/ui";
 import { getProfile, hasNotifications, listFavorites, locationOf } from "@/lib/user-data";
 
 export const metadata: Metadata = { title: "My Artists" };
@@ -23,10 +25,10 @@ export default async function MyArtistsPage({
   if (!userId) {
     return (
       <div className="space-y-4 py-12 text-center">
-        <h1 className="text-2xl font-bold">Follow your favorite artists</h1>
-        <p className="text-zinc-600 dark:text-zinc-400">Sign in to see all your artists&apos; upcoming shows in one place.</p>
+        <h1 className="text-3xl font-bold tracking-tight">Follow your favorite artists</h1>
+        <p className="text-muted">Sign in to see all your artists&apos; upcoming shows in one place.</p>
         <SignInPrompt label="Sign in with Google" redirectTo="/my-artists" />
-        <p className="mx-auto max-w-md text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mx-auto max-w-md text-sm text-muted">
           TourTix is free and doesn&apos;t sell tickets. We collect shows from ticket sites and link
           you to the seller to buy.
         </p>
@@ -66,28 +68,28 @@ export default async function MyArtistsPage({
     <div className="space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">My Artists</h1>
-          <p className="text-zinc-600 dark:text-zinc-400">
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">My Artists</h1>
+          <p className="text-muted">
             {favs.length} {favs.length === 1 ? "artist" : "artists"} followed
           </p>
         </div>
         {located ? (
-          <div className="flex rounded-lg border border-zinc-200 p-1 text-sm dark:border-zinc-800">
+          <div className="flex gap-1 rounded-full bg-surface p-1 text-sm font-medium">
             <Link
               href="/my-artists"
-              className={`rounded-md px-3 py-1 ${!nearOnly ? "bg-violet-600 text-white" : ""}`}
+              className={`rounded-full px-4 py-2 ${!nearOnly ? chipOn : chipOff}`}
             >
               All shows
             </Link>
             <Link
               href="/my-artists?near=1"
-              className={`rounded-md px-3 py-1 ${nearOnly ? "bg-violet-600 text-white" : ""}`}
+              className={`rounded-full px-4 py-2 ${nearOnly ? chipOn : chipOff}`}
             >
               Near me
             </Link>
           </div>
         ) : (
-          <Link href="/settings" className="text-sm text-violet-600 hover:underline">
+          <Link href="/settings" className={`text-sm ${linkAccent}`}>
             Set your location to see shows near you →
           </Link>
         )}
@@ -98,31 +100,32 @@ export default async function MyArtistsPage({
       <InstallButton />
 
       {favs.length === 0 && (
-        <p className="rounded-xl border border-dashed border-zinc-300 p-8 text-center text-zinc-600 dark:text-zinc-400 dark:border-zinc-700">
+        <p className="rounded-3xl bg-surface p-8 text-center text-muted">
           You&apos;re not following anyone yet.{" "}
-          <Link href="/" className="text-violet-600 hover:underline">
+          <Link href="/" className={linkAccent}>
             Search for an artist
           </Link>{" "}
-          and tap &ldquo;Follow artist&rdquo;.
+          and tap &ldquo;Follow&rdquo;.
         </p>
       )}
 
       {sections.map(({ fav, shows, total, failed }) => (
-        <section key={fav.artistId} className="space-y-3">
-          <div className="flex items-baseline justify-between gap-4">
-            <h2 className="text-xl font-semibold">
-              <Link href={`/artists/${fav.artistId}`} className="hover:text-violet-600">
-                {fav.artistName}
+        <section key={fav.artistId} className="space-y-2">
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="min-w-0 text-xl font-bold tracking-tight">
+              <Link href={`/artists/${fav.artistId}`} className="flex items-center gap-3 hover:underline">
+                <ArtistThumb name={fav.artistName} imageUrl={fav.imageUrl} size="h-10 w-10" />
+                <span className="truncate">{fav.artistName}</span>
               </Link>
             </h2>
             {total > shows.length && (
-              <Link href={`/artists/${fav.artistId}`} className="text-sm text-violet-600 hover:underline">
+              <Link href={`/artists/${fav.artistId}`} className={`shrink-0 text-sm ${linkAccent}`}>
                 See all {total} shows →
               </Link>
             )}
           </div>
           {shows.length ? (
-            <ul className="space-y-3">
+            <ul className="divide-y divide-line border-y border-line">
               {shows.map((s) => (
                 <ShowRow
                   key={s.id}
@@ -134,7 +137,7 @@ export default async function MyArtistsPage({
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="text-sm text-muted">
               {failed
                 ? "Couldn't load shows right now. Try again in a minute."
                 : nearOnly

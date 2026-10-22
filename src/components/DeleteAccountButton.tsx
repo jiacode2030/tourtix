@@ -14,7 +14,7 @@ export function DeleteAccountButton() {
           startTransition(() => deleteMyAccount());
         }
       }}
-      className="rounded-lg border border-rose-300 px-4 py-2 text-sm font-medium text-rose-700 hover:bg-rose-50 disabled:opacity-60 dark:border-rose-800 dark:text-rose-400 dark:hover:bg-rose-950"
+      className="inline-flex min-h-11 items-center rounded-full border border-red-300 px-5 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-60 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950"
     >
       {pending ? "Deleting…" : "Delete my account"}
     </button>

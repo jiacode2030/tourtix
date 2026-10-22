@@ -1,6 +1,8 @@
 "use client";
 
+import { Bell, BellOff } from "lucide-react";
 import Link from "next/link";
+import { btnPrimary, btnSecondary, linkAccent } from "@/lib/ui";
 import { useEffect, useState, useTransition } from "react";
 import {
   removePushSubscription,
@@ -35,11 +37,6 @@ function helpAnchor() {
   if (/Windows/.test(ua)) return "#windows";
   return "";
 }
-
-const button =
-  "rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-60";
-const primary = `${button} bg-violet-600 text-white hover:bg-violet-700`;
-const secondary = `${button} border border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800`;
 
 export function NotificationsToggle({ publicKey }: { publicKey: string }) {
   const [state, setState] = useState<State>("loading");
@@ -96,19 +93,19 @@ export function NotificationsToggle({ publicKey }: { publicKey: string }) {
     });
 
   return (
-    <div className="space-y-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
-      {state === "loading" && <p className="text-sm text-zinc-600 dark:text-zinc-400">Checking this device…</p>}
+    <div className="space-y-3 rounded-3xl bg-surface p-5">
+      {state === "loading" && <p className="text-sm text-muted">Checking this device…</p>}
 
       {state === "unsupported" && (
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="text-sm text-muted">
           This browser doesn&apos;t support notifications. Try Chrome, Edge, Firefox, or Safari on a
           computer or Android phone.
         </p>
       )}
 
       {state === "ios-install" && (
-        <div className="space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
-          <p className="font-medium text-zinc-900 dark:text-zinc-100">On iPhone, add TourTix to your Home Screen first:</p>
+        <div className="space-y-1 text-sm text-muted">
+          <p className="font-medium text-fg">On iPhone, add TourTix to your Home Screen first:</p>
           <ol className="list-decimal space-y-1 pl-5">
             <li>Tap the Share button in Safari.</li>
             <li>Tap &ldquo;Add to Home Screen&rdquo;.</li>
@@ -118,7 +115,7 @@ export function NotificationsToggle({ publicKey }: { publicKey: string }) {
       )}
 
       {state === "denied" && (
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="text-sm text-muted">
           Notifications are blocked for this site. Allow them in your browser&apos;s site settings, then
           reload this page.
         </p>
@@ -126,8 +123,11 @@ export function NotificationsToggle({ publicKey }: { publicKey: string }) {
 
       {state === "off" && (
         <div className="flex flex-wrap items-center gap-3">
-          <p className="flex-1 text-sm">Notifications are <strong>off</strong> on this device.</p>
-          <button type="button" onClick={enable} disabled={pending} className={primary}>
+          <p className="flex flex-1 basis-48 items-center gap-2 text-sm">
+            <BellOff size={18} aria-hidden className="text-muted" />
+            <span>Notifications are <strong>off</strong> on this device.</span>
+          </p>
+          <button type="button" onClick={enable} disabled={pending} className={btnPrimary}>
             Turn on notifications
           </button>
         </div>
@@ -135,24 +135,25 @@ export function NotificationsToggle({ publicKey }: { publicKey: string }) {
 
       {state === "on" && (
         <div className="flex flex-wrap items-center gap-3">
-          <p className="flex-1 text-sm">
-            Notifications are <strong className="text-emerald-600">on</strong> on this device.
+          <p className="flex flex-1 basis-48 items-center gap-2 text-sm">
+            <Bell size={18} aria-hidden className="text-live" />
+            <span>Notifications are <strong className="text-live">on</strong> on this device.</span>
           </p>
-          <button type="button" onClick={test} disabled={pending} className={secondary}>
+          <button type="button" onClick={test} disabled={pending} className={btnSecondary}>
             Send test
           </button>
-          <button type="button" onClick={disable} disabled={pending} className={secondary}>
+          <button type="button" onClick={disable} disabled={pending} className={btnSecondary}>
             Turn off
           </button>
         </div>
       )}
 
-      {message && <p className="text-sm text-zinc-600 dark:text-zinc-400">{message}</p>}
+      {message && <p className="text-sm text-muted">{message}</p>}
 
       {(state === "on" || state === "denied") && (
         <p className="text-sm">
-          <Link href={`/help/notifications${helpAnchor()}`} className="text-violet-600 hover:underline">
-            Not seeing notifications? Here&apos;s how to fix it →
+          <Link href={`/help/notifications${helpAnchor()}`} className={linkAccent}>
+            Not seeing notifications? Here&apos;s how to fix it
           </Link>
         </p>
       )}

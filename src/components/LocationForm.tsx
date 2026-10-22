@@ -1,15 +1,10 @@
 "use client";
 
+import { LocateFixed, MapPin } from "lucide-react";
 import { useRef, useState } from "react";
 import { saveLocation } from "@/app/actions";
 import { RADIUS_OPTIONS } from "@/lib/geo";
-
-const field =
-  "rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900";
-const primary =
-  "rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 disabled:opacity-60";
-const secondary =
-  "rounded-lg border border-zinc-300 px-3 py-2 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800";
+import { btnPrimary, btnSecondary, input } from "@/lib/ui";
 
 const errors: Record<string, string> = {
   zip: "We couldn't find that ZIP code. Check it and try again.",
@@ -68,8 +63,8 @@ export function LocationForm({
       <input ref={lng} type="hidden" name="lng" />
 
       {summary && (
-        <p className="rounded-lg bg-zinc-50 px-3 py-2 text-sm dark:bg-zinc-800/50">
-          📍 <strong>{summary}</strong>
+        <p className="flex items-center gap-2 rounded-2xl bg-surface px-4 py-3 text-sm">
+          <MapPin size={16} aria-hidden className="shrink-0 text-accent" /> <strong>{summary}</strong>
         </p>
       )}
 
@@ -88,14 +83,14 @@ export function LocationForm({
             maxLength={5}
             placeholder="e.g. 90012"
             title="5-digit US ZIP code"
-            className={`${field} w-36`}
+            className={`${input} w-36`}
           />
-          <button type="submit" onClick={() => (mode.current!.value = "zip")} className={primary}>
+          <button type="submit" onClick={() => (mode.current!.value = "zip")} className={btnPrimary}>
             Save
           </button>
-          <span className="self-center text-sm text-zinc-600 dark:text-zinc-400">or</span>
-          <button type="button" onClick={useHere} className={secondary}>
-            📍 Use my current location
+          <span className="self-center text-sm text-muted">or</span>
+          <button type="button" onClick={useHere} className={btnSecondary}>
+            <LocateFixed size={18} aria-hidden /> Use my current location
           </button>
         </div>
       </div>
@@ -106,7 +101,7 @@ export function LocationForm({
           name="radius"
           defaultValue={radiusMiles}
           onChange={() => hasLocation && submitAs("zip")}
-          className={`${field} block`}
+          className={`${input} block w-auto`}
         >
           {RADIUS_OPTIONS.map((r) => (
             <option key={r} value={r}>
@@ -117,11 +112,11 @@ export function LocationForm({
       </label>
 
       <div className="flex flex-wrap items-center gap-3 text-sm">
-        {saved && !status && <span className="text-emerald-600">Saved!</span>}
-        {error && errors[error] && <span className="text-rose-600">{errors[error]}</span>}
-        {status && <span className="text-zinc-600 dark:text-zinc-400">{status}</span>}
+        {saved && !status && <span className="font-medium text-live">Saved!</span>}
+        {error && errors[error] && <span className="text-red-600 dark:text-red-400">{errors[error]}</span>}
+        {status && <span className="text-muted">{status}</span>}
         {hasLocation && (
-          <button type="button" onClick={() => submitAs("clear")} className="text-zinc-600 dark:text-zinc-400 underline hover:text-rose-600">
+          <button type="button" onClick={() => submitAs("clear")} className="text-muted underline hover:text-red-600">
             Remove my location
           </button>
         )}

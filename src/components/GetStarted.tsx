@@ -1,4 +1,6 @@
+import { Check } from "lucide-react";
 import Link from "next/link";
+import { linkAccent } from "@/lib/ui";
 
 type Step = { done: boolean; label: string; href: string; action: string };
 
@@ -26,36 +28,36 @@ export function GetStarted({
   if (remaining === 0) return null;
 
   return (
-    <section className="space-y-3 rounded-xl border border-violet-200 bg-violet-50 p-4 dark:border-violet-900 dark:bg-violet-950/40">
-      <p className="rounded-lg bg-white p-3 text-sm dark:bg-zinc-900">
+    <section className="space-y-4 rounded-3xl bg-surface p-5 sm:p-6">
+      <p className="text-sm text-muted">
         <strong>How TourTix works:</strong> we gather tour dates and on-sale times from ticket sites
         and send you alerts. <strong>We don&apos;t sell tickets</strong>: when you&apos;re ready to
         buy, we link you to the seller (like Ticketmaster), and you buy and pay on their site.
       </p>
       <div className="flex items-baseline justify-between gap-2">
-        <h2 className="font-semibold">Get started</h2>
-        <span className="text-sm text-zinc-600 dark:text-zinc-400">
+        <h2 className="text-lg font-bold tracking-tight">Get started</h2>
+        <span className="text-sm text-muted">
           {steps.length - remaining} of {steps.length} done
         </span>
       </div>
-      <ol className="space-y-2">
+      <ol className="space-y-3">
         {steps.map((s) => (
           <li key={s.label} className="flex items-center gap-3 text-sm">
             <span
               aria-hidden="true"
-              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-                s.done ? "bg-emerald-500 text-white" : "border-2 border-violet-300 dark:border-violet-700"
+              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
+                s.done ? "bg-live text-bg" : "border-2 border-line"
               }`}
             >
-              {s.done ? "✓" : ""}
+              {s.done && <Check size={14} strokeWidth={3} />}
             </span>
-            <span className={`flex-1 ${s.done ? "text-zinc-400 line-through" : ""}`}>
+            <span className={`flex-1 ${s.done ? "text-muted line-through" : ""}`}>
               <span className="sr-only">{s.done ? "Done: " : "To do: "}</span>
               {s.label}
             </span>
             {!s.done && (
-              <Link href={s.href} className="font-medium text-violet-600 hover:underline">
-                {s.action} →
+              <Link href={s.href} className={`shrink-0 ${linkAccent}`}>
+                {s.action}
               </Link>
             )}
           </li>

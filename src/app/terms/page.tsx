@@ -34,7 +34,7 @@ export default function TermsPage() {
       <h2>Removal requests</h2>
       <p>
         Event organizers and rights holders can ask us to remove content through our{" "}
-        <a href="/contact?reason=removal" className="text-violet-600 hover:underline">
+        <a href="/contact?reason=removal" className="font-medium text-accent hover:underline">
           contact form
         </a>
         . We handle removal requests within 24 hours.

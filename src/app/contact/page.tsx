@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { REASONS } from "@/lib/contact";
+import { btnPrimary, input } from "@/lib/ui";
 import { sendContactMessage } from "./actions";
 
 export const metadata: Metadata = { title: "Contact" };
 
-const field =
-  "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900";
+const field = input;
 
 const errors: Record<string, string> = {
   short: "Please write a little more so we can help.",
@@ -21,21 +21,21 @@ export default async function ContactPage({
   if (sent) {
     return (
       <div className="mx-auto max-w-xl space-y-3 py-12 text-center">
-        <h1 className="text-2xl font-bold">Thanks, message sent!</h1>
-        <p className="text-zinc-600 dark:text-zinc-400">If you left an email address, we&apos;ll reply there.</p>
+        <h1 className="text-3xl font-bold tracking-tight">Thanks, message sent!</h1>
+        <p className="text-muted">If you left an email address, we&apos;ll reply there.</p>
       </div>
     );
   }
   return (
     <div className="mx-auto max-w-xl space-y-6">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Contact TourTix</h1>
-        <p className="text-zinc-600 dark:text-zinc-400">
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Contact TourTix</h1>
+        <p className="text-muted">
           Questions, feedback, privacy requests, or a request to remove content (for example, from
           an event organizer). Removal requests are handled within 24 hours.
         </p>
       </div>
-      {error && errors[error] && <p className="text-rose-600">{errors[error]}</p>}
+      {error && errors[error] && <p className="text-red-600 dark:text-red-400">{errors[error]}</p>}
       <form action={sendContactMessage} className="space-y-4">
         <label className="block space-y-1">
           <span className="text-sm font-medium">What&apos;s this about?</span>
@@ -49,7 +49,7 @@ export default async function ContactPage({
         </label>
         <label className="block space-y-1">
           <span className="text-sm font-medium">Message</span>
-          <textarea name="message" required minLength={5} maxLength={3000} rows={6} className={field} />
+          <textarea name="message" required minLength={5} maxLength={3000} rows={6} className={`${field} py-3`} />
         </label>
         <label className="block space-y-1">
           <span className="text-sm font-medium">Your email (optional, only if you want a reply)</span>
@@ -57,7 +57,7 @@ export default async function ContactPage({
         </label>
         {/* Honeypot for bots; hidden from people and screen readers. */}
         <input name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
-        <button type="submit" className="rounded-lg bg-violet-600 px-5 py-2 font-medium text-white hover:bg-violet-700">
+        <button type="submit" className={btnPrimary}>
           Send
         </button>
       </form>

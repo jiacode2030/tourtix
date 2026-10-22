@@ -1,4 +1,5 @@
 import { currentUserId } from "@/auth";
+import { Bell, CircleCheck, Clock, Ticket, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { ArtistCard } from "@/components/ArtistCard";
 import { AutoRefresh } from "@/components/AutoRefresh";
@@ -11,6 +12,7 @@ import { getShows, liveSales, popularArtists, searchArtists, upcomingDrops } fro
 import { fmtDateTime } from "@/lib/format";
 import { GENRES, isGenre } from "@/lib/genres";
 import { groupDrops, type TicketDrop } from "@/lib/sales";
+import { chip, chipOff, chipOn, linkAccent } from "@/lib/ui";
 import { listFavorites } from "@/lib/user-data";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -49,14 +51,30 @@ function startingWithin(drops: TicketDrop[], ms: number) {
   return drops.filter((d) => Date.parse(d.sale.start) - now <= ms);
 }
 
-function SectionHeading({ title, subtitle }: { title: string; subtitle?: string }) {
+function SectionHeading({ title, subtitle, icon }: { title: string; subtitle?: string; icon?: React.ReactNode }) {
   return (
-    <div>
-      <h2 className="text-xl font-semibold">{title}</h2>
-      {subtitle && <p className="text-sm text-zinc-600 dark:text-zinc-400">{subtitle}</p>}
+    <div className="space-y-1">
+      <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight">
+        {icon}
+        {title}
+      </h2>
+      {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
     </div>
   );
 }
+
+const LIVE_DOT = (
+  <span className="relative flex h-2.5 w-2.5" aria-hidden>
+    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-live opacity-60 motion-reduce:hidden" />
+    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-live" />
+  </span>
+);
+
+const STEPS = [
+  { icon: UserPlus, title: "Follow artists", text: "Search any artist and tap Follow." },
+  { icon: Bell, title: "Get alerts", text: "We remind you before presales and general sales start." },
+  { icon: Ticket, title: "Buy from the seller", text: "We link you to Ticketmaster and other sites. TourTix doesn't sell tickets." },
+];
 
 export default async function Home({
   searchParams,
@@ -68,10 +86,10 @@ export default async function Home({
   const genre = isGenre(params.genre) ? params.genre : undefined;
 
   const hero = (
-    <section className="space-y-5 text-center">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Never miss a ticket drop</h1>
-        <p className="text-lg text-zinc-700 dark:text-zinc-300">
+    <section className="space-y-6 pt-4 text-center sm:pt-10">
+      <div className="space-y-3">
+        <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-5xl">Never miss a ticket drop</h1>
+        <p className="mx-auto max-w-xl text-lg text-muted">
           Every tour date, presale, and on-sale time for your artists, in one place. Free.
         </p>
       </div>
@@ -79,21 +97,17 @@ export default async function Home({
         <SearchBar defaultValue={q} />
       </div>
       {!q && (
-        <ol className="mx-auto grid max-w-3xl gap-3 text-left sm:grid-cols-3">
-          {[
-            ["⭐", "Follow artists", "Search any artist and tap Follow."],
-            ["🔔", "Get alerts", "We remind you before presales and general sales start."],
-            ["🎟️", "Buy from the seller", "We link you to Ticketmaster and other sites. TourTix doesn't sell tickets."],
-          ].map(([icon, title, text], i) => (
-            <li key={title} className="flex gap-3 rounded-2xl bg-violet-50 p-4 dark:bg-violet-950/40">
-              <span className="text-2xl" aria-hidden="true">
-                {icon}
+        <ol className="mx-auto grid max-w-3xl gap-6 pt-4 text-left sm:grid-cols-3">
+          {STEPS.map(({ icon: Icon, title, text }, i) => (
+            <li key={title} className="flex gap-3 sm:flex-col">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent">
+                <Icon size={20} aria-hidden />
               </span>
               <span>
                 <span className="block font-semibold">
                   {i + 1}. {title}
                 </span>
-                <span className="block text-sm text-zinc-700 dark:text-zinc-300">{text}</span>
+                <span className="block text-sm text-muted">{text}</span>
               </span>
             </li>
           ))}
@@ -112,10 +126,10 @@ export default async function Home({
       <div className="space-y-8">
         {hero}
         <section className="space-y-4">
-          <h2 className="text-lg font-semibold">
+          <h2 className="text-xl font-bold tracking-tight">
             {results.length ? `Results for “${q}”` : `No artists found for “${q}”`}
           </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-x-4 lg:grid-cols-4">
             {results.map((a) => (
               <ArtistCard key={a.id} artist={a} following={followState(a.id)} />
             ))}
@@ -142,19 +156,21 @@ export default async function Home({
       {hero}
 
       {soon.length > 0 && (
-        <section className="space-y-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/40">
-          <h2 className="font-semibold">⏰ Dropping in the next 24 hours</h2>
-          <ul className="space-y-2">
+        <section className="space-y-3 rounded-3xl bg-surface p-5 sm:p-6">
+          <h2 className="flex items-center gap-2 font-semibold">
+            <Clock size={18} aria-hidden className="text-accent" /> Dropping in the next 24 hours
+          </h2>
+          <ul className="divide-y divide-line">
             {soon.map((d) => (
               <li key={d.artistId}>
                 <Link
                   href={`/artists/${d.artistId}`}
-                  className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 rounded-lg bg-white px-3 py-2 hover:bg-amber-100/50 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+                  className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-2.5 transition hover:opacity-80"
                 >
                   <span className="font-semibold">{d.artistName}</span>
-                  <span className="text-sm">
+                  <span className="text-sm font-medium">
                     <Countdown to={d.sale.start} label={d.sale.label} />
-                    <span className="block text-right text-xs text-zinc-600 dark:text-zinc-400">
+                    <span className="block text-right text-xs font-normal text-muted">
                       {fmtDateTime(d.sale.start, d.show.timezone)}
                     </span>
                   </span>
@@ -174,11 +190,7 @@ export default async function Home({
             key={g ?? "all"}
             href={genreLink(g)}
             scroll={false}
-            className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-sm ${
-              g === genre
-                ? "border-violet-600 bg-violet-600 text-white"
-                : "border-zinc-300 hover:border-violet-500 dark:border-zinc-700"
-            }`}
+            className={`${chip} ${g === genre ? chipOn : chipOff}`}
           >
             {g ?? "All music"}
           </Link>
@@ -194,7 +206,7 @@ export default async function Home({
           {mine.drops.length ? (
             <DropList drops={mine.drops} />
           ) : (
-            <p className="rounded-xl border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-600 dark:text-zinc-400 dark:border-zinc-700">
+            <p className="rounded-3xl bg-surface p-6 text-center text-sm text-muted">
               {mine.followsAnyone ? (
                 "No ticket sales coming up for your artists in the next 2 weeks."
               ) : (
@@ -208,7 +220,8 @@ export default async function Home({
       {live.presales.length > 0 && (
         <section className="space-y-4">
           <SectionHeading
-            title="🔥 Presales happening now"
+            icon={LIVE_DOT}
+            title="Presales happening now"
             subtitle="Open right now. Most need a code, sign-up, or membership."
           />
           <LiveList items={live.presales} />
@@ -217,7 +230,10 @@ export default async function Home({
 
       {live.justOnSale.length > 0 && (
         <section className="space-y-4">
-          <SectionHeading title="✅ Just went on sale" subtitle="General sales that opened in the last 2 days" />
+          <SectionHeading
+            icon={<CircleCheck size={20} aria-hidden className="text-live" />}
+            title="Just went on sale"
+            subtitle="General sales that opened in the last 2 days" />
           <LiveList items={live.justOnSale} />
         </section>
       )}
@@ -235,7 +251,7 @@ export default async function Home({
       {popular.length > 0 && (
         <section className="space-y-4">
           <SectionHeading title={genre ? `Popular ${genre} artists on tour` : "Popular artists on tour"} />
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-x-4 lg:grid-cols-4">
             {popular.map((a) => (
               <ArtistCard key={a.id} artist={a} nextSale={a.nextSale} following={followState(a.id)} />
             ))}
@@ -244,7 +260,7 @@ export default async function Home({
       )}
 
       {genre && drops.length === 0 && popular.length === 0 && (
-        <p className="text-center text-zinc-600 dark:text-zinc-400">No {genre} tours found right now. Try another genre.</p>
+        <p className="text-center text-muted">No {genre} tours found right now. Try another genre.</p>
       )}
 
       {announced.length > 0 && (
@@ -255,10 +271,10 @@ export default async function Home({
               <li key={a.artistId}>
                 <Link
                   href={`/artists/${a.artistId}`}
-                  className="inline-block rounded-full border border-zinc-300 px-4 py-2 text-sm hover:border-violet-500 dark:border-zinc-700"
+                  className="inline-block rounded-full bg-surface px-4 py-2 text-sm transition hover:bg-surface-2"
                 >
                   <span className="font-semibold">{a.artistName}</span>{" "}
-                  <span className="text-zinc-600 dark:text-zinc-400">
+                  <span className="text-muted">
                     +{a.newShows} {a.newShows === 1 ? "show" : "shows"}
                   </span>
                 </Link>
@@ -269,8 +285,8 @@ export default async function Home({
       )}
 
       {!userId && (
-        <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
-          <Link href="/my-artists" className="text-violet-600 hover:underline">
+        <p className="text-center text-sm text-muted">
+          <Link href="/my-artists" className={linkAccent}>
             Sign in
           </Link>{" "}
           to follow artists and get alerts when their tickets go on sale.

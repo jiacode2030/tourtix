@@ -17,7 +17,7 @@ import { livePresales } from "@/lib/live";
 import { hasLocation, isNear } from "@/lib/geo";
 import { upcomingSaleStarts } from "@/lib/sales";
 import type { Show } from "@/lib/types";
-import { btnSecondary } from "@/lib/ui";
+import { btnSecondary, STAGE_LIGHTS } from "@/lib/ui";
 import { getProfile, hasNotifications, isFavorite, locationOf } from "@/lib/user-data";
 
 export async function generateMetadata({
@@ -48,9 +48,6 @@ type FilterKey = (typeof FILTERS)[number]["key"];
 const FOREVER = Number.MAX_SAFE_INTEGER;
 
 // Shown when Ticketmaster has no artist photo.
-const STAGE_LIGHTS =
-  "radial-gradient(ellipse at 30% 20%, rgba(255,214,140,.9), transparent 35%), radial-gradient(ellipse at 75% 15%, rgba(120,160,255,.85), transparent 35%), radial-gradient(ellipse at 55% 75%, rgba(255,90,140,.5), transparent 45%), linear-gradient(180deg,#1b1b2b,#0b0b12)";
-
 export default async function ArtistPage({
   params,
   searchParams,

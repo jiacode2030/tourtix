@@ -97,16 +97,16 @@ export default function NotificationHelpPage() {
   return (
     <article className="mx-auto max-w-2xl space-y-8">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Not seeing notifications?</h1>
-        <p className="text-zinc-600 dark:text-zinc-400">
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Not seeing notifications?</h1>
+        <p className="text-muted">
           If TourTix says &ldquo;Test sent&rdquo; but nothing pops up, your device or browser is
           hiding it. Find your device below. After changing a setting, go to{" "}
-          <Link href="/settings" className="text-violet-600 hover:underline">
+          <Link href="/settings" className="font-medium text-accent hover:underline">
             Settings
           </Link>
           , turn notifications off and on again, and send another test.
         </p>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="text-sm text-muted">
           Also check your notification center: the alert may already be there.
         </p>
       </div>
@@ -116,7 +116,7 @@ export default function NotificationHelpPage() {
           <a
             key={s.id}
             href={`#${s.id}`}
-            className="rounded-full border border-zinc-300 px-3 py-1 hover:border-violet-500 hover:text-violet-600 dark:border-zinc-700"
+            className="rounded-full bg-surface px-4 py-2 font-medium transition hover:bg-surface-2"
           >
             {s.title}
           </a>
@@ -124,8 +124,8 @@ export default function NotificationHelpPage() {
       </nav>
 
       {sections.map((s) => (
-        <section key={s.id} id={s.id} className="scroll-mt-6 space-y-3">
-          <h2 className="text-xl font-semibold">{s.title}</h2>
+        <section key={s.id} id={s.id} className="scroll-mt-20 space-y-3">
+          <h2 className="text-xl font-bold tracking-tight">{s.title}</h2>
           <ol className="list-decimal space-y-2 pl-6 leading-relaxed">
             {s.steps.map((step, i) => (
               <li key={i}>{step}</li>

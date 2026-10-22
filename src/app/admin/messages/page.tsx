@@ -11,27 +11,27 @@ export default async function AdminMessagesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Contact messages</h1>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Contact messages</h1>
+        <p className="text-sm text-muted">
           Only you can see this page. Content removal requests must be handled within 24 hours.
           Turn on notifications in Settings to get alerted when a message arrives.
         </p>
       </div>
-      {messages.length === 0 && <p className="text-zinc-600 dark:text-zinc-400">No messages yet.</p>}
+      {messages.length === 0 && <p className="text-muted">No messages yet.</p>}
       <ul className="space-y-3">
         {messages.map((m) => (
-          <li key={m.id} className="space-y-2 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+          <li key={m.id} className="space-y-2 rounded-3xl bg-surface p-5">
             <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-              <span className={`font-semibold ${m.reason === "removal" ? "text-rose-600" : ""}`}>
+              <span className={`font-semibold ${m.reason === "removal" ? "text-red-600 dark:text-red-400" : ""}`}>
                 {reasonLabel(m.reason)}
               </span>
-              <span className="text-zinc-600 dark:text-zinc-400">{m.createdAt.toLocaleString("en-US", { timeZone: "America/New_York" })} ET</span>
+              <span className="text-muted">{m.createdAt.toLocaleString("en-US", { timeZone: "America/New_York" })} ET</span>
             </div>
             <p className="whitespace-pre-wrap">{m.message}</p>
             <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-              <span className="text-zinc-600 dark:text-zinc-400">
+              <span className="text-muted">
                 {m.email ? (
-                  <a href={`mailto:${m.email}`} className="text-violet-600 hover:underline">
+                  <a href={`mailto:${m.email}`} className="font-medium text-accent hover:underline">
                     Reply to {m.email}
                   </a>
                 ) : (
@@ -44,7 +44,7 @@ export default async function AdminMessagesPage() {
                   await deleteContactMessage(m.id);
                 }}
               >
-                <button type="submit" className="text-rose-600 hover:underline">
+                <button type="submit" className="text-red-600 dark:text-red-400 hover:underline">
                   Delete
                 </button>
               </form>

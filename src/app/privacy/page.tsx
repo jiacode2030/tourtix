@@ -113,7 +113,7 @@ export default function PrivacyPage() {
         access, correct, or delete your personal information. You can view and change your
         followed artists and location on the site, and delete everything from Settings.
         {" "}For any other request, use our{" "}
-        <a href="/contact?reason=privacy" className="text-violet-600 hover:underline">
+        <a href="/contact?reason=privacy" className="font-medium text-accent hover:underline">
           contact form
         </a>
         .
