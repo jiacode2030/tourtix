@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { rankArtists } from "./rank";
 import { sampleArtists, sampleShows } from "./sample-data";
 import { mergeShows, sgGetShows } from "./seatgeek";
 import { justWentOnSale, livePresales } from "./live";
@@ -21,7 +22,7 @@ export const usingSampleData = !process.env.TICKETMASTER_API_KEY;
 export async function searchArtists(query: string): Promise<Artist[]> {
   if (usingSampleData) {
     const q = query.toLowerCase();
-    return sampleArtists.filter((a) => a.name.toLowerCase().includes(q));
+    return rankArtists(query, sampleArtists.filter((a) => a.name.toLowerCase().includes(q)));
   }
   return tmSearchArtists(query);
 }

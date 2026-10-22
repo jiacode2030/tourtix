@@ -1,5 +1,6 @@
 import { apiFetch } from "./http";
 import { cleanUrl, sellerName } from "./links";
+import { rankArtists } from "./rank";
 import { presaleDisplayName } from "./presale-names";
 import { computeStatus } from "./status";
 import type { Artist, Presale, Show, ShowExtras } from "./types";
@@ -112,9 +113,11 @@ export async function tmSearchArtists(query: string): Promise<Artist[]> {
   const data = await tm("/attractions.json", {
     keyword: query,
     classificationName: "music",
-    size: "20",
+    size: "50",
   });
-  return (data._embedded?.attractions ?? []).map(toArtist);
+  // A wide net, then our own ranking: Ticketmaster's order can bury the artist
+  // people mean ("calvin" -> Calvin Harris) under tributes and other matches.
+  return rankArtists(query, (data._embedded?.attractions ?? []).map(toArtist)).slice(0, 24);
 }
 
 export async function tmGetArtist(id: string): Promise<Artist | null> {
@@ -246,5 +249,5 @@ export async function tmSuggestArtists(query: string, debug?: SuggestDebug): Pro
   } catch (err) {
     debug?.push({ source: "keyword search", count: 0, error: String(err) });
   }
-  return found.slice(0, 6);
+  return rankArtists(query, found).slice(0, 6);
 }
