@@ -3,6 +3,7 @@ export const REASONS = {
   removal: "Content removal request",
   privacy: "Privacy or data request",
   bug: "Something's broken",
+  data: "Wrong or missing show info",
 } as const;
 
 export type Reason = keyof typeof REASONS;

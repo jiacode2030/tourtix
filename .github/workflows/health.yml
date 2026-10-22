@@ -103,3 +103,7 @@ jobs:
         run: |
           curl -s --max-time 30 "$SITE/" | grep -q 'aria-label="Help"' || { echo "::error::Help button missing from homepage"; exit 1; }
           curl -s --max-time 30 "$SITE/faq" | grep -q "Take the quick tour" || { echo "::error::FAQ page missing the tour button"; exit 1; }
+
+      - name: Report-a-problem link prefills the form
+        run: |
+          curl -s --max-time 30 "$SITE/contact?reason=data&about=Test%20Artist%2C%20Test%20City" | grep -q "About: Test Artist, Test City" || { echo "::error::contact form did not prefill the show details"; exit 1; }

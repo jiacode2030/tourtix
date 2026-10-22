@@ -3,6 +3,7 @@ import { Lock } from "lucide-react";
 import type { Metadata } from "next";
 import { PassportForm } from "@/components/PassportForm";
 import { PassportHowItWorks } from "@/components/PassportHowItWorks";
+import { PassportPlans } from "@/components/PassportPlans";
 import { ShareCard } from "@/components/ShareCard";
 import { SignInPrompt } from "@/components/SignInPrompt";
 import { StampCard } from "@/components/StampCard";
@@ -73,6 +74,8 @@ export default async function PassportPage({ searchParams }: { searchParams: Pro
           )}
         </section>
       )}
+
+      <PassportPlans />
 
       <PassportForm error={error ? (errors[error] ?? null) : null} />
 

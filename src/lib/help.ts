@@ -37,7 +37,7 @@ export const TOUR_STEPS: TourStep[] = [
     id: "shows",
     icon: "shows",
     title: "Tap a show for everything",
-    text: "Each show has the sale times, a Remind me button for your calendar, and a link to the seller. We don't sell tickets: you buy and pay on the seller's site.",
+    text: "Each show has the sale times, a Remind me button for your calendar, a Mark as going button (saved only on your device), and a link to the seller. We don't sell tickets: you buy and pay on the seller's site.",
   },
   {
     id: "presales",

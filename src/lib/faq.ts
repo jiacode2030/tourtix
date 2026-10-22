@@ -52,6 +52,11 @@ export const FAQ_GROUPS: FaqGroup[] = [
         link: { href: "/settings#notifications", label: "Open notification settings" },
       },
       {
+        id: "quiet-hours",
+        q: "Can I stop alerts from waking me at night?",
+        a: "Use your phone's Do Not Disturb or Focus schedule. It silences all notifications overnight, and they'll be waiting in your notification list in the morning. TourTix doesn't have its own quiet hours, so a late-night sale reminder isn't held back from you unless your phone does it.",
+      },
+      {
         id: "no-alert",
         q: "Why didn't I get an alert?",
         a: "The usual causes are notifications being blocked in your browser or phone settings, Do Not Disturb or Focus being on, or (on iPhone) TourTix not being added to the Home Screen. Alerts are also only checked about once an hour. The help page walks through each device.",
@@ -119,6 +124,12 @@ export const FAQ_GROUPS: FaqGroup[] = [
   {
     title: "Your data",
     items: [
+      {
+        id: "going",
+        q: "What does \"Mark as going\" do?",
+        a: "It remembers a show on your own phone or computer, so you can find it later. It's saved only in your browser and never sent to TourTix, and it works without an account. After the show, your passport page asks \"Did you go?\" and can turn it into a stamp. Clearing your browser data removes these reminders.",
+        link: { href: "/passport", label: "Open your passport" },
+      },
       {
         id: "passport",
         q: "What is the concert passport?",

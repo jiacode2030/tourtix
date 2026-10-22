@@ -1,4 +1,4 @@
-import { ChevronDown, MapPin, Ticket } from "lucide-react";
+import { ChevronDown, Flag, MapPin, Ticket } from "lucide-react";
 import Link from "next/link";
 import { fmtDate, fmtDateTime, zonedTimeToUtc } from "@/lib/format";
 import { earliestForYou } from "@/lib/presale-access";
@@ -8,6 +8,7 @@ import type { SellerLink, Show } from "@/lib/types";
 import { btnPrimary } from "@/lib/ui";
 import { AddToCalendar, type CalendarEvent } from "./AddToCalendar";
 import { Countdown } from "./Countdown";
+import { GoingButton } from "./GoingButton";
 import { PresaleBadge } from "./PresaleBadge";
 import { ShareButton } from "./ShareButton";
 import { statusLabel } from "@/lib/status";
@@ -303,9 +304,24 @@ export function ShowRow({
             )}
             {nextSale && canBuy && concert && <AddToCalendar label="Add concert to calendar" event={concert} />}
             <ShareButton title={`${artistName} – ${place}, ${fmtDate(show.date)}`} path={`/artists/${artistId}#show-${show.id}`} />
+            {show.date && (
+              <GoingButton
+                plan={{ id: show.id, artistId, artistName, date: show.date, city: show.city, venue: show.venue }}
+              />
+            )}
           </div>
           {canBuy && <OtherSites artistName={artistName} show={show} />}
           <Details show={show} memberships={memberships} />
+          <p>
+            <Link
+              href={`/contact?reason=data&about=${encodeURIComponent(
+                `${artistName}, ${[show.venue, place].filter(Boolean).join(", ")}, ${fmtDate(show.date)} (show ${show.id})`.slice(0, 190),
+              )}`}
+              className="inline-flex min-h-9 items-center gap-1.5 text-xs text-muted hover:text-fg hover:underline"
+            >
+              <Flag size={13} aria-hidden /> Report a problem with this show
+            </Link>
+          </p>
         </div>
       </details>
     </li>

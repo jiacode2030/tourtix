@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Privacy Policy" };
 
 export default function PrivacyPage() {
   return (
-    <LegalPage title="Privacy Policy" updated="October 23, 2026">
+    <LegalPage title="Privacy Policy" updated="October 22, 2026">
       <p>
         This policy explains what information TourTix collects and how it is used. We will update
         this page whenever that changes, and the date above will change with it.
@@ -82,6 +82,14 @@ export default function PrivacyPage() {
       <p>
         If you pick light or dark mode, your choice is saved in your browser&apos;s local storage
         on your device so we can remember it. It never leaves your device.
+      </p>
+      <p>
+        If you tap &ldquo;Mark as going&rdquo; on a show, the show (artist, date, city, and venue) is
+        saved the same way, only in your browser&apos;s local storage on your device. We don&apos;t
+        receive it, store it on our servers, or see it. It works without an account. Tap the button
+        again, remove it from your passport page, or clear your browser&apos;s site data to delete
+        it. If you later tap &ldquo;Yes, stamp it&rdquo;, the concert is added to your passport as
+        described above.
       </p>
       <p>
         Third parties may place or read their own cookies and collect information directly from

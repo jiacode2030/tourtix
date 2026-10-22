@@ -15,9 +15,11 @@ const errors: Record<string, string> = {
 export default async function ContactPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sent?: string; error?: string; reason?: string }>;
+  searchParams: Promise<{ sent?: string; error?: string; reason?: string; about?: string }>;
 }) {
-  const { sent, error, reason } = await searchParams;
+  const { sent, error, reason, about: aboutRaw } = await searchParams;
+  // From a show's "Report a problem" link: tells us which show, so you don't have to.
+  const about = aboutRaw?.replace(/\s+/g, " ").trim().slice(0, 200) || null;
   if (sent) {
     return (
       <div className="mx-auto max-w-xl space-y-3 py-12 text-center">
@@ -49,7 +51,15 @@ export default async function ContactPage({
         </label>
         <label className="block space-y-1">
           <span className="text-sm font-medium">Message</span>
-          <textarea name="message" required minLength={5} maxLength={3000} rows={6} className={`${field} py-3`} />
+          <textarea
+            name="message"
+            required
+            minLength={5}
+            maxLength={3000}
+            rows={6}
+            defaultValue={about ? `About: ${about}\n\nWhat's wrong: ` : undefined}
+            className={`${field} py-3`}
+          />
         </label>
         <label className="block space-y-1">
           <span className="text-sm font-medium">Your email (optional, only if you want a reply)</span>
