@@ -80,8 +80,9 @@ export default function PrivacyPage() {
         not use advertising cookies or tracking pixels, and we don&apos;t show ads.
       </p>
       <p>
-        If you pick light or dark mode, your choice is saved in your browser&apos;s local storage
-        on your device so we can remember it. It never leaves your device.
+        If you pick light or dark mode, or dismiss or finish the welcome tour, your choice is saved
+        in your browser&apos;s local storage on your device so we can remember it. It never leaves
+        your device.
       </p>
       <p>
         If you tap &ldquo;Mark as going&rdquo; on a show, the show (artist, date, city, and venue) is
