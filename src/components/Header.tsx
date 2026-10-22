@@ -1,10 +1,12 @@
+import { LogOut, Menu, Search } from "lucide-react";
 import Link from "next/link";
 import { auth, signOut } from "@/auth";
 import { CloseOnNavigate } from "./CloseOnNavigate";
 import { SignInPrompt } from "./SignInPrompt";
+import { ThemeToggle } from "./ThemeToggle";
 
-const navLink = "font-medium hover:text-violet-600";
-const menuLink = "block px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800";
+const navLink = "rounded-full px-3 py-2 text-sm font-medium text-muted hover:bg-surface hover:text-fg";
+const menuLink = "flex min-h-12 items-center px-4 text-[15px] hover:bg-surface";
 
 async function signOutAction() {
   "use server";
@@ -14,9 +16,9 @@ async function signOutAction() {
 function Avatar({ name, image }: { name?: string | null; image?: string | null }) {
   return image ? (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={image} alt="" referrerPolicy="no-referrer" className="h-7 w-7 rounded-full" />
+    <img src={image} alt="" referrerPolicy="no-referrer" className="h-8 w-8 rounded-full" />
   ) : (
-    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-violet-600 text-xs text-white">
+    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-2 text-sm font-semibold">
       {(name ?? "?").charAt(0)}
     </span>
   );
@@ -26,18 +28,18 @@ export async function Header() {
   const session = await auth();
   const user = session?.user;
   return (
-    <header className="border-b border-zinc-200 dark:border-zinc-800">
-      <nav className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4">
+    <header className="sticky top-0 z-30 border-b border-line bg-bg/85 backdrop-blur">
+      <nav className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-4">
         <Link href="/" className="text-xl font-bold tracking-tight">
-          Tour<span className="text-violet-600">Tix</span>
+          TourTix
         </Link>
 
-        {/* Computers and tablets: links in a row. */}
-        <div className="hidden items-center gap-4 whitespace-nowrap text-sm sm:flex">
+        {/* Computers and tablets */}
+        <div className="hidden items-center gap-1 sm:flex">
           <Link href="/concerts" className={navLink}>
             Concerts
           </Link>
-          {user ? (
+          {user && (
             <>
               <Link href="/my-artists" className={navLink}>
                 My Artists
@@ -45,57 +47,67 @@ export async function Header() {
               <Link href="/settings" className={navLink}>
                 Settings
               </Link>
-              <form action={signOutAction}>
-                <button
-                  type="submit"
-                  title={`Signed in as ${user.email ?? user.name ?? "you"}`}
-                  className={`flex items-center gap-2 ${navLink}`}
-                >
-                  <Avatar name={user.name} image={user.image} />
-                  Sign out
-                </button>
-              </form>
             </>
+          )}
+          <ThemeToggle />
+          {user ? (
+            <form action={signOutAction}>
+              <button type="submit" title={`Signed in as ${user.email ?? user.name ?? "you"}. Sign out`} className="ml-1 flex items-center">
+                <Avatar name={user.name} image={user.image} />
+              </button>
+            </form>
           ) : (
             <SignInPrompt label="Sign in" redirectTo="/my-artists" />
           )}
         </div>
 
-        {/* Phones: a menu button. */}
-        <CloseOnNavigate className="relative sm:hidden">
-          <summary className="flex cursor-pointer list-none items-center gap-2 rounded-lg border border-zinc-300 px-3 py-1.5 text-sm font-medium dark:border-zinc-700">
-            {user && <Avatar name={user.name} image={user.image} />}
-            <span aria-hidden="true">☰</span> Menu
-          </summary>
-          <div className="absolute right-0 z-30 mt-2 w-56 overflow-hidden rounded-xl border border-zinc-200 bg-white text-sm shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
-            <Link href="/" className={menuLink}>
-              Search artists
-            </Link>
-            <Link href="/concerts" className={menuLink}>
-              Concerts near you
-            </Link>
-            {user ? (
-              <>
-                <Link href="/my-artists" className={menuLink}>
-                  My Artists
-                </Link>
-                <Link href="/settings" className={menuLink}>
-                  Settings &amp; notifications
-                </Link>
-                <form action={signOutAction} className="border-t border-zinc-200 dark:border-zinc-700">
-                  <button type="submit" className={`${menuLink} w-full text-left`}>
-                    Sign out
-                    <span className="block truncate text-xs text-zinc-600 dark:text-zinc-400">{user.email}</span>
+        {/* Phones */}
+        <div className="flex items-center gap-1 sm:hidden">
+          <Link href="/" aria-label="Search artists" className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-surface">
+            <Search size={20} aria-hidden />
+          </Link>
+          <CloseOnNavigate className="relative">
+            <summary
+              aria-label="Menu"
+              className="flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-full hover:bg-surface"
+            >
+              {user ? <Avatar name={user.name} image={user.image} /> : <Menu size={22} aria-hidden />}
+            </summary>
+            <div className="absolute right-0 z-40 mt-2 w-64 overflow-hidden rounded-2xl border border-line bg-bg py-1 shadow-xl">
+              <Link href="/concerts" className={menuLink}>
+                Concerts near you
+              </Link>
+              {user ? (
+                <>
+                  <Link href="/my-artists" className={menuLink}>
+                    My Artists
+                  </Link>
+                  <Link href="/settings" className={menuLink}>
+                    Settings &amp; alerts
+                  </Link>
+                </>
+              ) : null}
+              <div className="border-t border-line px-2 py-1">
+                <ThemeToggle withLabel />
+              </div>
+              {user ? (
+                <form action={signOutAction} className="border-t border-line">
+                  <button type="submit" className={`${menuLink} w-full gap-3 text-left`}>
+                    <LogOut size={18} aria-hidden />
+                    <span>
+                      Sign out
+                      <span className="block truncate text-xs text-muted">{user.email}</span>
+                    </span>
                   </button>
                 </form>
-              </>
-            ) : (
-              <div className="border-t border-zinc-200 p-3 dark:border-zinc-700">
-                <SignInPrompt label="Sign in with Google" redirectTo="/my-artists" />
-              </div>
-            )}
-          </div>
-        </CloseOnNavigate>
+              ) : (
+                <div className="border-t border-line p-3">
+                  <SignInPrompt label="Sign in with Google" redirectTo="/my-artists" />
+                </div>
+              )}
+            </div>
+          </CloseOnNavigate>
+        </div>
       </nav>
     </header>
   );

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { currentUserId } from "@/auth";
 import { notFound } from "next/navigation";
 import { AutoRefresh } from "@/components/AutoRefresh";
+import { Bell, Plus } from "lucide-react";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { LastChecked } from "@/components/LastChecked";
 import { LivePresales } from "@/components/LivePresales";
@@ -16,6 +17,7 @@ import { livePresales } from "@/lib/live";
 import { hasLocation, isNear } from "@/lib/geo";
 import { upcomingSaleStarts } from "@/lib/sales";
 import type { Show } from "@/lib/types";
+import { btnSecondary } from "@/lib/ui";
 import { getProfile, hasNotifications, isFavorite, locationOf } from "@/lib/user-data";
 
 export async function generateMetadata({
@@ -44,6 +46,10 @@ const FILTERS = [
 type FilterKey = (typeof FILTERS)[number]["key"];
 
 const FOREVER = Number.MAX_SAFE_INTEGER;
+
+// Shown when Ticketmaster has no artist photo.
+const STAGE_LIGHTS =
+  "radial-gradient(ellipse at 30% 20%, rgba(255,214,140,.9), transparent 35%), radial-gradient(ellipse at 75% 15%, rgba(120,160,255,.85), transparent 35%), radial-gradient(ellipse at 55% 75%, rgba(255,90,140,.5), transparent 45%), linear-gradient(180deg,#1b1b2b,#0b0b12)";
 
 export default async function ArtistPage({
   params,
@@ -86,97 +92,92 @@ export default async function ArtistPage({
     d ? new Date(`${d}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "";
   const nextShow = shows.find((s) => s.status !== "cancelled");
 
+  const metaLine = [
+    artist.genre,
+    summary.count ? `${summary.count} ${summary.count === 1 ? "show" : "shows"}` : null,
+    summary.count > 1 && summary.firstDate
+      ? `${sameYear ? range(summary.firstDate).replace(/, \d{4}$/, "") : range(summary.firstDate)} – ${range(summary.lastDate)}`
+      : nextShow
+        ? fmtDate(nextShow.date)
+        : null,
+    located && summary.near ? `${summary.near} near you` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <AutoRefresh />
-      <Link href="/" className="inline-block text-sm text-zinc-600 dark:text-zinc-400 hover:text-violet-600">
-        ← Back to search
-      </Link>
-      <div className="flex items-center gap-4">
-        <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 text-3xl font-bold text-white">
-          {artist.imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={artist.imageUrl} alt="" className="h-full w-full object-cover" />
-          ) : (
-            artist.name.charAt(0)
-          )}
+
+      {/* Photo header: rounded card in light mode, full-bleed fade in dark mode. */}
+      <header className="relative -mx-4 -mt-6 sm:mx-0 sm:mt-0">
+        <div
+          className="relative mx-4 mt-4 h-56 overflow-hidden rounded-3xl bg-surface bg-cover bg-center sm:mx-0 sm:h-72 dark:mx-0 dark:mt-0 dark:h-80 dark:rounded-none sm:dark:rounded-3xl"
+          style={
+            artist.imageUrl
+              ? { backgroundImage: `url(${JSON.stringify(artist.imageUrl)})` }
+              : { background: STAGE_LIGHTS }
+          }
+          role="img"
+          aria-label={artist.imageUrl ? `${artist.name}` : undefined}
+        >
+          <div className="absolute inset-0 hidden bg-gradient-to-b from-transparent via-bg/30 to-bg dark:block" />
         </div>
-        <div className="min-w-0 flex-1">
-          <h1 className="text-3xl font-bold">{artist.name}</h1>
-          <p className="text-zinc-600 dark:text-zinc-400">
-            {artist.genre ?? "Music"}
-            {nextShow && ` · Next show ${fmtDate(nextShow.date)}`}
-          </p>
-          {summary.count > 1 && summary.firstDate && (
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              {summary.count} shows · {sameYear ? range(summary.firstDate).replace(/, \d{4}$/, "") : range(summary.firstDate)}
-              {" – "}
-              {range(summary.lastDate)}
-              {located && ` · ${summary.near} near you`}
-            </p>
-          )}
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Unofficial fan tool, not affiliated with {artist.name}.
-          </p>
+        <div className="px-4 pt-5 sm:px-0 dark:absolute dark:inset-x-0 dark:bottom-0 dark:pb-4 sm:dark:px-6">
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">{artist.name}</h1>
+          {metaLine && <p className="mt-1 text-[15px] text-muted">{metaLine}</p>}
         </div>
-      </div>
+      </header>
+
       <div className="space-y-3">
-        {userId ? (
-          <FavoriteButton artistId={artist.id} isFavorite={following} />
-        ) : (
-          <SignInPrompt label="☆ Sign in to follow" redirectTo={`/artists/${artist.id}`} />
-        )}
+        <div className="flex flex-wrap gap-3">
+          {userId ? (
+            <FavoriteButton artistId={artist.id} isFavorite={following} />
+          ) : (
+            <SignInPrompt label="Follow" icon={<Plus size={18} aria-hidden />} redirectTo={`/artists/${artist.id}`} />
+          )}
+          <Link href="/settings#notifications" className={btnSecondary}>
+            <Bell size={18} aria-hidden /> Alerts
+          </Link>
+        </div>
         {following && !notifying && (
-          <div className="flex flex-wrap items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm dark:border-amber-900 dark:bg-amber-950/40">
+          <Link
+            href="/settings#notifications"
+            className="flex items-center gap-3 rounded-2xl bg-surface p-4 text-sm hover:bg-surface-2"
+          >
+            <Bell size={20} aria-hidden className="shrink-0 text-accent" />
             <span className="flex-1">
-              🔔 Want an alert when {artist.name} announces shows or tickets go on sale?
+              Get an alert when {artist.name} announces shows or tickets go on sale.
+              <span className="block font-semibold text-accent">Turn on notifications</span>
             </span>
-            <Link
-              href="/settings#notifications"
-              className="rounded-lg bg-violet-600 px-3 py-1.5 font-medium text-white hover:bg-violet-700"
-            >
-              Turn on notifications
-            </Link>
-          </div>
+          </Link>
         )}
+        <p className="text-xs text-muted">Unofficial fan tool, not affiliated with {artist.name}.</p>
       </div>
 
       {liveNow.length > 0 && <LivePresales sales={liveNow} />}
       {drop && <NextDropCard artistName={artist.name} drop={drop} timeline={saleTimeline(drop.shows.map((d) => d.show))} />}
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">
-          Upcoming shows <span className="text-zinc-400">({shows.length})</span>
-        </h2>
+        <h2 className="text-xl font-semibold">Upcoming shows</h2>
         {shows.length > 0 && (
-          <nav className="flex flex-wrap gap-2" aria-label="Filter shows">
+          <nav className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0" aria-label="Filter shows">
             {FILTERS.filter((f) => f.key !== "near" || located).map((f) => (
               <Link
                 key={f.key}
                 href={f.key === "all" ? `/artists/${artist.id}` : `/artists/${artist.id}?filter=${f.key}`}
                 scroll={false}
-                className={`rounded-full border px-3 py-1 text-sm ${
-                  filter === f.key
-                    ? "border-violet-600 bg-violet-600 text-white"
-                    : "border-zinc-300 hover:border-violet-500 dark:border-zinc-700"
+                className={`flex min-h-9 shrink-0 items-center whitespace-nowrap rounded-full px-4 text-sm font-medium ${
+                  filter === f.key ? "bg-cta text-on-cta" : "bg-surface text-fg hover:bg-surface-2"
                 }`}
               >
-                {f.label} ({shows.filter(matches[f.key]).length})
+                {f.label} · {shows.filter(matches[f.key]).length}
               </Link>
             ))}
           </nav>
         )}
-        {shows.length > 0 && (
-          <p className="rounded-xl bg-zinc-50 px-3 py-2 text-sm text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
-            🛒 You buy on the seller&apos;s website. TourTix doesn&apos;t sell tickets.
-            <span className="block text-xs text-zinc-600 dark:text-zinc-400">
-              Updates automatically (up to 5 min old). <LastChecked at={checkedAt} /> Check the date,
-              seats, and total price on the seller&apos;s site before buying.
-            </span>
-          </p>
-        )}
         {visible.length ? (
-          <ul className="space-y-3">
+          <ul className="divide-y divide-line border-y border-line">
             {visible.map((s) => (
               <ShowRow
                 key={s.id}
@@ -189,8 +190,15 @@ export default async function ArtistPage({
             ))}
           </ul>
         ) : (
-          <p className="rounded-xl border border-dashed border-zinc-300 p-6 text-center text-zinc-600 dark:text-zinc-400 dark:border-zinc-700">
+          <p className="rounded-2xl bg-surface p-6 text-center text-muted">
             {shows.length ? "No shows match this filter." : "No upcoming shows right now."}
+          </p>
+        )}
+        {shows.length > 0 && (
+          <p className="text-xs text-muted">
+            Tap a show for tickets and details. You buy on the seller&apos;s website; TourTix
+            doesn&apos;t sell tickets. Updates automatically (up to 5 min old).{" "}
+            <LastChecked at={checkedAt} />
           </p>
         )}
       </section>

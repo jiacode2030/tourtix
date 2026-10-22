@@ -1,5 +1,6 @@
 "use client";
 
+import { Check, Share2 } from "lucide-react";
 import { useState } from "react";
 
 export function ShareButton({ title, path }: { title: string; path: string }) {
@@ -19,8 +20,9 @@ export function ShareButton({ title, path }: { title: string; path: string }) {
     setTimeout(() => setCopied(false), 2000);
   };
   return (
-    <button type="button" onClick={share} className="text-sm font-medium text-violet-600 hover:underline">
-      {copied ? "✓ Link copied" : "↗ Share"}
+    <button type="button" onClick={share} className="flex min-h-11 items-center gap-2 text-sm font-medium text-accent hover:underline">
+      {copied ? <Check size={18} aria-hidden /> : <Share2 size={18} aria-hidden />}
+      {copied ? "Link copied" : "Share"}
     </button>
   );
 }

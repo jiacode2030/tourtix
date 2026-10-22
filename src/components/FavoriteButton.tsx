@@ -1,28 +1,28 @@
 "use client";
 
-import { useTransition } from "react";
+import { Check, Plus } from "lucide-react";
+import { useOptimistic, useTransition } from "react";
 import { toggleFavorite } from "@/app/actions";
+import { btnPrimary, btnSecondary } from "@/lib/ui";
 
-export function FavoriteButton({
-  artistId,
-  isFavorite,
-}: {
-  artistId: string;
-  isFavorite: boolean;
-}) {
+export function FavoriteButton({ artistId, isFavorite }: { artistId: string; isFavorite: boolean }) {
   const [pending, startTransition] = useTransition();
+  const [following, setFollowing] = useOptimistic(isFavorite);
   return (
     <button
       type="button"
       disabled={pending}
-      onClick={() => startTransition(() => toggleFavorite(artistId, isFavorite))}
-      className={`rounded-lg px-4 py-2 text-sm font-medium transition disabled:opacity-60 ${
-        isFavorite
-          ? "border border-violet-600 text-violet-700 hover:bg-violet-50 dark:text-violet-300 dark:hover:bg-violet-950"
-          : "bg-violet-600 text-white hover:bg-violet-700"
-      }`}
+      aria-pressed={following}
+      onClick={() =>
+        startTransition(async () => {
+          setFollowing(!following);
+          await toggleFavorite(artistId, following);
+        })
+      }
+      className={following ? btnSecondary : btnPrimary}
     >
-      {isFavorite ? "★ Following" : "☆ Follow artist"}
+      {following ? <Check size={18} aria-hidden /> : <Plus size={18} aria-hidden />}
+      {following ? "Following" : "Follow"}
     </button>
   );
 }

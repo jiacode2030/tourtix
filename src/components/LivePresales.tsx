@@ -1,43 +1,46 @@
 import { fmtDateTime } from "@/lib/format";
 import type { LiveSale } from "@/lib/live";
 import { presaleHelp } from "@/lib/presale-help";
+import { btnPrimary } from "@/lib/ui";
 
 // "Presale happening now" on an artist page.
 export function LivePresales({ sales }: { sales: LiveSale[] }) {
   return (
-    <section className="space-y-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-900 dark:bg-emerald-950/40">
-      <h2 className="text-lg font-bold">🔥 {sales.length === 1 ? "Presale" : "Presales"} happening now</h2>
+    <section className="space-y-3">
+      <h2 className="flex items-center gap-2 text-xl font-semibold">
+        <span className="relative flex h-2.5 w-2.5" aria-hidden>
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-live opacity-60" />
+          <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-live" />
+        </span>
+        {sales.length === 1 ? "Presale happening now" : "Presales happening now"}
+      </h2>
       <ul className="space-y-3">
         {sales.map((sale) => {
           const first = sale.shows[0];
           const seller = first.links[0];
           const signup = first.presales.find((p) => p.name === sale.label && p.url)?.url;
           return (
-            <li key={sale.label} className="space-y-2 rounded-xl bg-white p-3 dark:bg-zinc-900">
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <span className="font-semibold">{sale.label}</span>
-                <span className="text-sm text-zinc-600 dark:text-zinc-400">
+            <li key={sale.label} className="space-y-3 rounded-3xl bg-surface p-5">
+              <div>
+                <p className="text-lg font-semibold">{sale.label}</p>
+                <p className="text-sm text-muted">
                   {sale.shows.length} {sale.shows.length === 1 ? "show" : "shows"}
                   {sale.endsAt && <> · ends {fmtDateTime(sale.endsAt, first.timezone)}</>}
-                </span>
+                </p>
               </div>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                <span className="font-medium">How to get in:</span> {presaleHelp(sale.label)}
+              <p className="text-sm">
+                <span className="font-semibold">How to get in: </span>
+                <span className="text-muted">{presaleHelp(sale.label)}</span>
               </p>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
                 {seller && (
-                  <a
-                    href={seller.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded-lg bg-violet-600 px-3 py-1.5 font-medium text-white hover:bg-violet-700"
-                  >
+                  <a href={seller.url} target="_blank" rel="noopener noreferrer" className={btnPrimary}>
                     Go to {seller.seller}
                   </a>
                 )}
                 {signup && (
-                  <a href={signup} target="_blank" rel="noopener noreferrer" className="font-medium text-violet-600 hover:underline">
-                    Presale details →
+                  <a href={signup} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-accent hover:underline">
+                    Presale details
                   </a>
                 )}
               </div>
@@ -45,9 +48,7 @@ export function LivePresales({ sales }: { sales: LiveSale[] }) {
           );
         })}
       </ul>
-      <p className="text-xs text-zinc-600 dark:text-zinc-400">
-        General guidance only; rules differ by tour. Always check the seller&apos;s presale details.
-      </p>
+      <p className="text-xs text-muted">General guidance only; rules differ by tour. Check the seller&apos;s presale details.</p>
     </section>
   );
 }

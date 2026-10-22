@@ -67,11 +67,11 @@ export function Countdown({
   if (current == null) return null;
   const left = new Date(to).getTime() - current;
   if (bare) {
-    return left <= 0 ? <span className="text-emerald-600">Live now</span> : <span className="tabular-nums">{format(left)}</span>;
+    return left <= 0 ? <span className="text-live">Live now</span> : <span className="tabular-nums">{format(left)}</span>;
   }
-  if (left <= 0) return <span className="font-medium text-emerald-600">{label} is live now</span>;
+  if (left <= 0) return <span className="font-medium text-live">{label} is live now</span>;
   return (
-    <span className="font-medium text-amber-700 dark:text-amber-400">
+    <span className="font-medium text-accent">
       {label} in <span className="tabular-nums">{format(left)}</span>
     </span>
   );

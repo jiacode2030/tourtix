@@ -27,8 +27,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Apply the saved or device theme before the page paints, so it never flashes. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem("theme");if(t==="dark"||(!t&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}`,
+          }}
+        />
         {/* impact.com (Vivid Seats affiliate) site ownership verification.
             impact.com's tag uses `value` rather than the usual `content`. */}
         <meta
@@ -39,7 +45,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} antialiased`}>
         <SampleBanner />
         <Header />
-        <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
+        <main className="mx-auto max-w-5xl px-4 pt-6 pb-12">{children}</main>
         <Footer />
         <Analytics />
       </body>

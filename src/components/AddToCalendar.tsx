@@ -1,5 +1,7 @@
 "use client";
 
+import { CalendarPlus } from "lucide-react";
+
 export type CalendarEvent = {
   title: string;
   start: string; // ISO, or YYYY-MM-DD when allDay
@@ -60,22 +62,22 @@ function downloadIcs(e: CalendarEvent) {
 export function AddToCalendar({ event, label }: { event: CalendarEvent; label: string }) {
   return (
     <details className="relative">
-      <summary className="cursor-pointer list-none text-sm font-medium text-violet-600 hover:underline">
-        📅 {label}
+      <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-medium text-accent hover:underline">
+        <CalendarPlus size={18} aria-hidden /> {label}
       </summary>
-      <div className="absolute left-0 z-10 mt-2 w-52 overflow-hidden rounded-lg border border-zinc-200 bg-white text-sm shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
+      <div className="absolute left-0 z-20 mt-1 w-56 overflow-hidden rounded-xl border border-line bg-bg text-sm shadow-xl">
         <a
           href={googleUrl(event)}
           target="_blank"
           rel="noopener noreferrer"
-          className="block px-4 py-2 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+          className="block px-4 py-3 hover:bg-surface"
         >
           Google Calendar
         </a>
         <button
           type="button"
           onClick={() => downloadIcs(event)}
-          className="block w-full px-4 py-2 text-left hover:bg-zinc-50 dark:hover:bg-zinc-800"
+          className="block w-full px-4 py-3 text-left hover:bg-surface"
         >
           Apple / Outlook (.ics)
         </button>

@@ -1,11 +1,13 @@
+import { ChevronDown, MapPin } from "lucide-react";
 import { fmtDate, fmtDateTime, zonedTimeToUtc } from "@/lib/format";
 import { upcomingSaleStarts } from "@/lib/sales";
 import { otherSiteSearches, type SearchLink } from "@/lib/search-links";
 import type { SellerLink, Show } from "@/lib/types";
+import { btnPrimary } from "@/lib/ui";
 import { AddToCalendar, type CalendarEvent } from "./AddToCalendar";
 import { Countdown } from "./Countdown";
 import { ShareButton } from "./ShareButton";
-import { StatusBadge } from "./StatusBadge";
+import { statusLabel } from "@/lib/status";
 
 const FOREVER = Number.MAX_SAFE_INTEGER;
 
@@ -24,86 +26,41 @@ function fmtPrice(l: SellerLink) {
   return l.currency && l.currency !== "USD" ? `${amount} ${l.currency}` : amount;
 }
 
-const sellerButton =
-  "rounded-lg bg-violet-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-violet-700";
-
 function SellerOptions({ links }: { links: SellerLink[] }) {
   const sorted = sortByPrice(links);
   const priced = sorted.filter((l) => l.allInPrice != null).length;
-
-  // No prices from any seller: one clear button per seller.
-  if (priced === 0) {
-    return (
-      <div className="grid gap-2 sm:grid-cols-2">
-        {sorted.map((l) => (
-          <a
-            key={l.seller}
-            href={l.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-xl bg-violet-600 px-4 py-3 text-center font-semibold text-white hover:bg-violet-700"
-          >
-            Get tickets on {l.seller} →
-          </a>
-        ))}
-      </div>
-    );
-  }
-
   return (
-    <ul className="divide-y divide-zinc-100 rounded-lg border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
+    <div className="grid gap-2 sm:grid-cols-2">
       {sorted.map((l, i) => {
         const price = fmtPrice(l);
+        const note = [price && `from ${price} incl. fees`, i === 0 && priced >= 2 && "cheapest"].filter(Boolean).join(" · ");
         return (
-          <li key={l.seller} className="flex items-center gap-3 px-3 py-2">
-            <span className="flex-1 text-sm font-medium">
-              {l.seller}
-              {i === 0 && priced >= 2 && (
-                <span className="ml-2 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                  Cheapest
-                </span>
-              )}
+          <a key={l.seller} href={l.url} target="_blank" rel="noopener noreferrer" className={`${btnPrimary} w-full py-2`}>
+            <span className="flex flex-col items-center leading-tight">
+              <span>Get tickets on {l.seller}</span>
+              {note && <span className="text-xs font-normal opacity-80">{note}</span>}
             </span>
-            <span className="text-right text-sm">
-              {price ? (
-                <>
-                  <span className="font-semibold">from {price}</span>
-                  <span className="block text-xs text-zinc-600 dark:text-zinc-400">incl. fees</span>
-                </>
-              ) : (
-                <span className="text-zinc-600 dark:text-zinc-400">See price on site</span>
-              )}
-            </span>
-            <a href={l.url} target="_blank" rel="noopener noreferrer" className={sellerButton}>
-              View
-            </a>
-          </li>
+          </a>
         );
       })}
-    </ul>
+    </div>
   );
 }
 
 function SiteLinks({ label, links }: { label: string; links: SearchLink[] }) {
   if (!links.length) return null;
   return (
-    <div>
-      <span className="text-zinc-600 dark:text-zinc-400">{label}: </span>
+    <p>
+      <span className="text-muted">{label}: </span>
       {links.map((l, i) => (
         <span key={l.name}>
           {i > 0 && " · "}
-          <a
-            href={l.url}
-            target="_blank"
-            rel="nofollow noopener noreferrer"
-            title={`Search ${l.name}`}
-            className="font-medium text-violet-600 hover:underline"
-          >
+          <a href={l.url} target="_blank" rel="nofollow noopener noreferrer" className="font-medium text-accent hover:underline">
             {l.name}
           </a>
         </span>
       ))}
-    </div>
+    </p>
   );
 }
 
@@ -111,11 +68,11 @@ function OtherSites({ artistName, show }: { artistName: string; show: Show }) {
   const { resale, official } = otherSiteSearches(artistName, show.city, show.links.map((l) => l.seller));
   if (!resale.length && !official.length) return null;
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-1">
       <h4 className="font-semibold">Search other ticket sites</h4>
       <SiteLinks label="Resale" links={resale} />
       <SiteLinks label="Other official sellers" links={official} />
-      <p className="text-xs text-zinc-600 dark:text-zinc-400">
+      <p className="text-xs text-muted">
         Opens each site&apos;s own search. Not checked by TourTix, so they may not have this show.
       </p>
     </div>
@@ -154,68 +111,75 @@ function Details({ show }: { show: Show }) {
   if (!presales.length && !extras.seatmapUrl && !hasFacts) return null;
 
   return (
-      <div className="space-y-4">
-        {presales.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="font-semibold">Presales</h4>
-            <ul className="space-y-2">
-              {presales.map((p, i) => (
-                <li key={i} className="rounded-md bg-white p-2 dark:bg-zinc-900">
-                  <div className="font-medium">{p.name}</div>
-                  {p.start && (
-                    <div className="text-zinc-600 dark:text-zinc-400">
-                      {fmtDateTime(p.start, show.timezone)}
-                      {p.end && ` – ${fmtDateTime(p.end, show.timezone)}`}
-                    </div>
-                  )}
-                  {p.description && <p className="mt-1 text-zinc-600 dark:text-zinc-400">{p.description}</p>}
-                  {p.url && (
-                    <a
-                      href={p.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-1 inline-block font-medium text-violet-600 hover:underline"
-                    >
-                      Sign up / presale details →
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-            <p className="text-xs text-zinc-600 dark:text-zinc-400">
-              Some presales (like Verified Fan) need you to register days ahead. Check the sign-up
-              link early.
-            </p>
-          </div>
-        )}
-        {extras.seatmapUrl && (
-          <div className="space-y-2">
-            <h4 className="font-semibold">Seat map</h4>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={extras.seatmapUrl}
-              alt={`Seat map for ${show.venue ?? "the venue"}`}
-              loading="lazy"
-              className="max-h-96 w-full rounded-md bg-white object-contain"
-            />
-          </div>
-        )}
-        {hasFacts && (
-          <dl className="space-y-2">
-            {facts
-              .filter(([, v]) => v)
-              .map(([k, v]) => (
-                <div key={k}>
-                  <dt className="font-semibold">{k}</dt>
-                  <dd className="whitespace-pre-line text-zinc-600 dark:text-zinc-400">{v}</dd>
-                </div>
-              ))}
-          </dl>
-        )}
-      </div>
+    <div className="space-y-4">
+      {presales.length > 0 && (
+        <div className="space-y-2">
+          <h4 className="font-semibold">Presales</h4>
+          <ul className="divide-y divide-line">
+            {presales.map((p, i) => (
+              <li key={i} className="py-2">
+                <div className="font-medium">{p.name}</div>
+                {p.start && (
+                  <div className="text-muted">
+                    {fmtDateTime(p.start, show.timezone)}
+                    {p.end && ` – ${fmtDateTime(p.end, show.timezone)}`}
+                  </div>
+                )}
+                {p.description && <p className="mt-1 text-muted">{p.description}</p>}
+                {p.url && (
+                  <a href={p.url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block font-medium text-accent hover:underline">
+                    Sign up / presale details
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+          <p className="text-xs text-muted">
+            Some presales (like Verified Fan) need you to register days ahead.
+          </p>
+        </div>
+      )}
+      {extras.seatmapUrl && (
+        <div className="space-y-2">
+          <h4 className="font-semibold">Seat map</h4>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={extras.seatmapUrl}
+            alt={`Seat map for ${show.venue ?? "the venue"}`}
+            loading="lazy"
+            className="max-h-96 w-full rounded-xl bg-white object-contain"
+          />
+        </div>
+      )}
+      {hasFacts && (
+        <dl className="space-y-2">
+          {facts
+            .filter(([, v]) => v)
+            .map(([k, v]) => (
+              <div key={k}>
+                <dt className="font-semibold">{k}</dt>
+                <dd className="whitespace-pre-line text-muted">{v}</dd>
+              </div>
+            ))}
+        </dl>
+      )}
+    </div>
   );
 }
 
+const statusTone: Record<string, string> = {
+  onsale: "text-live",
+  presale: "text-live",
+  announced: "text-accent",
+  listed: "text-muted",
+  offsale: "text-muted",
+  cancelled: "text-red-600 dark:text-red-400",
+  postponed: "text-amber-700 dark:text-amber-400",
+  rescheduled: "text-amber-700 dark:text-amber-400",
+};
+
+// One show as a clean row: date, city, venue, and status. Tapping it opens
+// the ticket buttons, reminders, other ticket sites, and venue details.
 export function ShowRow({
   show,
   artistId,
@@ -227,117 +191,87 @@ export function ShowRow({
   artistId: string;
   artistName: string;
   nearYou?: boolean;
-  // The page's "Next ticket drop" card already shows this show's next sale.
+  // The page's "Next ticket drop" card already counts down to this show's sale.
   coveredByDrop?: boolean;
 }) {
   const place = placeOf(show);
   const nextSale = upcomingSaleStarts(show, FOREVER)[0];
-  const showSale = nextSale && !coveredByDrop;
   const canBuy = show.status !== "cancelled" && show.status !== "offsale" && show.status !== "postponed";
   const concert = showEvent(show, artistName);
-  const hasMore =
-    canBuy ||
-    show.presales.some((p) => p.start || p.url || p.description) ||
-    Object.values(show.extras).some(Boolean);
+  const d = show.date ? new Date(`${show.date}T12:00:00Z`) : null;
+  const part = (opts: Intl.DateTimeFormatOptions) => d!.toLocaleDateString("en-US", { ...opts, timeZone: "UTC" });
 
   return (
-    <li
-      id={`show-${show.id}`}
-      className="scroll-mt-6 overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"
-    >
-      <div className="flex gap-4 p-4">
-        <DateTile date={show.date} />
-        <div className="min-w-0 flex-1 space-y-1.5">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <p className="text-lg font-semibold leading-snug">{place || "Location TBA"}</p>
-              {show.venue && <p className="truncate text-sm text-zinc-600 dark:text-zinc-400">{show.venue}</p>}
-            </div>
-            <StatusBadge status={show.status} />
+    <li id={`show-${show.id}`} className="scroll-mt-20">
+      <details className="group">
+        <summary className="flex min-h-[72px] cursor-pointer list-none items-center gap-4 py-3">
+          <div className="w-12 shrink-0 text-center">
+            {d ? (
+              <>
+                <div className="text-xs font-semibold uppercase text-muted">{part({ month: "short" })}</div>
+                <div className="text-2xl font-bold leading-tight">{part({ day: "numeric" })}</div>
+              </>
+            ) : (
+              <div className="text-xs font-semibold text-muted">TBA</div>
+            )}
           </div>
-          {nearYou && (
-            <span className="inline-block rounded-full bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-800 dark:bg-violet-950 dark:text-violet-300">
-              📍 Near you
-            </span>
-          )}
-          {nextSale && coveredByDrop && (
-            <p className="text-sm text-zinc-700 dark:text-zinc-300">
-              {nextSale.label}: {fmtDateTime(nextSale.start, show.timezone)}
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-base font-semibold">{place || "Location TBA"}</p>
+            <p className="truncate text-sm text-muted">
+              {show.venue}
+              {show.venue && " · "}
+              <span className={`font-medium ${statusTone[show.status] ?? "text-muted"}`}>
+                {nextSale && !coveredByDrop && show.status !== "presale" ? (
+                  <Countdown to={nextSale.start} label={nextSale.label} />
+                ) : (
+                  statusLabel[show.status]
+                )}
+              </span>
             </p>
-          )}
-          {showSale && (
-            <div className="text-sm">
-              <p className="text-zinc-700 dark:text-zinc-300">
-                {nextSale.label}: {fmtDateTime(nextSale.start, show.timezone)}
+            {nearYou && (
+              <p className="mt-0.5 flex items-center gap-1 text-xs font-medium text-accent">
+                <MapPin size={12} aria-hidden /> Near you
               </p>
-              <Countdown to={nextSale.start} label={nextSale.label} />
-            </div>
-          )}
-        </div>
-      </div>
-
-      {canBuy && show.links.length > 0 && (
-        <div className="px-4 pb-4">
-          <SellerOptions links={show.links} />
-        </div>
-      )}
-
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-zinc-100 px-4 py-3 text-sm dark:border-zinc-800">
-        {showSale ? (
-          <AddToCalendar
-            label="Remind me"
-            event={{
-              title: `${artistName} – ${nextSale.label}`,
-              start: nextSale.start,
-              end: new Date(new Date(nextSale.start).getTime() + 30 * 60 * 1000).toISOString(),
-              location: show.links[0]?.url,
-              details: `${artistName} at ${show.venue ?? place}, ${fmtDate(show.date)}.\n${show.links
-                .map((l) => `${l.seller}: ${l.url}`)
-                .join("\n")}`,
-            }}
-          />
-        ) : (
-          canBuy && concert && <AddToCalendar label="Add to calendar" event={concert} />
-        )}
-        <ShareButton
-          title={`${artistName} – ${place}, ${fmtDate(show.date)}`}
-          path={`/artists/${artistId}#show-${show.id}`}
-        />
-        {hasMore && (
-        <details className="group w-full">
-          <summary className="cursor-pointer list-none font-medium text-violet-600 hover:underline">
-            <span className="group-open:hidden">More ▾</span>
-            <span className="hidden group-open:inline">Less ▴</span>
-          </summary>
-          <div className="mt-3 space-y-4 rounded-xl bg-zinc-50 p-3 dark:bg-zinc-800/50">
-            {canBuy && <OtherSites artistName={artistName} show={show} />}
-            <Details show={show} />
-            {showSale && canBuy && concert && <AddToCalendar label="Add the concert itself to your calendar" event={concert} />}
+            )}
           </div>
-        </details>
-        )}
-      </div>
-    </li>
-  );
-}
+          <ChevronDown size={20} aria-hidden className="shrink-0 text-muted transition group-open:rotate-180" />
+        </summary>
 
-// Calendar-style date block: "NOV / 21 / Sat".
-function DateTile({ date }: { date: string | null }) {
-  if (!date) {
-    return (
-      <div className="flex w-14 shrink-0 flex-col items-center justify-center rounded-xl bg-violet-50 py-2 text-xs font-semibold text-violet-700 dark:bg-violet-950 dark:text-violet-300">
-        TBA
-      </div>
-    );
-  }
-  const d = new Date(`${date}T12:00:00Z`);
-  const part = (opts: Intl.DateTimeFormatOptions) => d.toLocaleDateString("en-US", { ...opts, timeZone: "UTC" });
-  return (
-    <div className="flex w-14 shrink-0 flex-col items-center rounded-xl bg-violet-50 py-2 text-violet-700 dark:bg-violet-950 dark:text-violet-300">
-      <span className="text-xs font-semibold uppercase">{part({ month: "short" })}</span>
-      <span className="text-2xl font-bold leading-none">{part({ day: "numeric" })}</span>
-      <span className="text-xs">{part({ weekday: "short" })}</span>
-      {d.getUTCFullYear() !== new Date().getUTCFullYear() && <span className="text-[10px] opacity-75">{d.getUTCFullYear()}</span>}
-    </div>
+        <div className="space-y-4 pb-5 pl-16 text-sm">
+          <p className="text-muted">
+            {d && part({ weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+            {nextSale && (
+              <>
+                <br />
+                {nextSale.label}: {fmtDateTime(nextSale.start, show.timezone)}
+              </>
+            )}
+          </p>
+          {canBuy && show.links.length > 0 && <SellerOptions links={show.links} />}
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            {nextSale ? (
+              <AddToCalendar
+                label="Remind me"
+                event={{
+                  title: `${artistName} – ${nextSale.label}`,
+                  start: nextSale.start,
+                  end: new Date(new Date(nextSale.start).getTime() + 30 * 60 * 1000).toISOString(),
+                  location: show.links[0]?.url,
+                  details: `${artistName} at ${show.venue ?? place}, ${fmtDate(show.date)}.\n${show.links
+                    .map((l) => `${l.seller}: ${l.url}`)
+                    .join("\n")}`,
+                }}
+              />
+            ) : (
+              canBuy && concert && <AddToCalendar label="Add to calendar" event={concert} />
+            )}
+            {nextSale && canBuy && concert && <AddToCalendar label="Add concert to calendar" event={concert} />}
+            <ShareButton title={`${artistName} – ${place}, ${fmtDate(show.date)}`} path={`/artists/${artistId}#show-${show.id}`} />
+          </div>
+          {canBuy && <OtherSites artistName={artistName} show={show} />}
+          <Details show={show} />
+        </div>
+      </details>
+    </li>
   );
 }

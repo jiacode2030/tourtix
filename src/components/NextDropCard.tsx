@@ -1,6 +1,7 @@
 import type { NextDrop, SaleStage } from "@/lib/drops";
 import { fmtDate, fmtDateTime } from "@/lib/format";
 import { presaleHelp } from "@/lib/presale-help";
+import { btnPrimary } from "@/lib/ui";
 import { AddToCalendar } from "./AddToCalendar";
 import { Countdown } from "./Countdown";
 
@@ -10,9 +11,9 @@ function place(d: NextDrop["focus"]) {
 
 function StageChip({ stage, timeZone }: { stage: SaleStage; timeZone: string | null }) {
   const styles = {
-    ended: "bg-zinc-100 text-zinc-500 line-through dark:bg-zinc-800",
-    live: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
-    upcoming: "bg-white text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300",
+    ended: "text-muted line-through",
+    live: "bg-live-soft text-live",
+    upcoming: "bg-bg text-fg",
   }[stage.state];
   const detail =
     stage.state === "live"
@@ -25,7 +26,7 @@ function StageChip({ stage, timeZone }: { stage: SaleStage; timeZone: string | n
           ? fmtDateTime(stage.start, timeZone)
           : "";
   return (
-    <li className={`rounded-full px-3 py-1 text-xs font-medium ${styles}`}>
+    <li className={`rounded-full px-3 py-1.5 text-xs font-medium ${styles}`}>
       {stage.label}
       {detail && <span className="font-normal"> · {detail}</span>}
     </li>
@@ -51,26 +52,27 @@ export function NextDropCard({
   const signup = focus.show.presales.find((p) => p.name === drop.label && p.url);
 
   return (
-    <section className="space-y-4 rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 to-fuchsia-50 p-5 dark:border-violet-900 dark:from-violet-950/50 dark:to-fuchsia-950/30">
-      <div className="space-y-1">
-        <p className="text-sm font-medium text-violet-700 dark:text-violet-300">🎟️ Next ticket drop</p>
-        <h2 className="text-xl font-bold">{drop.label}</h2>
-        <p className="text-4xl font-extrabold tracking-tight text-violet-700 sm:text-5xl dark:text-violet-300">
+    <section className="space-y-4 rounded-3xl bg-surface p-5 sm:p-6">
+      <div>
+        <p className="text-sm font-medium text-muted">Next ticket drop · {drop.label}</p>
+        <p className="mt-1 text-5xl font-bold tracking-tight">
           <Countdown to={focus.start} label={drop.label} bare />
         </p>
-        <p className="text-sm text-zinc-700 dark:text-zinc-300">
-          {drop.localTime} local time · {count === 1 ? `${place(focus)}, ${fmtDate(focus.show.date)}` : `${count} shows`}
+        <p className="mt-2 text-[15px] text-muted">
+          Opens {drop.localTime} (venue&apos;s local time)
+          <br />
+          {count === 1 ? `For the ${place(focus)} show on ${fmtDate(focus.show.date)}` : `For ${count} shows`}
         </p>
         {differentZones && (
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="mt-1 text-sm text-muted">
             Each city opens at its own local time.{" "}
             {focus.show.id === first.show.id ? (
               <>
-                Opens first in {place(first)} ({fmtDateTime(first.start, first.show.timezone)}).
+                {place(first)} opens first ({fmtDateTime(first.start, first.show.timezone)}).
               </>
             ) : (
               <>
-                The countdown is for your nearest show, {place(focus)} (
+                Counting down to your nearest show, {place(focus)} (
                 {fmtDateTime(focus.start, focus.show.timezone)}). {place(first)} opens first.
               </>
             )}
@@ -79,19 +81,15 @@ export function NextDropCard({
       </div>
 
       {drop.label !== "General sale" && (
-        <p className="rounded-lg bg-white/70 p-3 text-sm dark:bg-zinc-900/60">
-          <span className="font-medium">How to get in:</span> {presaleHelp(drop.label)}
+        <p className="rounded-2xl bg-bg p-4 text-sm">
+          <span className="font-semibold">How to get in: </span>
+          <span className="text-muted">{presaleHelp(drop.label)}</span>
         </p>
       )}
 
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
         {seller && (
-          <a
-            href={seller.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700"
-          >
+          <a href={seller.url} target="_blank" rel="noopener noreferrer" className={btnPrimary}>
             Go to {seller.seller}
           </a>
         )}
@@ -108,13 +106,8 @@ export function NextDropCard({
           }}
         />
         {signup?.url && (
-          <a
-            href={signup.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-medium text-violet-600 hover:underline"
-          >
-            Presale sign-up / details →
+          <a href={signup.url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-accent hover:underline">
+            Presale sign-up
           </a>
         )}
       </div>
@@ -126,9 +119,6 @@ export function NextDropCard({
           ))}
         </ul>
       )}
-      <p className="text-xs text-zinc-600 dark:text-zinc-400">
-        You buy on the seller&apos;s site. Times come from Ticketmaster and can change.
-      </p>
     </section>
   );
 }
