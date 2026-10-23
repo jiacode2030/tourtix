@@ -8,6 +8,7 @@ import { LocationForm } from "@/components/LocationForm";
 import { NotificationsToggle } from "@/components/NotificationsToggle";
 import { ReminderTips } from "@/components/ReminderTips";
 import { SignInPrompt } from "@/components/SignInPrompt";
+import { SignInNotice } from "@/components/SignInNotice";
 import { DEFAULT_RADIUS } from "@/lib/geo";
 import { MEMBERSHIPS } from "@/lib/presale-access";
 import { currentAdminId } from "@/lib/admin";
@@ -28,6 +29,7 @@ export default async function SettingsPage({
       <div className="space-y-4 py-12 text-center">
         <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
         <SignInPrompt label="Sign in with Google" redirectTo="/settings" />
+        <SignInNotice />
       </div>
     );
   }

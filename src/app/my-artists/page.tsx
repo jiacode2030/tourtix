@@ -7,6 +7,7 @@ import { AutoRefresh } from "@/components/AutoRefresh";
 import { GetStarted } from "@/components/GetStarted";
 import { InstallButton } from "@/components/InstallButton";
 import { SignInPrompt } from "@/components/SignInPrompt";
+import { SignInNotice } from "@/components/SignInNotice";
 import { SuggestedArtists } from "@/components/SuggestedArtists";
 import { getShows } from "@/lib/data";
 import { hasLocation, isNear } from "@/lib/geo";
@@ -30,6 +31,7 @@ export default async function MyArtistsPage({
         <h1 className="text-3xl font-bold tracking-tight">Follow your favorite artists</h1>
         <p className="text-muted">Sign in to see all your artists&apos; upcoming shows in one place.</p>
         <SignInPrompt label="Sign in with Google" redirectTo="/my-artists" />
+        <SignInNotice />
         <p className="mx-auto max-w-md text-sm text-muted">
           TourTix is free and doesn&apos;t sell tickets. We collect shows from ticket sites and link
           you to the seller to buy.

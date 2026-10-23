@@ -6,6 +6,7 @@ import { PassportHowItWorks } from "@/components/PassportHowItWorks";
 import { PassportPlans } from "@/components/PassportPlans";
 import { ShareCard } from "@/components/ShareCard";
 import { SignInPrompt } from "@/components/SignInPrompt";
+import { SignInNotice } from "@/components/SignInNotice";
 import { StampCard } from "@/components/StampCard";
 import { passportStats } from "@/lib/passport";
 import { listStamps } from "@/lib/user-data";
@@ -31,6 +32,7 @@ export default async function PassportPage({ searchParams }: { searchParams: Pro
           only you can see your stamps.
         </p>
         <SignInPrompt label="Sign in with Google" redirectTo="/passport" />
+        <SignInNotice />
       </div>
     );
   }

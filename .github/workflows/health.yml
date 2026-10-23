@@ -56,6 +56,9 @@ jobs:
           done
           curl -s --max-time 30 "$SITE/privacy" | grep -q "Ticketmaster" || { echo "::error::privacy policy missing data source"; exit 1; }
           curl -s --max-time 30 "$SITE/terms" | grep -q "within 24 hours" || { echo "::error::terms missing removal policy"; exit 1; }
+          for path in /my-artists /passport /settings; do
+            curl -s --max-time 30 "$SITE$path" | sed 's/<!-- -->//g' | grep -q "By signing in, you agree to our" || { echo "::error::sign-in terms notice missing on $path"; exit 1; }
+          done
           # Only look inside links: the footer's "not affiliated" text is fine.
           echo "$home" | grep -qiE 'href="[^"]*(aff=|affiliate_id|irclickid|clickid=)' && { echo "::error::affiliate links found; Ticketmaster's terms forbid earning from its data"; exit 1; } || true
 

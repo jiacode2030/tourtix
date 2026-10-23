@@ -10,6 +10,7 @@ import { LivePresales } from "@/components/LivePresales";
 import { NextDropCard } from "@/components/NextDropCard";
 import { ShowRow } from "@/components/ShowRow";
 import { SignInPrompt } from "@/components/SignInPrompt";
+import { SignInNotice } from "@/components/SignInNotice";
 import { getArtist, getShows } from "@/lib/data";
 import { nextDrop, saleTimeline, tourSummary } from "@/lib/drops";
 import { fmtDate } from "@/lib/format";
@@ -141,6 +142,7 @@ export default async function ArtistPage({
             <Bell size={18} aria-hidden /> Alerts
           </Link>
         </div>
+        {!userId && <SignInNotice className="mx-0" />}
         {following && !notifying && (
           <Link
             href="/settings#notifications"

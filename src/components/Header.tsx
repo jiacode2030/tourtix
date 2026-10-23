@@ -3,6 +3,8 @@ import Link from "next/link";
 import { auth, signOut } from "@/auth";
 import { CloseOnNavigate } from "./CloseOnNavigate";
 import { SignInPrompt } from "./SignInPrompt";
+import { SignInNotice } from "./SignInNotice";
+import { btnPrimary } from "@/lib/ui";
 import { ThemeToggle } from "./ThemeToggle";
 
 const navLink = "rounded-full px-3 py-2 text-sm font-medium text-muted hover:bg-surface hover:text-fg";
@@ -60,7 +62,9 @@ export async function Header() {
               </button>
             </form>
           ) : (
-            <SignInPrompt label="Sign in" redirectTo="/my-artists" />
+            <Link href="/my-artists" className={btnPrimary}>
+              Sign in
+            </Link>
           )}
         </div>
 
@@ -109,6 +113,7 @@ export async function Header() {
               ) : (
                 <div className="border-t border-line p-3">
                   <SignInPrompt label="Sign in with Google" redirectTo="/my-artists" />
+                  <SignInNotice className="mt-2 text-left" />
                 </div>
               )}
             </div>
