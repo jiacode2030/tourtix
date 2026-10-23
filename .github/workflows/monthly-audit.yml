@@ -1,0 +1,35 @@
+# Monthly full audit of the live site: working, security, legal and accuracy
+# checks (scripts/final-audit.mjs). A failed run means something drifted;
+# GitHub emails the repo owner. The full report is saved with each run.
+name: Monthly audit
+
+on:
+  schedule:
+    - cron: "23 15 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run the audit
+        run: |
+          set -o pipefail
+          node scripts/final-audit.mjs | tee audit-report.txt
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          grep -E '^(PASS|FAIL|NOTE)|^FINAL' audit-report.txt | grep -v '^PASS ' >> "$GITHUB_STEP_SUMMARY" || true
+          head -3 audit-report.txt >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: audit-report
+          path: audit-report.txt
