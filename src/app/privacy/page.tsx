@@ -85,6 +85,11 @@ export default function PrivacyPage() {
         your device.
       </p>
       <p>
+        TourTix installs a small background script (a service worker) in your browser. It shows
+        notifications you turn on and a &ldquo;You&apos;re offline&rdquo; page when you have no
+        connection. It saves no personal information and none of the show pages.
+      </p>
+      <p>
         If you tap &ldquo;Mark as going&rdquo; on a show, the show (artist, date, city, and venue) is
         saved the same way, only in your browser&apos;s local storage on your device. We don&apos;t
         receive it, store it on our servers, or see it. It works without an account. Tap the button
