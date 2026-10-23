@@ -5,6 +5,7 @@ import { KNOWN_ARTISTS } from "./known-artists";
 import { dedupeByName, matchTyped, mergeArtists, nameScore, rankArtists } from "./rank";
 import { presaleDisplayName } from "./presale-names";
 import { computeStatus } from "./status";
+import { isOver } from "./show-date";
 import type { Artist, Presale, Show, ShowExtras } from "./types";
 
 const BASE = "https://app.ticketmaster.com/discovery/v2";
@@ -142,7 +143,7 @@ export async function tmGetShows(artistId: string): Promise<Show[]> {
     sort: "date,asc",
     size: "100",
   });
-  return (data._embedded?.events ?? []).map(toShow);
+  return (data._embedded?.events ?? []).map(toShow).filter((s: Show) => !isOver(s.date, s.timezone));
 }
 
 // Ticketmaster wants UTC timestamps without milliseconds.
