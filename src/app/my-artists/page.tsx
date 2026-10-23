@@ -6,6 +6,7 @@ import { ShowRow } from "@/components/ShowRow";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { GetStarted } from "@/components/GetStarted";
 import { InstallButton } from "@/components/InstallButton";
+import { InstallTipCard } from "@/components/InstallTipCard";
 import { SignInPrompt } from "@/components/SignInPrompt";
 import { SignInNotice } from "@/components/SignInNotice";
 import { SuggestedArtists } from "@/components/SuggestedArtists";
@@ -103,7 +104,8 @@ export default async function MyArtistsPage({
 
       <AutoRefresh />
       <GetStarted following={favs.length > 0} located={located} notifying={notifying} stamped={stamped} />
-      <InstallButton />
+      <InstallButton iosHint={false} />
+      {favs.length > 0 && <InstallTipCard />}
 
       {favs.length === 0 && <SuggestedArtists genreParam={params.genre} />}
 

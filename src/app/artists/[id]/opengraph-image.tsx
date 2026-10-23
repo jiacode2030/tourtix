@@ -2,7 +2,8 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { getArtist, getShows } from "@/lib/data";
-import { fmtDate } from "@/lib/format";
+import { fmtDate, fmtDateTime } from "@/lib/format";
+import { upcomingSaleStarts } from "@/lib/sales";
 
 // The preview card shown when an artist page is shared in texts and social apps.
 export const size = { width: 1200, height: 630 };
@@ -19,6 +20,11 @@ export default async function Image({ params }: { params: Promise<{ id: string }
   const shows = artist ? await getShows(artist).catch(() => []) : [];
   const upcoming = shows.filter((s) => s.status !== "cancelled");
   const next = upcoming[0];
+  // The soonest sale in the next 90 days, shown in the venue's local time.
+  const drop = upcoming
+    .flatMap((s) => upcomingSaleStarts(s, 90 * 24 * 60 * 60 * 1000).map((x) => ({ ...x, tz: s.timezone })))
+    .sort((a, b) => a.start.localeCompare(b.start))[0];
+  const dropLabel = drop ? `${drop.label.length > 30 ? `${drop.label.slice(0, 29)}…` : drop.label} · ${fmtDateTime(drop.start, drop.tz)}` : "";
   const place = next ? [next.city, next.region ?? next.country].filter(Boolean).join(", ") : "";
   const [bold, regular, glow] = await Promise.all([
     asset("Inter-ExtraBold.otf"),
@@ -62,6 +68,9 @@ export default async function Image({ params }: { params: Promise<{ id: string }
               ? `Next show: ${fmtDate(next.date)}${place ? ` · ${place}` : ""}`
               : "Tour dates & ticket drops"}
           </div>
+          {dropLabel && (
+            <div style={{ display: "flex", fontSize: 32, fontWeight: 800, color: "#ff9a76" }}>{`Next drop: ${dropLabel}`}</div>
+          )}
           <div style={{ display: "flex", gap: 16, marginTop: 8 }}>
             {upcoming.length > 0 && (
               <div

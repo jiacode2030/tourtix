@@ -39,6 +39,7 @@ describe("page tips", () => {
     expect(pageKey("/settings")).toBe("settings");
     expect(pageKey("/concerts")).toBe("concerts");
     expect(pageKey("/faq")).toBe("faq");
+    expect(pageKey("/this-week")).toBe("this-week");
     expect(pageKey("/privacy")).toBe("other");
     expect(pageKey("/nope/at/all")).toBe("other");
   });

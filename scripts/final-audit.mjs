@@ -9,7 +9,7 @@ const get = async (p, opts = {}) => { const t0 = Date.now(); const r = await fet
 const text = (h) => h.replace(/<script[\s\S]*?<\/script>/g, "").replace(/<style[\s\S]*?<\/style>/g, "").replace(/<[^>]+>/g, " ").replace(/&#x27;/g, "'").replace(/&amp;/g, "&").replace(/\s+/g, " ");
 
 // ---------------- WORKING ----------------
-const pages = ["/", "/concerts", "/tips", "/faq", "/contact", "/privacy", "/terms", "/help/notifications", "/passport", "/settings", "/my-artists", "/sitemap.xml", "/robots.txt", "/manifest.webmanifest", "/sw.js", "/opengraph-image.png", "/icon-192.png", "/api/auth/providers"];
+const pages = ["/", "/this-week", "/concerts", "/tips", "/faq", "/contact", "/privacy", "/terms", "/help/notifications", "/passport", "/settings", "/my-artists", "/sitemap.xml", "/robots.txt", "/manifest.webmanifest", "/sw.js", "/opengraph-image.png", "/icon-192.png", "/api/auth/providers"];
 for (const p of pages) { try { const { r, ms } = await get(p); check(`working: ${p} loads (${ms}ms)`, r.status === 200 && ms < 8000, `HTTP ${r.status}, ${ms}ms`); } catch (e) { check(`working: ${p} loads`, false, String(e)); } }
 { const { r } = await get("/sw.js"); check("working: service worker is served as JavaScript", /javascript/.test(r.headers.get("content-type") ?? ""), r.headers.get("content-type")); }
 { const r = await fetch("http://tourtix.vercel.app/", { redirect: "manual" }); check("security: http redirects to https", [301, 307, 308].includes(r.status) && (r.headers.get("location") ?? "").startsWith("https://"), `HTTP ${r.status} ${r.headers.get("location")}`); }

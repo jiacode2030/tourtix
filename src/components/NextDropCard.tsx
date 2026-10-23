@@ -2,9 +2,11 @@ import { ChevronDown } from "lucide-react";
 import type { NextDrop, SaleStage } from "@/lib/drops";
 import { fmtDate, fmtDateTime } from "@/lib/format";
 import { presaleHelp } from "@/lib/presale-help";
+import { isSaleDay } from "@/lib/sale-day";
 import { btnPrimary } from "@/lib/ui";
 import { AddToCalendar } from "./AddToCalendar";
 import { Countdown } from "./Countdown";
+import { SaleDayTips } from "./SaleDayTips";
 
 function place(d: NextDrop["focus"]) {
   return [d.show.city, d.show.region ?? d.show.country].filter(Boolean).join(", ");
@@ -89,6 +91,8 @@ export function NextDropCard({
           <span className="text-muted">{presaleHelp(drop.label)}</span>
         </p>
       )}
+
+      {isSaleDay(focus.start) && <SaleDayTips />}
 
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
         {seller && (

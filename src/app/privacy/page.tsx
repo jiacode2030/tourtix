@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Privacy Policy" };
 
 export default function PrivacyPage() {
   return (
-    <LegalPage title="Privacy Policy" updated="October 22, 2026">
+    <LegalPage title="Privacy Policy" updated="October 23, 2026">
       <p>
         This policy explains what information TourTix collects and how it is used. We will update
         this page whenever that changes, and the date above will change with it.
@@ -80,7 +80,7 @@ export default function PrivacyPage() {
         not use advertising cookies or tracking pixels, and we don&apos;t show ads.
       </p>
       <p>
-        If you pick light or dark mode, or dismiss or finish the welcome tour, your choice is saved
+        If you pick light or dark mode, dismiss or finish the welcome tour, or dismiss the iPhone &ldquo;Add to Home Screen&rdquo; tip, your choice is saved
         in your browser&apos;s local storage on your device so we can remember it. It never leaves
         your device.
       </p>

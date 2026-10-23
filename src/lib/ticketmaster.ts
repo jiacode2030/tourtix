@@ -188,7 +188,9 @@ export async function tmPopularArtists(limit: number, genre?: string): Promise<A
 
 // US music events whose public sale starts within the window.
 export async function tmEventsGoingOnSale(windowMs: number, genre?: string): Promise<EventWithArtist[]> {
-  const now = Date.now();
+  // Rounded down to 5 minutes so the request is identical (and cached) for
+  // everyone in that window instead of unique to the second.
+  const now = Math.floor(Date.now() / 300_000) * 300_000;
   const data = await tm("/events.json", {
     ...musicFilter(genre),
     countryCode: "US",

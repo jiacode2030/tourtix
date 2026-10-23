@@ -8,7 +8,7 @@ export const revalidate = 86400; // rebuild daily
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteUrl();
-  const pages = ["", "/concerts", "/tips", "/faq", "/help/notifications", "/contact", "/privacy", "/terms"].map(
+  const pages = ["", "/this-week", "/concerts", "/tips", "/faq", "/help/notifications", "/contact", "/privacy", "/terms"].map(
     (path) => ({ url: `${base}${path}`, changeFrequency: "weekly" as const }),
   );
 

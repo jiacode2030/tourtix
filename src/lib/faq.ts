@@ -36,6 +36,12 @@ export const FAQ_GROUPS: FaqGroup[] = [
         a: "From Ticketmaster's public event data. It can change at any time, so always confirm the date, time, and final price (including fees) on the seller's site before you buy.",
       },
       {
+        id: "this-week",
+        q: "Where can I see everything dropping soon?",
+        a: "The \"This week's drops\" page lists presales and on-sales opening in the next 7 days for popular US tours, soonest first, plus presales open right now. It covers the most in-demand tours, so follow an artist to be alerted about all of theirs.",
+        link: { href: "/this-week", label: "See this week's drops" },
+      },
+      {
         id: "freshness",
         q: "How up to date is it?",
         a: "Pages refresh from the source about every 5 minutes, and each page shows when it was last checked. Notifications are checked about once an hour, so an alert can arrive a little late.",
@@ -66,6 +72,11 @@ export const FAQ_GROUPS: FaqGroup[] = [
         id: "iphone",
         q: "How do I get alerts on iPhone?",
         a: "iPhone only allows website alerts for sites added to the Home Screen. In Safari, tap Share, then \"Add to Home Screen\", open TourTix from that icon, and turn on notifications in Settings.",
+      },
+      {
+        id: "iphone-card",
+        q: "Why does TourTix show an \"Add to Home Screen\" card on my iPhone?",
+        a: "iPhone only delivers website alerts to sites on your Home Screen, so the card shows the steps. Tap the X to hide it; it comes back after 30 days if TourTix still isn't on your Home Screen. Whether you dismissed it is remembered only on your phone.",
       },
       {
         id: "calendar",
@@ -112,6 +123,12 @@ export const FAQ_GROUPS: FaqGroup[] = [
         id: "same-day-twice",
         q: "Why does a show appear more than once on the same date?",
         a: "Ticketmaster can list several things for one night: regular tickets, a multi-day pass, or a travel or VIP package. When that happens we show each listing's name under the venue so you can tell them apart.",
+      },
+      {
+        id: "sale-day",
+        q: "What's the \"Sale day checklist\"?",
+        a: "On the day a sale opens, the artist page shows a short checklist: log in and save payment details early, use one device and tab, use the seller link and check the address, check the total with fees, and be wary of anyone selling tickets before the sale starts. It's general advice, not a guarantee of anything.",
+        link: { href: "/tips", label: "Ticket buying tips" },
       },
       {
         id: "scams",

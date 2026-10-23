@@ -255,6 +255,9 @@ export default async function Home({
             subtitle="Upcoming presales and on-sales for US concerts"
           />
           <DropList drops={drops} />
+          <Link href={genre ? `/this-week?genre=${encodeURIComponent(genre)}` : "/this-week"} className={linkAccent}>
+            See everything dropping this week →
+          </Link>
         </section>
       )}
 

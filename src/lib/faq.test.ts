@@ -15,7 +15,7 @@ describe("FAQ", () => {
   });
 
   it("only links to pages that exist on the site", () => {
-    const known = ["/settings", "/help/notifications", "/tips", "/privacy", "/contact", "/passport"];
+    const known = ["/settings", "/help/notifications", "/tips", "/privacy", "/contact", "/passport", "/this-week"];
     for (const f of ALL_FAQS) if (f.link) expect(known.some((k) => f.link!.href.startsWith(k))).toBe(true);
   });
 

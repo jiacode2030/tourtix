@@ -63,7 +63,7 @@ export const TOUR_STEPS: TourStep[] = [
 ];
 
 export type Tip = { title: string; text: string };
-export type PageKey = "home" | "artist" | "my-artists" | "passport" | "settings" | "concerts" | "faq" | "other";
+export type PageKey = "home" | "artist" | "my-artists" | "passport" | "settings" | "concerts" | "this-week" | "faq" | "other";
 
 export const PAGE_TIPS: Record<PageKey, { heading: string; tips: Tip[] }> = {
   home: {
@@ -114,6 +114,14 @@ export const PAGE_TIPS: Record<PageKey, { heading: string; tips: Tip[] }> = {
       { title: "Near me", text: "Share your location in Settings to use the near me option." },
     ],
   },
+  "this-week": {
+    heading: "This week's drops",
+    tips: [
+      { title: "Soonest first", text: "Sales are listed in order. Times are in each venue's local time." },
+      { title: "Tap an artist", text: "You'll see every sale stage, how to get in, and the seller link. Tap Follow there to get alerts." },
+      { title: "Share it", text: "The Share button sends a link to this list to a friend or group chat." },
+    ],
+  },
   faq: {
     heading: "On this page",
     tips: [{ title: "Not here?", text: "Use the contact form and we'll help." }],
@@ -134,6 +142,7 @@ export function pageKey(pathname: string): PageKey {
   if (pathname.startsWith("/passport")) return "passport";
   if (pathname.startsWith("/settings")) return "settings";
   if (pathname.startsWith("/concerts")) return "concerts";
+  if (pathname.startsWith("/this-week")) return "this-week";
   if (pathname.startsWith("/faq")) return "faq";
   return "other";
 }

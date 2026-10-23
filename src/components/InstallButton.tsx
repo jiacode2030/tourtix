@@ -9,7 +9,7 @@ type InstallEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{
 
 // Offers "Install TourTix" where the browser supports it (Chrome, Edge,
 // Android), and Add to Home Screen steps on iPhone.
-export function InstallButton() {
+export function InstallButton({ iosHint = true }: { iosHint?: boolean }) {
   const [prompt, setPrompt] = useState<InstallEvent | null>(null);
   const [ios, setIos] = useState(false);
   const [installed, setInstalled] = useState(false);
@@ -50,7 +50,7 @@ export function InstallButton() {
       </button>
     );
   }
-  if (ios) {
+  if (ios && iosHint) {
     return (
       <p className="flex gap-2 text-sm text-muted">
         <Smartphone size={18} aria-hidden className="mt-0.5 shrink-0" />

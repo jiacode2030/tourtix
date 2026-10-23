@@ -5,9 +5,11 @@ import { notFound } from "next/navigation";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { Bell, Plus } from "lucide-react";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { InstallTipCard } from "@/components/InstallTipCard";
 import { LastChecked } from "@/components/LastChecked";
 import { LivePresales } from "@/components/LivePresales";
 import { NextDropCard } from "@/components/NextDropCard";
+import { ShareButton } from "@/components/ShareButton";
 import { ShowRow } from "@/components/ShowRow";
 import { SignInPrompt } from "@/components/SignInPrompt";
 import { SignInNotice } from "@/components/SignInNotice";
@@ -141,6 +143,7 @@ export default async function ArtistPage({
           <Link href="/settings#notifications" className={btnSecondary}>
             <Bell size={18} aria-hidden /> Alerts
           </Link>
+          <ShareButton title={`${artist.name} tour dates and ticket drops`} path={`/artists/${artist.id}`} />
         </div>
         {!userId && <SignInNotice className="mx-0" />}
         {following && !notifying && (
@@ -158,6 +161,7 @@ export default async function ArtistPage({
             </span>
           </Link>
         )}
+        {following && <InstallTipCard />}
         <p className="text-xs text-muted">Unofficial fan tool, not affiliated with {artist.name}.</p>
       </div>
 
