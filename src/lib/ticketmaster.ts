@@ -6,6 +6,7 @@ import { dedupeByName, matchTyped, mergeArtists, nameScore, rankArtists } from "
 import { presaleDisplayName } from "./presale-names";
 import { computeStatus } from "./status";
 import { isOver } from "./show-date";
+import { cleanArtistName } from "./artist-name";
 import type { Artist, Presale, Show, ShowExtras } from "./types";
 
 const BASE = "https://app.ticketmaster.com/discovery/v2";
@@ -41,10 +42,13 @@ function notability(links: unknown): number {
   return wiki + spotify + others;
 }
 
-function toArtist(a: any): Artist {
+// Artists with no usable name (a link or ID instead of a name) are skipped.
+function toArtist(a: any): Artist | null {
+  const name = cleanArtistName(a?.name);
+  if (!name || !a?.id) return null;
   return {
     id: a.id,
-    name: a.name,
+    name,
     imageUrl: pickImage(a.images),
     genre: a.classifications?.[0]?.genre?.name ?? null,
     upcomingShows: a.upcomingEvents?._total ?? 0,
@@ -156,7 +160,7 @@ function withArtists(data: any): EventWithArtist[] {
     const a = e._embedded?.attractions?.[0];
     if (!a) return [];
     const artist = toArtist(a);
-    return isMusicGenre(artist.genre) ? [{ artist, show: toShow(e) }] : [];
+    return artist && isMusicGenre(artist.genre) ? [{ artist, show: toShow(e) }] : [];
   });
 }
 
@@ -306,7 +310,7 @@ export async function tmFindArtists(query: string, limit: number, debug?: Sugges
 async function tmKeyword(keyword: string, debug: SuggestDebug | undefined, label: string): Promise<Artist[]> {
   try {
     const data = await tm("/attractions.json", { keyword, classificationName: "music", size: "50" });
-    const artists = (data._embedded?.attractions ?? []).map(toArtist);
+    const artists = (data._embedded?.attractions ?? []).map(toArtist).filter((a: Artist | null): a is Artist => a !== null);
     debug?.push({ source: label, count: artists.length });
     return artists;
   } catch (err) {

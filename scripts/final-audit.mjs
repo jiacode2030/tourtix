@@ -61,6 +61,13 @@ for (const p of ["/settings", "/my-artists"]) { const { t } = await get(p); chec
 { const { t } = await get("/faq"); const j = t.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/); let ok = false, n = 0; try { n = JSON.parse(j[1]).mainEntity.length; ok = n > 10; } catch {} check("working: FAQ markup is valid", ok, String(n)); }
 
 // ---------------- ACCURACY ----------------
+for (const path of ["/", "/this-week"]) {
+  const { t } = await get(path);
+  const names = [...t.matchAll(/<h3[^>]*>([^<]+)<\/h3>|class="truncate font-semibold">([^<]+)</g)].map((m) => (m[1] ?? m[2]).replace(/&#x27;/g, "'").replace(/&amp;/g, "&").trim());
+  const junk = names.filter((n) => !n || /^(\/|https?:|www\.|artists\/)/i.test(n) || (/^[A-Za-z0-9_-]{10,}$/.test(n) && /\d/.test(n) && /[A-Za-z]/.test(n)));
+  check(`accuracy: every artist name on ${path} is a real name (${names.length} checked)`, (path !== "/" || names.length > 0) && junk.length === 0, junk.join(" | ") || "no names found");
+  check(`accuracy: no look-alike typo names on ${path}`, !/JAŸ/.test(t));
+}
 { const { t } = await get("/"); const s = text(t);
   check("accuracy: showing real Ticketmaster data, not sample data", !/sample data/i.test(s));
   check("accuracy: no non-music events in the popular list", !/GRAND PRIX|Motorsports|Wrestling/i.test(s), (s.match(/.{20}(GRAND PRIX|Motorsports).{20}/i) ?? [""])[0]);
