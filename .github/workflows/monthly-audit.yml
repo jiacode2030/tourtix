@@ -28,6 +28,9 @@ jobs:
           grep -E '^(PASS|FAIL|NOTE)|^FINAL' audit-report.txt | grep -v '^PASS ' >> "$GITHUB_STEP_SUMMARY" || true
           head -3 audit-report.txt >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
+      - name: Name the failed checks
+        if: failure()
+        run: grep '^FAIL' audit-report.txt | while read -r line; do echo "::error::$line"; done
       - uses: actions/upload-artifact@v4
         if: always()
         with:
